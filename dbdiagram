@@ -1,0 +1,102 @@
+Table Order {
+  OrderId INT [pk]
+  OrderNumber VARCHAR
+  ShippingDate DATETIME
+  OrderDate DATETIME
+  OrderAmount float
+  OrderStatus enum
+  Cart_CartId INT
+  Customer_CustomerId INT
+}
+
+
+Table OrderItem {
+  Order_OrderId INT 
+  Product_ProductId INT 
+  MRP FLOAT // Giá đề xuất
+  Quantity INT
+}
+
+
+Table Product {
+  ProductId INT [pk]
+  ProductName VARCHAR
+  SellerId INT 
+  MRP FLOAT // Giá đề xuất
+  CategoryId INT 
+  Stock bool
+  Brand VARCHAR
+}
+
+Table Payment {
+  PaymentId INT [pk]
+  Order_OrderId INT 
+  PaymentMode ENUM
+  Customer_CustomerId INT 
+  Date_of_payment DATETIME
+}
+
+Table Address {
+  AddressId INT [pk]
+  StreetName VARCHAR
+  ApartmentNo VARCHAR
+  City VARCHAR
+  State VARCHAR
+  Pincode INT
+  Customer_CustomerId INT 
+}
+
+Table Cart {
+  CartId INT [pk]
+  Customer_CustomerId INT 
+  Product_ProductId INT 
+  GrandTotal FLOAT
+  ItemsTotal INT
+}
+
+Table Review {
+  ReviewId INT [pk]
+  Description VARCHAR
+  Ratings ENUM
+  Product_ProductId INT 
+  Customer_CustomerId INT 
+}
+
+Table Seller {
+  SellerId INT [pk]
+  Name VARCHAR
+  Phone VARCHAR
+  Total_Sales FLOAT
+}
+
+Table Category {
+  CategoryId INT [pk]
+  CategoryName ENUM
+  Description VARCHAR
+}
+
+Table Customer {
+  CustomerId INT [pk]
+  FirstName VARCHAR
+  MiddleName VARCHAR
+  LastName VARCHAR
+  Email VARCHAR
+  DateOfBirth DATE
+  Phone varchar
+  Age INT
+}
+
+Ref: Order.Customer_CustomerId > Customer.CustomerId
+Ref: OrderItem.Order_OrderId - Order.OrderId
+Ref: OrderItem.Product_ProductId > Product.ProductId
+Ref: Product.SellerId <> Seller.SellerId
+Ref: Product.CategoryId > Category.CategoryId
+Ref: Payment.Order_OrderId - Order.OrderId
+Ref: Payment.Customer_CustomerId > Customer.CustomerId
+Ref: Payment.Customer_CustomerId - Order.Customer_CustomerId
+Ref: Address.Customer_CustomerId - Customer.CustomerId
+Ref: Cart.Customer_CustomerId - Customer.CustomerId
+Ref: Cart.Product_ProductId <> Product.ProductId
+Ref: Review.Customer_CustomerId > Customer.CustomerId
+Ref: Review.Product_ProductId > Product.ProductId
+
