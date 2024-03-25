@@ -4,10 +4,11 @@ Table Order {
   ShippingDate DATETIME
   OrderDate DATETIME
   OrderAmount float
-  OrderStatus enum
+  OrderStatus enum // Possible values: 'pending', 'processing', 'shipped', 'delivered', 'cancelled'
   Cart_CartId INT
   Customer_CustomerId INT
 }
+
 
 
 Table OrderItem {
@@ -24,14 +25,14 @@ Table Product {
   SellerId INT 
   MRP FLOAT // Giá đề xuất
   CategoryId INT 
-  Stock bool
+  Stock int
   Brand VARCHAR
 }
 
 Table Payment {
   PaymentId INT [pk]
   Order_OrderId INT 
-  PaymentMode ENUM
+  PaymentMode ENUM // Possible values: 'bank_transfer', 'cash'
   Customer_CustomerId INT 
   Date_of_payment DATETIME
 }
@@ -54,10 +55,11 @@ Table Cart {
   ItemsTotal INT
 }
 
+
 Table Review {
   ReviewId INT [pk]
   Description VARCHAR
-  Ratings ENUM
+  Ratings ENUM // Possible values: '1', '2', '3', '4', '5'
   Product_ProductId INT 
   Customer_CustomerId INT 
 }
@@ -67,6 +69,8 @@ Table Seller {
   Name VARCHAR
   Phone VARCHAR
   Total_Sales FLOAT
+  Email varchar
+  Description text
 }
 
 Table Category {
