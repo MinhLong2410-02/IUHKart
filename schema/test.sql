@@ -1,0 +1,13 @@
+CREATE TABLE "TEST1" (
+  "TestId" INT PRIMARY KEY,
+  "TestName" VARCHAR,
+  "TestDate" DATE
+);
+
+CREATE TABLE "TEST2" (
+  "TestId" INT,
+  "TestName" VARCHAR,
+  "TestDate" DATE
+);
+
+ALTER TABLE "TEST2" ADD FOREIGN KEY ("TestId") REFERENCES "TEST1" ("TestId");

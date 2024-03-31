@@ -1,0 +1,104 @@
+Table Order {
+  OrderId int [primary key, not null]
+  OrderNumber varchar(255)
+  ShippingDate date
+  OrderDate date
+  OrderAmount float
+  OrderStatus varchar(255) //enum('pending', 'processing', 'shipped', 'delivered', 'cancelled')
+  Cart_CartId int [not null]
+  CustomerId int [not null]
+}
+
+
+Table OrderItem {
+  OrderItemId int [primary key, not null]
+  ProductId int [not null]
+  OrderId int [not null]
+  MRP float // Giá đề xuất
+  Quantity int
+}
+
+
+Table Product {
+  ProductId int [primary key, not null]
+  ProductName varchar(255)
+  SellerId int [not null] 
+  MRP float // Giá đề xuất
+  CategoryId int [not null]  
+  Stock int
+  Brand varchar(255)
+}
+
+Table Payment {
+  PaymentId int [primary key, not null]
+  OrderId int [not null] 
+  PaymentMode varchar(255) //enum('bank_transfer', 'cash')
+  CustomerId int [not null]  
+  Date_of_payment date
+}
+
+Table Address {
+  AddressId int [primary key, not null]
+  StreetName varchar(255)
+  ApartmentNo varchar(255)
+  City varchar(255)
+  State varchar(255)
+  Pincode int
+  CustomerId int [not null]  
+}
+
+Table Cart {
+  CartId int [primary key, not null]
+  CustomerId int [not null] 
+  ProductId int [not null] 
+  GrandTotal float
+  ItemsTotal int
+}
+
+
+Table Review {
+  ReviewId int [primary key, not null]
+  Description text
+  Ratings varchar(255) //enum('1', '2', '3', '4', '5') // Possible values: '1', '2', '3', '4', '5'
+  ProductId int [not null]  
+  CustomerId int [not null]  
+}
+
+Table Seller {
+  SellerId int [primary key, not null]
+  Name varchar(255)
+  Phone varchar(20)
+  TotalSales float
+  Email varchar(50)
+  Description text
+}
+
+Table Category {
+  CategoryId int [primary key, not null]
+  CategoryName varchar(255)
+  Description text
+}
+
+Table Customer {
+  CustomerId int [primary key, not null]
+  FirstName varchar(30)
+  MiddleName varchar(30)
+  LastName varchar(30)
+  Email varchar(50)
+  DateOfBirth date
+  Phone varchar(20)
+  Age smallint
+}
+
+Ref: Order.CustomerId > Customer.CustomerId
+Ref: OrderItem.OrderId > Order.OrderId
+Ref: OrderItem.ProductId > Product.ProductId
+Ref: Product.SellerId > Seller.SellerId
+Ref: Product.CategoryId > Category.CategoryId
+Ref: Payment.OrderId > Order.OrderId
+Ref: Payment.CustomerId > Customer.CustomerId
+Ref: Address.CustomerId > Customer.CustomerId
+Ref: Cart.CustomerId > Customer.CustomerId
+Ref: Cart.ProductId > Product.ProductId
+Ref: Review.CustomerId > Customer.CustomerId
+Ref: Review.ProductId > Product.ProductId
