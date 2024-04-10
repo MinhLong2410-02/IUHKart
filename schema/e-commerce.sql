@@ -6,25 +6,45 @@ CREATE TABLE "Order" (
   "OrderAmount" float,
   "OrderStatus" varchar(255),
   "Cart_CartId" int NOT NULL,
-  "CustomerId" int NOT NULL
+  "CustomerId" int NOT NULL,
+  "AddressId" int
 );
 
-CREATE TABLE "OrderItem" (
-  "OrderItemId" int PRIMARY KEY NOT NULL,
+CREATE TABLE "OrderProduct" (
+  "OrderProductId" int PRIMARY KEY NOT NULL,
   "ProductId" int NOT NULL,
   "OrderId" int NOT NULL,
-  "MRP" float,
+  "Price" float,
   "Quantity" int
 );
 
 CREATE TABLE "Product" (
   "ProductId" int PRIMARY KEY NOT NULL,
   "ProductName" varchar(255),
-  "SellerId" int NOT NULL,
-  "MRP" float,
   "CategoryId" int NOT NULL,
+  "SellerId" int NOT NULL,
+  "OriginalPrice" float,
   "Stock" int,
   "Brand" varchar(255)
+);
+
+CREATE TABLE "ProductImage" (
+  "ProductImgId" int PRIMARY KEY,
+  "ProductId" int,
+  "ProductImgUrl" varchar
+);
+
+CREATE TABLE "Discount" (
+  "DiscountId" int PRIMARY KEY,
+  "Percentage" float
+);
+
+CREATE TABLE "ProductDiscount" (
+  "ProductDiscountId" int PRIMARY KEY,
+  "ProductId" int,
+  "DiscountId" int,
+  "StartDate" datetime,
+  "EndDate" datetime
 );
 
 CREATE TABLE "Payment" (
@@ -37,18 +57,14 @@ CREATE TABLE "Payment" (
 
 CREATE TABLE "Address" (
   "AddressId" int PRIMARY KEY NOT NULL,
-  "StreetName" varchar(255),
-  "ApartmentNo" varchar(255),
-  "City" varchar(255),
-  "State" varchar(255),
-  "Pincode" int,
-  "CustomerId" int NOT NULL
+  "City_Province" varchar(100),
+  "AddressDetail" varchar(200)
 );
 
 CREATE TABLE "Cart" (
   "CartId" int PRIMARY KEY NOT NULL,
-  "CustomerId" int NOT NULL,
   "ProductId" int NOT NULL,
+  "CustomerId" int NOT NULL,
   "GrandTotal" float,
   "ItemsTotal" int
 );
@@ -67,7 +83,8 @@ CREATE TABLE "Seller" (
   "Phone" varchar(20),
   "TotalSales" float,
   "Email" varchar(50),
-  "Description" text
+  "Description" text,
+  "AddressId" int
 );
 
 CREATE TABLE "Category" (
@@ -78,20 +95,24 @@ CREATE TABLE "Category" (
 
 CREATE TABLE "Customer" (
   "CustomerId" int PRIMARY KEY NOT NULL,
-  "FirstName" varchar(30),
-  "MiddleName" varchar(30),
-  "LastName" varchar(30),
+  "FullName" varchar(30),
   "Email" varchar(50),
   "DateOfBirth" date,
   "Phone" varchar(20),
-  "Age" smallint
+  "Age" smallint,
+  "AvatarUrl" varchar(200),
+  "AddressId" int
 );
+
+ALTER TABLE "ProductDiscount" ADD FOREIGN KEY ("DiscountId") REFERENCES "Discount" ("DiscountId");
+
+ALTER TABLE "ProductDiscount" ADD FOREIGN KEY ("ProductId") REFERENCES "Product" ("ProductId");
 
 ALTER TABLE "Order" ADD FOREIGN KEY ("CustomerId") REFERENCES "Customer" ("CustomerId");
 
-ALTER TABLE "OrderItem" ADD FOREIGN KEY ("OrderId") REFERENCES "Order" ("OrderId");
+ALTER TABLE "OrderProduct" ADD FOREIGN KEY ("OrderId") REFERENCES "Order" ("OrderId");
 
-ALTER TABLE "OrderItem" ADD FOREIGN KEY ("ProductId") REFERENCES "Product" ("ProductId");
+ALTER TABLE "OrderProduct" ADD FOREIGN KEY ("ProductId") REFERENCES "Product" ("ProductId");
 
 ALTER TABLE "Product" ADD FOREIGN KEY ("SellerId") REFERENCES "Seller" ("SellerId");
 
@@ -101,7 +122,11 @@ ALTER TABLE "Payment" ADD FOREIGN KEY ("OrderId") REFERENCES "Order" ("OrderId")
 
 ALTER TABLE "Payment" ADD FOREIGN KEY ("CustomerId") REFERENCES "Customer" ("CustomerId");
 
-ALTER TABLE "Address" ADD FOREIGN KEY ("CustomerId") REFERENCES "Customer" ("CustomerId");
+ALTER TABLE "Customer" ADD FOREIGN KEY ("AddressId") REFERENCES "Address" ("AddressId");
+
+ALTER TABLE "Seller" ADD FOREIGN KEY ("AddressId") REFERENCES "Address" ("AddressId");
+
+ALTER TABLE "Order" ADD FOREIGN KEY ("AddressId") REFERENCES "Address" ("AddressId");
 
 ALTER TABLE "Cart" ADD FOREIGN KEY ("CustomerId") REFERENCES "Customer" ("CustomerId");
 
@@ -110,3 +135,5 @@ ALTER TABLE "Cart" ADD FOREIGN KEY ("ProductId") REFERENCES "Product" ("ProductI
 ALTER TABLE "Review" ADD FOREIGN KEY ("CustomerId") REFERENCES "Customer" ("CustomerId");
 
 ALTER TABLE "Review" ADD FOREIGN KEY ("ProductId") REFERENCES "Product" ("ProductId");
+
+ALTER TABLE "ProductImage" ADD FOREIGN KEY ("ProductId") REFERENCES "Product" ("ProductId");
