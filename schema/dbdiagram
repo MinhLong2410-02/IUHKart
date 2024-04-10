@@ -7,14 +7,14 @@ Table Order {
   OrderStatus varchar(255) //enum('pending', 'processing', 'shipped', 'delivered', 'cancelled')
   Cart_CartId int [not null]
   CustomerId int [not null]
+  AddressId int
 }
 
-
-Table OrderItem {
-  OrderItemId int [primary key, not null]
+Table OrderProduct {
+  OrderProductId int [primary key, not null]
   ProductId int [not null]
   OrderId int [not null]
-  MRP float // Giá đề xuất
+  Price float // Giá đề xuất
   Quantity int
 }
 
@@ -22,11 +22,31 @@ Table OrderItem {
 Table Product {
   ProductId int [primary key, not null]
   ProductName varchar(255)
-  SellerId int [not null] 
-  MRP float // Giá đề xuất
   CategoryId int [not null]  
+  SellerId int [not null] 
+  OriginalPrice float // Giá gốc
   Stock int
   Brand varchar(255)
+}
+
+Table ProductImage{
+  ProductImgId int [pk]
+  ProductId int 
+  ProductImgUrl varchar
+}
+
+Table Discount{
+  DiscountId int pk
+  Percentage float
+
+}
+
+Table ProductDiscount{
+  ProductDiscountId int pk
+  ProductId int
+  DiscountId int
+  StartDate datetime
+  EndDate datetime
 }
 
 Table Payment {
@@ -38,19 +58,15 @@ Table Payment {
 }
 
 Table Address {
-  AddressId int [primary key, not null]
-  StreetName varchar(255)
-  ApartmentNo varchar(255)
-  City varchar(255)
-  State varchar(255)
-  Pincode int
-  CustomerId int [not null]  
+  AddressId int [pk, not null]
+  City_Province varchar(100)
+  AddressDetail varchar(200)
 }
 
 Table Cart {
   CartId int [primary key, not null]
-  CustomerId int [not null] 
   ProductId int [not null] 
+  CustomerId int [not null] 
   GrandTotal float
   ItemsTotal int
 }
@@ -71,6 +87,7 @@ Table Seller {
   TotalSales float
   Email varchar(50)
   Description text
+  AddressId int
 }
 
 Table Category {
@@ -81,24 +98,31 @@ Table Category {
 
 Table Customer {
   CustomerId int [primary key, not null]
-  FirstName varchar(30)
-  MiddleName varchar(30)
-  LastName varchar(30)
+  FullName varchar(30)
   Email varchar(50)
   DateOfBirth date
   Phone varchar(20)
   Age smallint
+  AvatarUrl varchar(200)
+  AddressId int
 }
 
+Ref: ProductDiscount.DiscountId > Discount.DiscountId
+Ref: ProductDiscount.ProductId > Product.ProductId
 Ref: Order.CustomerId > Customer.CustomerId
-Ref: OrderItem.OrderId > Order.OrderId
-Ref: OrderItem.ProductId > Product.ProductId
+Ref: OrderProduct.OrderId > Order.OrderId
+Ref: OrderProduct.ProductId > Product.ProductId
 Ref: Product.SellerId > Seller.SellerId
 Ref: Product.CategoryId > Category.CategoryId
 Ref: Payment.OrderId > Order.OrderId
 Ref: Payment.CustomerId > Customer.CustomerId
-Ref: Address.CustomerId > Customer.CustomerId
+Ref: Address.AddressId - Customer.AddressId
+Ref: Address.AddressId - Seller.AddressId
+Ref: Address.AddressId - Order.AddressId
 Ref: Cart.CustomerId > Customer.CustomerId
 Ref: Cart.ProductId > Product.ProductId
 Ref: Review.CustomerId > Customer.CustomerId
 Ref: Review.ProductId > Product.ProductId
+Ref: ProductImage.ProductId > Product.ProductId
+
+// Ref: "Customer"."CustomerId" < "Customer"."FullName"

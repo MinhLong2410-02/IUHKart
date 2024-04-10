@@ -1,0 +1,9 @@
+Django
+djangorestframework
+psycopg2-binary
+python-dotenv
+django-allauth
+django-crispy-forms
+crispy-bootstrap5
+django-multiselectfield
+Pillow
