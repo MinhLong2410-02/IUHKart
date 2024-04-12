@@ -93,6 +93,12 @@ CREATE TABLE "category" (
   "description" text
 );
 
+CREATE TABLE "category_product" (
+  "category_product_id" int PRIMARY KEY,
+  "category_id" int,
+  "product_id" int
+);
+
 CREATE TABLE "customer" (
   "customer_id" int PRIMARY KEY,
   "address_id" int,
@@ -110,6 +116,10 @@ CREATE TABLE "invoice" (
   "payment_id" int,
   "total_money" float
 );
+
+ALTER TABLE "category_product" ADD FOREIGN KEY ("category_id") REFERENCES "category" ("category_id");
+
+ALTER TABLE "category_product" ADD FOREIGN KEY ("product_id") REFERENCES "product" ("product_id");
 
 ALTER TABLE "product_discount" ADD FOREIGN KEY ("invoice_id") REFERENCES "invoice" ("invoice_id");
 
