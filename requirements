@@ -7,3 +7,4 @@ django-crispy-forms
 crispy-bootstrap5
 django-multiselectfield
 Pillow
+django-jazzmin
