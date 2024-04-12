@@ -23,7 +23,7 @@ Table Product {
   ProductId int [primary key, not null]
   ProductName varchar(255)
   CategoryId int [not null]  
-  SellerId int [not null] 
+  VendorId int [not null] 
   OriginalPrice float // Giá gốc
   Stock int
   Brand varchar(255)
@@ -80,8 +80,8 @@ Table Review {
   CustomerId int [not null]  
 }
 
-Table Seller {
-  SellerId int [primary key, not null]
+Table Vendor {
+  VendorId int [primary key, not null]
   Name varchar(255)
   Phone varchar(20)
   TotalSales float
@@ -112,12 +112,12 @@ Ref: ProductDiscount.ProductId > Product.ProductId
 Ref: Order.CustomerId > Customer.CustomerId
 Ref: OrderProduct.OrderId > Order.OrderId
 Ref: OrderProduct.ProductId > Product.ProductId
-Ref: Product.SellerId > Seller.SellerId
+Ref: Product.VendorId > Vendor.VendorId
 Ref: Product.CategoryId > Category.CategoryId
 Ref: Payment.OrderId > Order.OrderId
 Ref: Payment.CustomerId > Customer.CustomerId
 Ref: Address.AddressId - Customer.AddressId
-Ref: Address.AddressId - Seller.AddressId
+Ref: Address.AddressId - Vendor.AddressId
 Ref: Address.AddressId - Order.AddressId
 Ref: Cart.CustomerId > Customer.CustomerId
 Ref: Cart.ProductId > Product.ProductId

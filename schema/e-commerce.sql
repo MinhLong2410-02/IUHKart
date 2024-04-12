@@ -22,7 +22,7 @@ CREATE TABLE "Product" (
   "ProductId" int PRIMARY KEY NOT NULL,
   "ProductName" varchar(255),
   "CategoryId" int NOT NULL,
-  "SellerId" int NOT NULL,
+  "VendorId" int NOT NULL,
   "OriginalPrice" float,
   "Stock" int,
   "Brand" varchar(255)
@@ -77,8 +77,8 @@ CREATE TABLE "Review" (
   "CustomerId" int NOT NULL
 );
 
-CREATE TABLE "Seller" (
-  "SellerId" int PRIMARY KEY NOT NULL,
+CREATE TABLE "Vendor" (
+  "VendorId" int PRIMARY KEY NOT NULL,
   "Name" varchar(255),
   "Phone" varchar(20),
   "TotalSales" float,
@@ -114,7 +114,7 @@ ALTER TABLE "OrderProduct" ADD FOREIGN KEY ("OrderId") REFERENCES "Order" ("Orde
 
 ALTER TABLE "OrderProduct" ADD FOREIGN KEY ("ProductId") REFERENCES "Product" ("ProductId");
 
-ALTER TABLE "Product" ADD FOREIGN KEY ("SellerId") REFERENCES "Seller" ("SellerId");
+ALTER TABLE "Product" ADD FOREIGN KEY ("VendorId") REFERENCES "Vendor" ("VendorId");
 
 ALTER TABLE "Product" ADD FOREIGN KEY ("CategoryId") REFERENCES "Category" ("CategoryId");
 
@@ -124,7 +124,7 @@ ALTER TABLE "Payment" ADD FOREIGN KEY ("CustomerId") REFERENCES "Customer" ("Cus
 
 ALTER TABLE "Customer" ADD FOREIGN KEY ("AddressId") REFERENCES "Address" ("AddressId");
 
-ALTER TABLE "Seller" ADD FOREIGN KEY ("AddressId") REFERENCES "Address" ("AddressId");
+ALTER TABLE "Vendor" ADD FOREIGN KEY ("AddressId") REFERENCES "Address" ("AddressId");
 
 ALTER TABLE "Order" ADD FOREIGN KEY ("AddressId") REFERENCES "Address" ("AddressId");
 
