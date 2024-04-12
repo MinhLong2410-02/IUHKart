@@ -11,7 +11,10 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
 from pathlib import Path
-
+from dotenv import load_dotenv
+load_dotenv('./.env')
+from os import environ
+print(environ['NAME'])
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -31,12 +34,15 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'jazzmin',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    
+    'apps.vendor',
 ]
 
 MIDDLEWARE = [
@@ -73,13 +79,22 @@ WSGI_APPLICATION = 'iuhkart.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': environ['NAME'],
+            'USER': environ['USER'],
+            'PASSWORD': environ['PASSWORD'],
+            'HOST': environ['HOST'],
+            'PORT': environ['PORT'],
+        }
     }
-}
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
@@ -116,8 +131,31 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
 STATIC_URL = 'static/'
+if DEBUG:
+    STATICFILES_DIRS = ['Ecommerce/static',]
+else:
+    STATIC_ROOT = BASE_DIR / 'static'
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media' 
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'aiclub.iuh@gmail.com'
+EMAIL_HOST_PASSWORD = "abc"
+EMAIL_USE_TLS = True
+
+JAZZMIN_SETTINGS={
+    "site_title":"IUHKart",
+    "site_header": "IUHKart",
+    "site_brand": "Administration",
+    "welcome_sign": "Welcome to the Admin Page",
+    "login_logo": "images/logo.png",
+}
