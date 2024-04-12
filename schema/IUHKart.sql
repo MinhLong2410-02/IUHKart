@@ -43,7 +43,9 @@ CREATE TABLE "product_discount" (
   "product_id" int,
   "discount_id" int,
   "start_date" timestamp,
-  "end_date" timestamp
+  "end_date" timestamp,
+  "price_after_discount" float,
+  "invoice_id" int
 );
 
 CREATE TABLE "payment" (
@@ -92,7 +94,7 @@ CREATE TABLE "category" (
 );
 
 CREATE TABLE "customer" (
-  "customer_id" int PRIMARY KEY NOT NULL,
+  "customer_id" int PRIMARY KEY,
   "address_id" int,
   "fullname" varchar(30),
   "email" varchar(50),
@@ -101,6 +103,19 @@ CREATE TABLE "customer" (
   "age" smallint,
   "avatar_url" varchar(200)
 );
+
+CREATE TABLE "invoice" (
+  "invoice_id" int PRIMARY KEY,
+  "order_id" int,
+  "payment_id" int,
+  "total_money" float
+);
+
+ALTER TABLE "product_discount" ADD FOREIGN KEY ("invoice_id") REFERENCES "invoice" ("invoice_id");
+
+ALTER TABLE "payment" ADD FOREIGN KEY ("payment_id") REFERENCES "invoice" ("payment_id");
+
+ALTER TABLE "order" ADD FOREIGN KEY ("order_id") REFERENCES "invoice" ("order_id");
 
 ALTER TABLE "product_discount" ADD FOREIGN KEY ("discount_id") REFERENCES "discount" ("discount_id");
 
@@ -116,8 +131,6 @@ ALTER TABLE "product" ADD FOREIGN KEY ("vendor_id") REFERENCES "vendor" ("vendor
 
 ALTER TABLE "product" ADD FOREIGN KEY ("category_id") REFERENCES "category" ("category_id");
 
-ALTER TABLE "payment" ADD FOREIGN KEY ("order_id") REFERENCES "order" ("order_id");
-
 ALTER TABLE "payment" ADD FOREIGN KEY ("customer_id") REFERENCES "customer" ("customer_id");
 
 ALTER TABLE "customer" ADD FOREIGN KEY ("address_id") REFERENCES "address" ("address_id");
@@ -126,9 +139,9 @@ ALTER TABLE "vendor" ADD FOREIGN KEY ("address_id") REFERENCES "address" ("addre
 
 ALTER TABLE "order" ADD FOREIGN KEY ("address_id") REFERENCES "address" ("address_id");
 
-ALTER TABLE "cart" ADD FOREIGN KEY ("customer_id") REFERENCES "customer" ("customer_id");
+ALTER TABLE "customer" ADD FOREIGN KEY ("customer_id") REFERENCES "cart" ("customer_id");
 
-ALTER TABLE "cart" ADD FOREIGN KEY ("product_id") REFERENCES "product" ("product_id");
+ALTER TABLE "product" ADD FOREIGN KEY ("product_id") REFERENCES "cart" ("product_id");
 
 ALTER TABLE "review" ADD FOREIGN KEY ("customer_id") REFERENCES "customer" ("customer_id");
 
