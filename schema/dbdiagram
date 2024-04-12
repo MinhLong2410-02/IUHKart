@@ -1,128 +1,126 @@
-Table Order {
-  OrderId int [primary key, not null]
-  OrderNumber varchar(255)
-  ShippingDate date
-  OrderDate date
-  OrderAmount float
-  OrderStatus varchar(255) //enum('pending', 'processing', 'shipped', 'delivered', 'cancelled')
-  Cart_CartId int [not null]
-  CustomerId int [not null]
-  AddressId int
+Table order {
+  order_id int [primary key, not null]
+  order_number varchar(255)
+  shipping_date date
+  order_date date
+  order_amount float
+  order_status varchar(255) //enum('pending', 'processing', 'shipped', 'delivered', 'cancelled')
+  // cart_id int [not null]
+  customer_id int [not null]
+  address_id int
 }
 
-Table OrderProduct {
-  OrderProductId int [primary key, not null]
-  ProductId int [not null]
-  OrderId int [not null]
-  Price float // Giá đề xuất
-  Quantity int
-}
-
-
-Table Product {
-  ProductId int [primary key, not null]
-  ProductName varchar(255)
-  CategoryId int [not null]  
-  VendorId int [not null] 
-  OriginalPrice float // Giá gốc
-  Stock int
-  Brand varchar(255)
-}
-
-Table ProductImage{
-  ProductImgId int [pk]
-  ProductId int 
-  ProductImgUrl varchar
-}
-
-Table Discount{
-  DiscountId int pk
-  Percentage float
-
-}
-
-Table ProductDiscount{
-  ProductDiscountId int pk
-  ProductId int
-  DiscountId int
-  StartDate datetime
-  EndDate datetime
-}
-
-Table Payment {
-  PaymentId int [primary key, not null]
-  OrderId int [not null] 
-  PaymentMode varchar(255) //enum('bank_transfer', 'cash')
-  CustomerId int [not null]  
-  Date_of_payment date
-}
-
-Table Address {
-  AddressId int [pk, not null]
-  City_Province varchar(100)
-  AddressDetail varchar(200)
-}
-
-Table Cart {
-  CartId int [primary key, not null]
-  ProductId int [not null] 
-  CustomerId int [not null] 
-  GrandTotal float
-  ItemsTotal int
+Table order_product {
+  order_product_id int [primary key, not null]
+  product_id int [not null]
+  order_id int [not null]
+  price float // Giá đề xuất
+  quantity int
 }
 
 
-Table Review {
-  ReviewId int [primary key, not null]
-  Description text
-  Ratings varchar(255) //enum('1', '2', '3', '4', '5') // Possible values: '1', '2', '3', '4', '5'
-  ProductId int [not null]  
-  CustomerId int [not null]  
+Table product {
+  product_id int [primary key, not null]
+  product_name varchar(255)
+  vendor_id int [not null] 
+  category_id int [not null]  
+  original_price float // Giá gốc
+  stock int
+  brand varchar(255)
 }
 
-Table Vendor {
-  VendorId int [primary key, not null]
-  Name varchar(255)
-  Phone varchar(20)
-  TotalSales float
-  Email varchar(50)
-  Description text
-  AddressId int
+Table product_image{
+  product_img_id int [pk]
+  product_id int 
+  product_img_url varchar
 }
 
-Table Category {
-  CategoryId int [primary key, not null]
-  CategoryName varchar(255)
-  Description text
+Table discount{
+  discount_id int pk
+  percentage float
 }
 
-Table Customer {
-  CustomerId int [primary key, not null]
-  FullName varchar(30)
-  Email varchar(50)
-  DateOfBirth date
-  Phone varchar(20)
-  Age smallint
-  AvatarUrl varchar(200)
-  AddressId int
+Table product_discount{
+  product_discount_id int pk
+  product_id int
+  discount_id int
+  start_date datetime
+  end_date datetime
 }
 
-Ref: ProductDiscount.DiscountId > Discount.DiscountId
-Ref: ProductDiscount.ProductId > Product.ProductId
-Ref: Order.CustomerId > Customer.CustomerId
-Ref: OrderProduct.OrderId > Order.OrderId
-Ref: OrderProduct.ProductId > Product.ProductId
-Ref: Product.VendorId > Vendor.VendorId
-Ref: Product.CategoryId > Category.CategoryId
-Ref: Payment.OrderId > Order.OrderId
-Ref: Payment.CustomerId > Customer.CustomerId
-Ref: Address.AddressId - Customer.AddressId
-Ref: Address.AddressId - Vendor.AddressId
-Ref: Address.AddressId - Order.AddressId
-Ref: Cart.CustomerId > Customer.CustomerId
-Ref: Cart.ProductId > Product.ProductId
-Ref: Review.CustomerId > Customer.CustomerId
-Ref: Review.ProductId > Product.ProductId
-Ref: ProductImage.ProductId > Product.ProductId
+Table payment {
+  payment_id int [primary key, not null]
+  order_id int [not null] 
+  payment_mode varchar(255) //enum('bank_transfer', 'cash')
+  customer_id int [not null]  
+  date_of_payment date
+}
 
-// Ref: "Customer"."CustomerId" < "Customer"."FullName"
+Table address {
+  address_id int [pk, not null]
+  city_province varchar(100)
+  address_detail varchar(200)
+}
+
+Table cart {
+  cart_id int [primary key, not null]
+  product_id int [not null] 
+  customer_id int [not null] 
+  grand_total float
+  items_total int
+}
+
+
+Table review {
+  review_id int [primary key, not null]
+  description text
+  ratings varchar(255) //enum('1', '2', '3', '4', '5') // Possible values: '1', '2', '3', '4', '5'
+  product_id int [not null]  
+  customer_id int [not null]  
+}
+
+Table vendor {
+  vendor_id int [primary key, not null]
+  address_id int
+  name varchar(255)
+  phone varchar(20)
+  email varchar(50)
+  description text
+}
+
+Table category {
+  category_id int [primary key, not null]
+  category_name varchar(255)
+  description text
+}
+
+Table customer {
+  customer_id int [primary key, not null]
+  address_id int
+  fullname varchar(30)
+  email varchar(50)
+  date_of_birth date
+  phone varchar(20)
+  age smallint
+  avatar_url varchar(200)
+}
+
+Ref: product_discount.discount_id > discount.discount_id
+Ref: product_discount.product_id > product.product_id
+Ref: order.customer_id > customer.customer_id
+Ref: order_product.order_id > order.order_id
+Ref: order_product.product_id > product.product_id
+Ref: product.vendor_id > vendor.vendor_id
+Ref: product.category_id > category.category_id
+Ref: payment.order_id > order.order_id
+Ref: payment.customer_id > customer.customer_id
+Ref: address.address_id - customer.address_id
+Ref: address.address_id - vendor.address_id
+Ref: address.address_id - order.address_id
+Ref: cart.customer_id > customer.customer_id
+Ref: cart.product_id > product.product_id
+Ref: review.customer_id > customer.customer_id
+Ref: review.product_id > product.product_id
+Ref: product_image.product_id > product.product_id
+
+// Ref: "customer"."customer_id" < "customer"."FullName"
