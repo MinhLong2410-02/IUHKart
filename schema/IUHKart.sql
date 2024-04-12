@@ -65,7 +65,7 @@ CREATE TABLE "address" (
 CREATE TABLE "cart" (
   "cart_id" int PRIMARY KEY NOT NULL,
   "product_id" int NOT NULL,
-  "customer_id" int NOT NULL,
+  "customer_id" int UNIQUE NOT NULL,
   "grand_total" float,
   "items_total" int
 );
@@ -90,7 +90,8 @@ CREATE TABLE "vendor" (
 CREATE TABLE "category" (
   "category_id" int PRIMARY KEY NOT NULL,
   "category_name" varchar(255),
-  "description" text
+  "slug" varchar(255),
+  "category_img_url" varchar(255)
 );
 
 CREATE TABLE "category_product" (
@@ -112,8 +113,8 @@ CREATE TABLE "customer" (
 
 CREATE TABLE "invoice" (
   "invoice_id" int PRIMARY KEY,
-  "order_id" int,
-  "payment_id" int,
+  "order_id" int UNIQUE,
+  "payment_id" int UNIQUE,
   "total_money" float
 );
 
@@ -151,7 +152,7 @@ ALTER TABLE "order" ADD FOREIGN KEY ("address_id") REFERENCES "address" ("addres
 
 ALTER TABLE "customer" ADD FOREIGN KEY ("customer_id") REFERENCES "cart" ("customer_id");
 
-ALTER TABLE "product" ADD FOREIGN KEY ("product_id") REFERENCES "cart" ("product_id");
+ALTER TABLE "cart" ADD FOREIGN KEY ("product_id") REFERENCES "product" ("product_id");
 
 ALTER TABLE "review" ADD FOREIGN KEY ("customer_id") REFERENCES "customer" ("customer_id");
 
