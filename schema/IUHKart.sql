@@ -115,12 +115,12 @@ CREATE TABLE "transaction" (
 
 CREATE TABLE "address" (
   "address_id" int PRIMARY KEY NOT NULL,
+  "province_id" int,
   "address_detail" varchar(200)
 );
 
 CREATE TABLE "province" (
   "province_id" int PRIMARY KEY,
-  "address_id" int,
   "province_name" varchar(50),
   "province_name_en" varchar(50),
   "type" varchar(10)
@@ -143,7 +143,7 @@ CREATE TABLE "ward" (
   "type" varchar(10)
 );
 
-ALTER TABLE "province" ADD FOREIGN KEY ("address_id") REFERENCES "address" ("address_id");
+ALTER TABLE "address" ADD FOREIGN KEY ("province_id") REFERENCES "province" ("province_id");
 
 ALTER TABLE "district" ADD FOREIGN KEY ("province_id") REFERENCES "province" ("province_id");
 

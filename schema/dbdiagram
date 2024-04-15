@@ -120,12 +120,12 @@ table transaction{
 
 Table address {
   address_id int [pk, not null]
+  province_id int
   address_detail varchar(200)
 }
 
 table province{
   province_id int [pk]
-  address_id int 
   province_name varchar(50)
   province_name_en varchar(50)
   type varchar(10) //enum: city, province
@@ -148,7 +148,7 @@ table ward{
   type varchar(10) //enum: ward, commune, town
 }
 
-Ref: province.address_id > address.address_id
+Ref: province.province_id - address.province_id
 Ref: district.province_id > province.province_id
 Ref: ward.district_id > district.district_id
 Ref: ward.province_id > province.province_id
