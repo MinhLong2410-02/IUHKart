@@ -8,3 +8,4 @@ crispy-bootstrap5
 django-multiselectfield
 Pillow
 django-jazzmin
+azure-storage-blob
