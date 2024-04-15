@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 import os
 from dotenv import dotenv_values
-import postgres_tool
+
+
+
 config = {
     **dotenv_values(".env")
 }

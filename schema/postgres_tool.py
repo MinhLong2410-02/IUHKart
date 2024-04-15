@@ -1,7 +1,4 @@
 import psycopg2
-import pandas as pd
-import numpy as np
-import datetime
 from tabulate import tabulate
 
 

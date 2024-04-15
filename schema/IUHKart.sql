@@ -24,7 +24,8 @@ CREATE TABLE "product" (
   "category_id" int NOT NULL,
   "original_price" float,
   "stock" int,
-  "brand" varchar(255)
+  "brand" varchar(255),
+  "slug" varchar(255)
 );
 
 CREATE TABLE "product_image" (
@@ -45,7 +46,7 @@ CREATE TABLE "product_discount" (
   "start_date" timestamp,
   "end_date" timestamp,
   "price_after_discount" float,
-  "invoice_id" int
+  "transaction_id" int
 );
 
 CREATE TABLE "payment" (
@@ -54,12 +55,6 @@ CREATE TABLE "payment" (
   "payment_mode" varchar(255),
   "customer_id" int NOT NULL,
   "date_of_payment" date
-);
-
-CREATE TABLE "address" (
-  "address_id" int PRIMARY KEY NOT NULL,
-  "city_province" varchar(100),
-  "address_detail" varchar(200)
 );
 
 CREATE TABLE "cart" (
@@ -111,22 +106,60 @@ CREATE TABLE "customer" (
   "avatar_url" varchar(200)
 );
 
-CREATE TABLE "invoice" (
-  "invoice_id" int PRIMARY KEY,
+CREATE TABLE "transaction" (
+  "transaction_id" int PRIMARY KEY,
   "order_id" int UNIQUE,
   "payment_id" int UNIQUE,
   "total_money" float
 );
 
+CREATE TABLE "address" (
+  "address_id" int PRIMARY KEY NOT NULL,
+  "address_detail" varchar(200)
+);
+
+CREATE TABLE "province" (
+  "province_id" int PRIMARY KEY,
+  "address_id" int,
+  "province_name" varchar(50),
+  "province_name_en" varchar(50),
+  "type" varchar(10)
+);
+
+CREATE TABLE "district" (
+  "district_id" int PRIMARY KEY,
+  "province_id" int,
+  "district_name" varchar(50),
+  "district_name_en" varchar(50),
+  "type" varchar(15)
+);
+
+CREATE TABLE "ward" (
+  "ward_id" int PRIMARY KEY,
+  "ward_name" varchar(50),
+  "ward_name_en" varchar(50),
+  "province_id" int,
+  "district_id" int,
+  "type" varchar(10)
+);
+
+ALTER TABLE "province" ADD FOREIGN KEY ("address_id") REFERENCES "address" ("address_id");
+
+ALTER TABLE "district" ADD FOREIGN KEY ("province_id") REFERENCES "province" ("province_id");
+
+ALTER TABLE "ward" ADD FOREIGN KEY ("district_id") REFERENCES "district" ("district_id");
+
+ALTER TABLE "ward" ADD FOREIGN KEY ("province_id") REFERENCES "province" ("province_id");
+
 ALTER TABLE "category_product" ADD FOREIGN KEY ("category_id") REFERENCES "category" ("category_id");
 
 ALTER TABLE "category_product" ADD FOREIGN KEY ("product_id") REFERENCES "product" ("product_id");
 
-ALTER TABLE "product_discount" ADD FOREIGN KEY ("invoice_id") REFERENCES "invoice" ("invoice_id");
+ALTER TABLE "product_discount" ADD FOREIGN KEY ("transaction_id") REFERENCES "transaction" ("transaction_id");
 
-ALTER TABLE "payment" ADD FOREIGN KEY ("payment_id") REFERENCES "invoice" ("payment_id");
+ALTER TABLE "payment" ADD FOREIGN KEY ("payment_id") REFERENCES "transaction" ("payment_id");
 
-ALTER TABLE "order" ADD FOREIGN KEY ("order_id") REFERENCES "invoice" ("order_id");
+ALTER TABLE "order" ADD FOREIGN KEY ("order_id") REFERENCES "transaction" ("order_id");
 
 ALTER TABLE "product_discount" ADD FOREIGN KEY ("discount_id") REFERENCES "discount" ("discount_id");
 
