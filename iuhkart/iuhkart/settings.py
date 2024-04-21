@@ -79,22 +79,24 @@ WSGI_APPLICATION = 'iuhkart.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
-DATABASES = {
+if environ.get('STATUS') == 'DEV':
+    DATABASES = {
         'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': environ['NAME'],
-            'USER': environ['USER'],
-            'PASSWORD': environ['PASSWORD'],
-            'HOST': environ['HOST'],
-            'PORT': environ['PORT'],
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
         }
     }
+else:
+    DATABASES = {
+            'default': {
+                'ENGINE': 'django.db.backends.postgresql',
+                'NAME': environ['NAME'],
+                'USER': environ['USER'],
+                'PASSWORD': environ['PASSWORD'],
+                'HOST': environ['HOST'],
+                'PORT': environ['PORT'],
+            }
+        }
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
@@ -159,6 +161,7 @@ JAZZMIN_SETTINGS={
     "site_title":"IUHKart",
     "site_header": "IUHKart",
     "site_brand": "Administration",
-    "welcome_sign": "Welcome to the Admin Page",
+    "welcome_sign": "Welcome to the Vendor Page",
     "login_logo": "images/logo.png",
 }
+JAZZMIN_SETTINGS["show_ui_builder"] = True
