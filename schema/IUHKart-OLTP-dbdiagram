@@ -77,16 +77,28 @@ Table review {
 }
 
 Table vendor {
-  vendor_id int [primary key, not null]
-  address_id int
-  name varchar(255)
-  phone varchar(20)
-  email varchar(50)
+  vendor_id int pk
+  vendor_name varchar(255)
   description text
+  vendor_logo varchar(200)
+}
+Table customer {
+  customer_id int pk
+  fullname varchar(30)
+  date_of_birth date
+  age smallint
+  avatar_url varchar(200)
+}
+
+Table user{
+  user_id int pk
+  address_id int
+  email varchar(50)
+  phone varchar(20)
 }
 
 Table category {
-  category_id int [primary key, not null]
+  category_id int pk
   category_name varchar(255)
   slug varchar(255)
   category_img_url varchar(255)
@@ -99,16 +111,6 @@ Table category_product{
 
 }
 
-Table customer {
-  customer_id int pk
-  address_id int
-  fullname varchar(30)
-  email varchar(50)
-  date_of_birth date
-  phone varchar(20)
-  age smallint
-  avatar_url varchar(200)
-}
 
 table transaction{
   transaction_id int pk
@@ -152,8 +154,8 @@ Ref: province.province_id - address.province_id
 Ref: district.province_id > province.province_id
 Ref: ward.district_id > district.district_id
 Ref: ward.province_id > province.province_id
-
-
+Ref: user.user_id - vendor.vendor_id
+Ref: user.user_id - customer.customer_id
 Ref: category_product.category_id > category.category_id
 Ref: category_product.product_id > product.product_id
 Ref: transaction.transaction_id < product_discount.transaction_id
@@ -167,8 +169,7 @@ Ref: order_product.product_id > product.product_id
 Ref: product.vendor_id > vendor.vendor_id
 Ref: product.category_id > category.category_id
 Ref: payment.customer_id > customer.customer_id
-Ref: address.address_id - customer.address_id
-Ref: address.address_id - vendor.address_id
+Ref: address.address_id - user.address_id
 Ref: address.address_id - order.address_id
 Ref: cart.customer_id - customer.customer_id
 Ref: cart.product_id > product.product_id
