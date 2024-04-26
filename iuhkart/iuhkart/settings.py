@@ -33,17 +33,27 @@ ALLOWED_HOSTS = []
 
 # Application definition
 
-INSTALLED_APPS = [
-    'jazzmin',
+DEFAULT_APPS  = [
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'apps.vendor',
     # 'crispy_forms',
 ]
+
+THIRD_PARTY_APPS = [
+    'jazzmin',
+]
+
+LOCAL_APPS = [
+    'apps.vendor',
+    'apps.customers',
+]
+
+INSTALLED_APPS = DEFAULT_APPS + LOCAL_APPS + THIRD_PARTY_APPS
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -128,21 +138,20 @@ USE_I18N = True
 
 USE_TZ = True
 
-
+AUTH_USER_MODEL = "customers.User"
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
 STATIC_URL = '/static/'
-if DEBUG:
-    STATICFILES_DIRS = [os.path.join(BASE_DIR,"static")]
-else:
-    STATIC_ROOT = BASE_DIR / 'static'
+STATIC_ROOT = BASE_DIR / "staticfiles"
+STATICFILES_DIRS = [BASE_DIR / 'static']
+STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
     
 
 
 
-MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media' 
+# MEDIA_URL = '/media/'
+# MEDIA_ROOT = BASE_DIR / 'media' 
 
 
 # Default primary key field type
@@ -162,6 +171,6 @@ JAZZMIN_SETTINGS={
     "site_header": "IUHKart",
     "site_brand": "Administration",
     "welcome_sign": "Welcome to the Vendor Page",
-    "login_logo": "images/logo.png",
+    "login_logo": "/images/logo.png",
+    "show_ui_builder": True,
 }
-JAZZMIN_SETTINGS["show_ui_builder"] = True
