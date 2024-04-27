@@ -21,7 +21,7 @@ class Province(models.Model):
 
 class District(models.Model):
     district_id = models.AutoField(primary_key=True)
-    pronvince_id = models.ForeignKey(Province, on_delete=models.CASCADE)
+    province_id = models.ForeignKey(Province, on_delete=models.CASCADE)
     district_name = models.CharField(max_length=50)
     district_name_en = models.CharField(max_length=50)
     type = models.CharField(max_length=30)
