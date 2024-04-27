@@ -44,7 +44,7 @@ DEFAULT_APPS  = [
 ]
 
 THIRD_PARTY_APPS = [
-    'jazzmin',
+    'crispy_forms',
 ]
 
 LOCAL_APPS = [
