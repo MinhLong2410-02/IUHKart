@@ -57,7 +57,8 @@ def insert_category():
     category_cache = {c.category_id: c for c in Category.objects.all()}
     return category_cache
 
-
+insert_address()
+insert_category()
 user1 = User.objects.create_user(
         email='minhlong2002@gmail.com',
         password=make_password('123'),
@@ -91,5 +92,3 @@ vendor3 = Vendor.objects.create(
     phone='1234567892',
     description='This is a description for Vendor Three.'
 )
-insert_address()
-insert_category()
