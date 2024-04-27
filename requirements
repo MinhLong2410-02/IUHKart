@@ -10,3 +10,4 @@ Pillow
 django-jazzmin
 azure-storage-blob
 django-autoslug
+crispy-tailwind
