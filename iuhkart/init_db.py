@@ -10,6 +10,9 @@ import json
 import os
 os.system('migrate.bat')
 
+import ssl
+ssl._create_default_https_context = ssl._create_stdlib_context
+
 def insert_address():
     province_df = pd.read_csv('https://raw.githubusercontent.com/MinhLong2410-02/VN-province-api-test/main/province.csv')
     district_df = pd.read_csv('https://raw.githubusercontent.com/MinhLong2410-02/VN-province-api-test/main/district.csv')
