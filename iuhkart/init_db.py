@@ -10,7 +10,7 @@ import json
 import os
 os.system('migrate.bat')
 
-def init_address():
+def insert_address():
     province_df = pd.read_csv('https://raw.githubusercontent.com/MinhLong2410-02/VN-province-api-test/main/province.csv')
     district_df = pd.read_csv('https://raw.githubusercontent.com/MinhLong2410-02/VN-province-api-test/main/district.csv')
     ward_df = pd.read_csv('https://raw.githubusercontent.com/MinhLong2410-02/VN-province-api-test/main/ward.csv')
@@ -43,9 +43,21 @@ def init_address():
         type=ward['type']
     ) for ward in wards]
     Ward.objects.bulk_create(ward_objs)
-init_address()
 
-# User = get_user_model()
+def insert_category():
+    category_df = pd.read_csv('https://raw.githubusercontent.com/MinhLong2410-02/IUHKart/main/schema/Database/categories.csv?token=GHSAT0AAAAAACNO47DOPCF3BEIKDNAK5KSUZRMTRGA')
+    categories = category_df.to_dict('records')
+    category_objs = [Category(
+        category_id = category['category_id'],
+        slug = category['slug'],
+        category_name=category['name'],
+        category_img_url=category['category_img_url']
+    ) for category in categories]
+    Category.objects.bulk_create(category_objs)
+    category_cache = {c.category_id: c for c in Category.objects.all()}
+    return category_cache
+
+
 user1 = User.objects.create_user(
         email='minhlong2002@gmail.com',
         password=make_password('123'),
@@ -53,7 +65,7 @@ user1 = User.objects.create_user(
     )
 vendor1 = Vendor.objects.create(
         user=user1,
-        name='Vendor One',
+        name='Minh Long',
         phone='1234567890',
         description='This is a description for Vendor One.'
     )
@@ -64,7 +76,20 @@ user2 = User.objects.create_user(
 )
 vendor2 = Vendor.objects.create(
     user=user2,
-    name='Vendor Two',
+    name='Văn Hậu',
     phone='1234567891',
     description='This is a description for Vendor Two.'
 )
+user3 = User.objects.create_user(
+    email='quachnam311@gmail.com',
+    password=make_password('123'),
+    is_vendor=True,
+)
+vendor3 = Vendor.objects.create(
+    user=user3,
+    name='Qx Nam',
+    phone='1234567892',
+    description='This is a description for Vendor Three.'
+)
+insert_address()
+insert_category()
