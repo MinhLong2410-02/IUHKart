@@ -28,6 +28,7 @@ Table product {
   stock int
   brand varchar(255)
   slug varchar(255)
+  product_description text
 }
 
 Table product_image{

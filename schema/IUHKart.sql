@@ -25,7 +25,8 @@ CREATE TABLE "product" (
   "original_price" float,
   "stock" int,
   "brand" varchar(255),
-  "slug" varchar(255)
+  "slug" varchar(255),
+  "product_description" text
 );
 
 CREATE TABLE "product_image" (
@@ -74,16 +75,29 @@ CREATE TABLE "review" (
 );
 
 CREATE TABLE "vendor" (
-  "vendor_id" int PRIMARY KEY NOT NULL,
+  "vendor_id" int PRIMARY KEY,
+  "vendor_name" varchar(255),
+  "description" text,
+  "vendor_logo" varchar(200)
+);
+
+CREATE TABLE "customer" (
+  "customer_id" int PRIMARY KEY,
+  "fullname" varchar(30),
+  "date_of_birth" date,
+  "age" smallint,
+  "avatar_url" varchar(200)
+);
+
+CREATE TABLE "user" (
+  "user_id" int PRIMARY KEY,
   "address_id" int,
-  "name" varchar(255),
-  "phone" varchar(20),
   "email" varchar(50),
-  "description" text
+  "phone" varchar(20)
 );
 
 CREATE TABLE "category" (
-  "category_id" int PRIMARY KEY NOT NULL,
+  "category_id" int PRIMARY KEY,
   "category_name" varchar(255),
   "slug" varchar(255),
   "category_img_url" varchar(255)
@@ -93,17 +107,6 @@ CREATE TABLE "category_product" (
   "category_product_id" int PRIMARY KEY,
   "category_id" int,
   "product_id" int
-);
-
-CREATE TABLE "customer" (
-  "customer_id" int PRIMARY KEY,
-  "address_id" int,
-  "fullname" varchar(30),
-  "email" varchar(50),
-  "date_of_birth" date,
-  "phone" varchar(20),
-  "age" smallint,
-  "avatar_url" varchar(200)
 );
 
 CREATE TABLE "transaction" (
@@ -151,6 +154,10 @@ ALTER TABLE "ward" ADD FOREIGN KEY ("district_id") REFERENCES "district" ("distr
 
 ALTER TABLE "ward" ADD FOREIGN KEY ("province_id") REFERENCES "province" ("province_id");
 
+ALTER TABLE "vendor" ADD FOREIGN KEY ("vendor_id") REFERENCES "user" ("user_id");
+
+ALTER TABLE "customer" ADD FOREIGN KEY ("customer_id") REFERENCES "user" ("user_id");
+
 ALTER TABLE "category_product" ADD FOREIGN KEY ("category_id") REFERENCES "category" ("category_id");
 
 ALTER TABLE "category_product" ADD FOREIGN KEY ("product_id") REFERENCES "product" ("product_id");
@@ -177,9 +184,7 @@ ALTER TABLE "product" ADD FOREIGN KEY ("category_id") REFERENCES "category" ("ca
 
 ALTER TABLE "payment" ADD FOREIGN KEY ("customer_id") REFERENCES "customer" ("customer_id");
 
-ALTER TABLE "customer" ADD FOREIGN KEY ("address_id") REFERENCES "address" ("address_id");
-
-ALTER TABLE "vendor" ADD FOREIGN KEY ("address_id") REFERENCES "address" ("address_id");
+ALTER TABLE "user" ADD FOREIGN KEY ("address_id") REFERENCES "address" ("address_id");
 
 ALTER TABLE "order" ADD FOREIGN KEY ("address_id") REFERENCES "address" ("address_id");
 
