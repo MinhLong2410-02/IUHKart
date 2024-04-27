@@ -17,20 +17,22 @@ class UserManager(BaseUserManager):
         return user
 
     def create_user(self, email, password=None, **extra_fields):
-        extra_fields.setdefault("is_superuser", False)
-        return self._create_user(email, password, **extra_fields)
+        user = self._create_user(email, password, **extra_fields)
+        user.is_superuser = False
+        return user
 
     def create_superuser(self, email, password, **extra_fields):
-        extra_fields.setdefault("is_superuser", True)
-        extra_fields.setdefault("is_staff", True)
-
-        if extra_fields.get("is_superuser") is not True:
-            raise ValueError("Superuser must have is_superuser=True.")
-
-        return self._create_user(email, password, **extra_fields)
+        user = self.create_user(
+            email= self.normalize_email(email),
+            password = password,
+        )
+        user.is_admin = True
+        user.is_staff = True
+        user.is_superuser = True
+        user.save(using=self._db)
+        return user
 
 class User(AbstractBaseUser):
-
     username = None
     email = models.EmailField(_('email address'), unique=True, max_length=255)
     address = models.OneToOneField(Address, models.DO_NOTHING, blank=True, null=True)
