@@ -3,7 +3,7 @@ from django.db import models
 # Create your models here.
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
 from django.utils.translation import gettext_lazy as _
-
+from apps.address.models import Address
 class UserManager(BaseUserManager):
     use_in_migrations = True
 
@@ -33,7 +33,7 @@ class User(AbstractBaseUser):
 
     username = None
     email = models.EmailField(_('email address'), unique=True, max_length=255)
-    address = models.ForeignKey('Address', models.DO_NOTHING, blank=True, null=True)
+    address = models.OneToOneField(Address, models.DO_NOTHING, blank=True, null=True)
     is_customer = models.BooleanField(default=False)
     is_vendor = models.BooleanField(default=False)
 
@@ -56,11 +56,3 @@ class Customer(models.Model):
         verbose_name_plural = "Customers"
         db_table = 'customer'
 
-class Address(models.Model):
-    address_id = models.IntegerField(primary_key=True)
-    city_province = models.CharField(max_length=100, blank=True, null=True)
-    address_detail = models.CharField(max_length=200, blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'address'
