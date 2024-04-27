@@ -92,24 +92,31 @@ WSGI_APPLICATION = 'iuhkart.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
-if environ.get('STATUS') == 'DEV':
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
-        }
+# if environ.get('STATUS') == 'DEV':
+#     DATABASES = {
+#         'default': {
+#             'ENGINE': 'django.db.backends.sqlite3',
+#             'NAME': BASE_DIR / 'db.sqlite3',
+#         }
+#     }
+# else:
+#     DATABASES = {
+#             'default': {
+#                 'ENGINE': 'django.db.backends.postgresql',
+#                 'NAME': environ['NAME'],
+#                 'USER': environ['USER'],
+#                 'PASSWORD': environ['PASSWORD'],
+#                 'HOST': environ['HOST'],
+#                 'PORT': environ['PORT'],
+#             }
+#         }
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
-else:
-    DATABASES = {
-            'default': {
-                'ENGINE': 'django.db.backends.postgresql',
-                'NAME': environ['NAME'],
-                'USER': environ['USER'],
-                'PASSWORD': environ['PASSWORD'],
-                'HOST': environ['HOST'],
-                'PORT': environ['PORT'],
-            }
-        }
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
