@@ -10,11 +10,19 @@ class Category(models.Model):
     category_img_url = models.URLField(max_length=100)
     def __str__(self):
         return f"{self.category_id} - {self.category_name} - {self.category_img_url}"
+    class Meta:
+        db_table = 'category'
+        verbose_name_plural = 'Categories'
+        ordering = ['-category_id']
 
 class CategoryProduct(models.Model):
     category_product_id = models.AutoField(primary_key=True)
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
     product = models.ForeignKey('Product', on_delete=models.CASCADE)
+    class Meta:
+        db_table = 'category_product'
+        verbose_name_plural = 'Category Products'
+        # unique_together = ('category', 'product')
 
 class Product(models.Model):
     product_id = models.AutoField(primary_key=True)
