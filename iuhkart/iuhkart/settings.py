@@ -50,7 +50,8 @@ THIRD_PARTY_APPS = [
 LOCAL_APPS = [
     'apps.vendor',
     'apps.customers',
-    'apps.product'
+    'apps.product',
+    'apps.address',
 ]
 
 INSTALLED_APPS = DEFAULT_APPS + LOCAL_APPS + THIRD_PARTY_APPS
