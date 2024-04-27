@@ -20,13 +20,14 @@ CREATE TABLE "order_product" (
 CREATE TABLE "product" (
   "product_id" int PRIMARY KEY NOT NULL,
   "product_name" varchar(255),
-  "vendor_id" int NOT NULL,
+  "created_by" int NOT NULL,
   "category_id" int NOT NULL,
   "original_price" float,
   "stock" int,
   "brand" varchar(255),
   "slug" varchar(255),
-  "product_description" text
+  "product_description" text,
+  "customer" int
 );
 
 CREATE TABLE "product_image" (
@@ -178,7 +179,7 @@ ALTER TABLE "order_product" ADD FOREIGN KEY ("order_id") REFERENCES "order" ("or
 
 ALTER TABLE "order_product" ADD FOREIGN KEY ("product_id") REFERENCES "product" ("product_id");
 
-ALTER TABLE "product" ADD FOREIGN KEY ("vendor_id") REFERENCES "vendor" ("vendor_id");
+ALTER TABLE "product" ADD FOREIGN KEY ("created_by") REFERENCES "vendor" ("vendor_id");
 
 ALTER TABLE "product" ADD FOREIGN KEY ("category_id") REFERENCES "category" ("category_id");
 

@@ -22,13 +22,14 @@ Table order_product {
 Table product {
   product_id int [pk, not null]
   product_name varchar(255)
-  vendor_id int [not null] 
+  created_by int [not null] 
   category_id int [not null]  
   original_price float // Giá gốc
   stock int
   brand varchar(255)
   slug varchar(255)
   product_description text
+  customer int 
 }
 
 Table product_image{
@@ -167,7 +168,7 @@ Ref: product_discount.product_id > product.product_id
 Ref: order.customer_id > customer.customer_id
 Ref: order_product.order_id > order.order_id
 Ref: order_product.product_id > product.product_id
-Ref: product.vendor_id > vendor.vendor_id
+Ref: product.created_by > vendor.vendor_id
 Ref: product.category_id > category.category_id
 Ref: payment.customer_id > customer.customer_id
 Ref: address.address_id - user.address_id
