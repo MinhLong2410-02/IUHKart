@@ -37,3 +37,8 @@ class Product(models.Model):
         db_table = 'product'
         verbose_name_plural = 'Products'
         ordering = ['-product_id']
+
+class ProductImages(models.Model):
+    product_image_id = models.AutoField(primary_key=True)
+    product_id = models.ForeignKey(Product, on_delete=models.CASCADE)
+    image_url = models.URLField(max_length=255)
