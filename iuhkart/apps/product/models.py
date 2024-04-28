@@ -15,17 +15,9 @@ class Category(models.Model):
         verbose_name_plural = 'Categories'
         ordering = ['-category_id']
 
-class CategoryProduct(models.Model):
-    category_product_id = models.AutoField(primary_key=True)
-    category = models.ForeignKey(Category, on_delete=models.CASCADE)
-    product = models.ForeignKey('Product', on_delete=models.CASCADE)
-    class Meta:
-        db_table = 'category_product'
-        verbose_name_plural = 'Category Products'
-        # unique_together = ('category', 'product')
-
 class Product(models.Model):
     product_id = models.AutoField(primary_key=True)
+
     product_name = models.CharField(max_length=255)
     product_description = models.TextField()
     original_price = models.DecimalField(max_digits=10, decimal_places=2)
@@ -36,7 +28,7 @@ class Product(models.Model):
     
     created_by = models.ForeignKey(Vendor, on_delete=models.CASCADE)
     customer = models.ForeignKey(Customer, related_name="customer", on_delete=models.CASCADE, null=True)
-    category = models.ManyToManyField(Category, through=CategoryProduct)
+    category = models.ForeignKey(Category, on_delete=models.CASCADE)
     
     def __str__(self) -> str:
         return f"{self.product_id} - {self.product_name} - {self.original_price} - {self.stock} - {self.brand} - {self.created_by}"
