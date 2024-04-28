@@ -8,7 +8,7 @@ import pandas as pd
 from django.contrib.auth.hashers import make_password
 import json, random
 import os
-# os.system('migrate.bat')
+os.system('migrate.bat')
 
 import ssl
 ssl._create_default_https_context = ssl._create_stdlib_context
