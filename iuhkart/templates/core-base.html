@@ -1,0 +1,245 @@
+<!doctype html>
+{% load static %}
+<html class="no-js" lang="zxx">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="x-ua-compatible" content="ie=edge">
+        <!-- [lomofy] collocated from https://brandlance.com/lomofy-com.html -->
+        <title>{% block title %}{%endblock title%} | Lomofy</title>
+        <!-- SEO Tags -->
+        <meta name="author" content="Hossain Chisty(Backend Developer)">
+        <meta name="description" content="django multi-vendor-e-commerce website">
+        <meta name="keywords" content="django, e-commerce, e-store, e-shop, desktop, laptop, smartphone, gaming, Lomofy, python, multi-vendor-ecommerce-software">
+        <link rel="canonical" href="https://multi-vendor-ecommerce-app.herokuapp.com/">
+        <meta property="og:title" content="Django e-commerce website" />
+        <meta property="og:description" content="e-commerce website">
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://multi-vendor-ecommerce-app.herokuapp.com/">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+		<link rel="shortcut icon" type="image/x-icon" href="{% static 'assets/img/favicon.ico' %}">
+
+		<!-- CSS here -->
+        <link rel="stylesheet" href="{% static 'assets/css/bootstrap.min.css' %}">
+        <link rel="stylesheet" href="{% static 'assets/css/owl.carousel.min.css' %}">
+        <link rel="stylesheet" href="{% static 'assets/css/flaticon.css' %}">
+        <link rel="stylesheet" href="{% static 'assets/css/slicknav.css' %}">
+        <link rel="stylesheet" href="{% static 'assets/css/animate.min.css' %}">
+        <link rel="stylesheet" href="{% static 'assets/css/magnific-popup.css' %}">
+        <link rel="stylesheet" href="{% static 'assets/css/fontawesome-all.min.css' %}">
+        <link rel="stylesheet" href="{% static 'assets/css/themify-icons.css' %}">
+        <link rel="stylesheet" href="{% static 'assets/css/slick.css' %}">
+        <link rel="stylesheet" href="{% static 'assets/css/nice-select.css' %}">
+        <link rel="stylesheet" href="{% static 'assets/css/style.css' %}">
+        <link rel="stylesheet" href="https://unpkg.com/@trevoreyre/autocomplete-js/dist/style.css" />
+   </head>
+
+   <body>
+
+    <header>
+        <!-- Header Start -->
+       <div class="header-area">
+            <div class="main-header ">
+                <div class="header-top top-bg d-none d-lg-block">
+                   <div class="container-fluid">
+                       <div class="col-xl-12">
+                            <div class="row d-flex justify-content-between align-items-center">
+                                <div class="header-info-left d-flex">
+                                    <div class="flag">
+                                        <img src="{% static 'assets/img/icon/header_icon.png' %}" alt="Site Logo" width="35" height="20">
+                                    </div>
+                                    <ul class="contact-now">     
+                                        <li>Contact: +84919975131</li>
+                                    </ul>
+                                </div>
+                                <div class="header-info-right">
+                                   <ul>                                          
+                                        {% if request.user.is_authenticated %}
+                                       <li><a href="{% url 'customer_profile' %}">My Account </a></li>
+                                       <li><a href="">Wish List</a></li>
+                                       <li><a href="">Cart</a></li>
+                                       {% else %}
+                                       <li><a href="{% url 'vendor:vendor_sign_up' %}">Sell On IUHKart</a></li>
+                                       {% endif %}
+                                   </ul>
+                                </div>
+                            </div>
+                       </div>
+                   </div>
+                </div>
+               <div class="header-bottom  header-sticky">
+                    <div class="container-fluid">
+                        <div class="row align-items-center">
+                            <!-- Logo -->
+                            <div class="col-xl-1 col-lg-1 col-md-1 col-sm-3">
+                                <div class="logo">
+                                  <a href="{% url 'vendor:home' %}"><img src="{% static 'assets/img/logo.png' %}" alt=""></a>
+                                </div>
+                            </div>
+                            <div class="col-xl-6 col-lg-8 col-md-7 col-sm-5">
+                                <!-- Main-menu -->
+                                <div class="main-menu f-right d-none d-lg-block">
+                                    <nav>                                                
+                                        <ul id="navigation">                                                                     
+                                            <li><a href="{% url 'vendor:home' %}">Home</a></li>
+                                            <li class="hot"><a href="#">Latest</a>
+                                                <ul class="submenu">
+                                                    <li><a href="{% url 'vendor:home' %}"> Product list</a></li>
+                                                </ul>
+                                            </li>
+                                            <li><a href="">Blog</a></li>
+                                            <li><a href="">About</a></li>
+                                            <li><a href="">Contact</a></li>
+                                        </ul>
+                                    </nav>
+                                </div>
+                            </div> 
+                            <div class="col-xl-5 col-lg-3 col-md-3 col-sm-3 fix-card">
+                                <ul class="header-right f-right d-none d-lg-block d-flex justify-content-between">
+                                                
+                                    
+                                    <li class="d-none d-xl-block">
+                                        <div class="form-box f-right ">
+                                            <form method="get" action="">
+                                            <div id="autocomplete" class="autocomplete">
+                                                <input name="query" class="input is-link" placeholder="Search in Lomofy"
+                                                    aria-label="Search in Lomofy"
+                                                >
+                                                <div class="search-icon">
+                                                    <i class="fas fa-search special-tag"></i>
+                                                </div>
+
+                                                
+                                                <ul class="autocomplete-result-list"></ul>
+                                            </div>
+                                            </form>
+                                        </div>
+                                    </li>
+                                    
+
+                                    <li class=" d-none d-xl-block">
+                                        <div class="favorit-items">
+                                            <a href=""><i class="far fa-heart">
+                                            </a></i>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div class="shopping-card">
+                                            <a href=""><i class="fas fa-shopping-cart"></i></a>
+                                        </div>
+                                    </li>
+                                    {% if request.user.is_authenticated %}
+                                     <li class="d-none d-lg-block"> 
+                                     <a href="{% url 'customer_sign_out' %}" class="btn header-btn">Sign Out</a></li>
+                               
+                                    {% else %}
+                                    <li class="d-none d-lg-block"> <a href="{% url 'customer_sign_in' %}" class="btn header-btn">Sign in</a></li>
+                    
+                                   {% endif %}
+
+                                </ul>
+                            </div>
+                            <!-- Mobile Menu -->
+                            <div class="col-12">
+                                <div class="mobile_menu d-block d-lg-none"></div>
+                            </div>
+                        </div>
+                    </div>
+               </div>
+            </div>
+       </div>
+        <!-- Header End -->
+    </header>
+    {% block body %}
+
+    {% endblock body %}
+
+	<!-- JS here -->
+	
+		<!-- All JS Custom Plugins Link Here here -->
+        <script src="{% static 'assets/js/vendor/modernizr-3.5.0.min.js' %}"></script>
+		<!-- Jquery, Popper, Bootstrap -->
+		<script src="{% static 'assets/js/vendor/jquery-1.12.4.min.js' %}"></script>
+        <script src="{% static 'assets/js/popper.min.js' %}"></script>
+        <script src="{% static 'assets/js/bootstrap.min.js' %}"></script>
+	    <!-- Jquery Mobile Menu -->
+        <script src="{% static 'assets/js/jquery.slicknav.min.js' %}"></script>
+
+		<!-- Jquery Slick , Owl-Carousel Plugins -->
+        <script src="{% static 'assets/js/owl.carousel.min.js' %}"></script>
+        <script src="{% static 'assets/js/slick.min.js' %}"></script>
+
+		<!-- One Page, Animated-HeadLin -->
+        <script src="{% static 'assets/js/wow.min.js' %}"></script>
+		<script src="{% static 'assets/js/animated.headline.js' %}"></script>
+        <script src="{% static 'assets/js/jquery.magnific-popup.js' %}"></script>
+
+		<!-- Scrollup, nice-select, sticky -->
+        <script src="{% static 'assets/js/jquery.scrollUp.min.js' %}"></script>
+        <script src="{% static 'assets/js/jquery.nice-select.min.js' %}"></script>
+		<script src="{% static 'assets/js/jquery.sticky.js' %}"></script>
+        
+        <!-- contact js -->
+        <script src="{% static 'assets/js/contact.js' %}"></script>
+        <script src="{% static 'assets/js/jquery.form.js' %}"></script>
+        <script src="{% static 'assets/js/jquery.validate.min.js' %}"></script>
+        <script src="{% static 'assets/js/mail-script.js' %}"></script>
+        <script src="{% static 'assets/js/jquery.ajaxchimp.min.js' %}"></script>
+        
+		<!-- Jquery Plugins, main Jquery -->	
+        <script src="{% static 'assets/js/plugins.js' %}"></script>
+        <script src="{% static 'assets/js/main.js' %}"></script>
+        <script src="https://unpkg.com/@trevoreyre/autocomplete-js"></script>
+
+
+        <script>
+            new Autocomplete('#autocomplete', {
+
+                search: input => {
+                    const url = `/search?query=${input}`
+                    return new Promise(resolve => {
+                        fetch(url)
+                            .then(response => response.json())
+                            .then(data => {
+                                resolve(data.data)
+                            })
+                            .catch(error => {
+                                console.log(error)
+                            })
+                    })
+
+                },
+                    renderResult: (result, props) => {
+                            console.log(props)
+                    
+                            let group = ''
+                            if (result.index % 3 === 0) {
+                                group = `<li class="group">Group</li>`
+                            }
+                            return `${group}
+                                <li ${props}>
+                                    <div class="wiki-title">
+                                    <img src="${result.url}" alt="${result.title}">
+                                    ${result.title}
+                                    </div>
+                                </li>`
+                        },
+
+                        getResultValue: result => result,
+                        onSubmit: result => {
+                            window.open(`product?query=${result.title}`)
+                        }
+                    });
+
+                document.addEventListener('DOMContentLoaded', () => {
+                (document.querySelectorAll('.notification .delete') || []).forEach(($delete) => {
+                    const $notification = $delete.parentNode;
+
+                    $delete.addEventListener('click', () => {
+                        $notification.parentNode.removeChild($notification);
+                    });
+                });
+            });
+        </script>
+        
+    </body>
+</html>
