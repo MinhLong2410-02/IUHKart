@@ -21,4 +21,4 @@ def VendorSignUpView(request):
             return redirect('vendor:root_path')
     else:
         form = VendorSignUpForm()
-    return render(request, 'sign-up.html', {'form': form})
+    return render(request, 'vendor/sign-up.html', {'form': form})

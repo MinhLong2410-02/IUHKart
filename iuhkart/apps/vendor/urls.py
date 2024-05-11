@@ -11,7 +11,7 @@ urlpatterns = [
     path('', home, name='home'),
     path('sign-in/', SignInView.as_view(), name='vendor_sign_in'),
     path('add-product/', SignInView.as_view(), name='add_product'),
-    path('sign-up/', VendorSignUpView, name='vendor_sign_up'),
+    path('becoming-a-member/', VendorSignUpView, name='vendor_sign_up'),
     path(
         "sign-out",
         auth_views.LogoutView.as_view(template_name="sign_out.html"),

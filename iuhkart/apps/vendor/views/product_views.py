@@ -17,7 +17,7 @@ def create_product_view(request):
             return redirect('vendor:root_path')
     else:
         form = ProductForm()
-    return render(request, 'add_product_form.html', {'form': form})
+    return render(request, 'vendor/add_product_form.html', {'form': form})
 
 
 @vendor_verified
@@ -33,4 +33,4 @@ def edit_product_view(request, product_id):
             return redirect('vendor:root_path')
     else:
         form = ProductForm(instance=product)
-    return render(request, 'edit_product_form.html', {'form': form})
+    return render(request, 'vendor/edit_product_form.html', {'form': form})
