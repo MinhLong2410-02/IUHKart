@@ -1,11 +1,12 @@
 <!DOCTYPE html>
 {% load tailwind_filters %}
+{% load static %}
 <html>
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width">
         <title>Sign up</title>
-         <link href="https://cdn.jsdelivr.net/npm/tailwindcss/dist/tailwind.min.css" rel="stylesheet">
+        <link href="https://cdn.jsdelivr.net/npm/tailwindcss/dist/tailwind.min.css" rel="stylesheet">
     </head>
     
     <body>
@@ -17,8 +18,8 @@
         <div class="bg-indigo-200 min-h-screen flex flex-col">
             <div class="max-w-5xl mx-auto flex-1 flex flex-col items-center justify-center">
                 <div class="bg-blue-100 px-6 py-8 rounded shadow-md text-black w-full">
-                    <p class="text-center text-3xl font-bold">SELL ON LOMOFY</p>
-                    <p class="text-center font-bold">Open Your Online Store Now</p>
+                    <p class="text-center text-3xl font-bold">REGISTER TO BECOME VENDOR</p>
+                    <p class="text-center font-bold">Open Your Online Store On IUHKART Right Now</p>
                     <br>
                     <form method="POST" enctype="multipart/form-data">
                             {% csrf_token %}
