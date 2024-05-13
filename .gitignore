@@ -161,3 +161,7 @@ cython_debug/
 #.idea/
 
 *.zip
+
+# qdrant
+search/__pycache__/
+search/qdrant_db/
