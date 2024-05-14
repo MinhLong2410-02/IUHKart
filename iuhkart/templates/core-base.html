@@ -4,17 +4,14 @@
     <head>
         <meta charset="utf-8">
         <meta http-equiv="x-ua-compatible" content="ie=edge">
-        <!-- [lomofy] collocated from https://brandlance.com/lomofy-com.html -->
-        <title>{% block title %}{%endblock title%} | Lomofy</title>
+        <title>{% block title %}{%endblock title%} | IUHKart</title>
         <!-- SEO Tags -->
-        <meta name="author" content="Hossain Chisty(Backend Developer)">
+        <meta name="author" content="Trần Minh Long">
         <meta name="description" content="django multi-vendor-e-commerce website">
-        <meta name="keywords" content="django, e-commerce, e-store, e-shop, desktop, laptop, smartphone, gaming, Lomofy, python, multi-vendor-ecommerce-software">
-        <link rel="canonical" href="https://multi-vendor-ecommerce-app.herokuapp.com/">
+        <meta name="keywords" content="django, e-commerce, e-store, e-shop, desktop, laptop, smartphone, gaming, IUHKart, python, multi-vendor-ecommerce-software">
         <meta property="og:title" content="Django e-commerce website" />
         <meta property="og:description" content="e-commerce website">
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://multi-vendor-ecommerce-app.herokuapp.com/">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 		<link rel="shortcut icon" type="image/x-icon" href="{% static 'assets/img/favicon.ico' %}">
 
@@ -72,7 +69,7 @@
                             <!-- Logo -->
                             <div class="col-xl-1 col-lg-1 col-md-1 col-sm-3">
                                 <div class="logo">
-                                  <a href="{% url 'vendor:home' %}"><img src="{% static 'assets/img/logo.png' %}" alt=""></a>
+                                  <a href="{% url 'vendor:home' %}"><img src="{% static 'assets/img/iuhkart.png' %}" alt="" width="100" height="70"></a>
                                 </div>
                             </div>
                             <div class="col-xl-6 col-lg-8 col-md-7 col-sm-5">
@@ -101,8 +98,8 @@
                                         <div class="form-box f-right ">
                                             <form method="get" action="">
                                             <div id="autocomplete" class="autocomplete">
-                                                <input name="query" class="input is-link" placeholder="Search in Lomofy"
-                                                    aria-label="Search in Lomofy"
+                                                <input name="query" class="input is-link" placeholder="Search..."
+                                                    aria-label="Search" type="search" autocomplete="off"
                                                 >
                                                 <div class="search-icon">
                                                     <i class="fas fa-search special-tag"></i>
@@ -156,38 +153,38 @@
 	<!-- JS here -->
 	
 		<!-- All JS Custom Plugins Link Here here -->
-        <script src="{% static 'assets/js/vendor/modernizr-3.5.0.min.js' %}"></script>
+        <script src="{% static 'js/vendor/modernizr-3.5.0.min.js' %}"></script>
 		<!-- Jquery, Popper, Bootstrap -->
-		<script src="{% static 'assets/js/vendor/jquery-1.12.4.min.js' %}"></script>
-        <script src="{% static 'assets/js/popper.min.js' %}"></script>
-        <script src="{% static 'assets/js/bootstrap.min.js' %}"></script>
+		<script src="{% static 'js/vendor/jquery-1.12.4.min.js' %}"></script>
+        <script src="{% static 'js/popper.min.js' %}"></script>
+        <script src="{% static 'js/bootstrap.min.js' %}"></script>
 	    <!-- Jquery Mobile Menu -->
-        <script src="{% static 'assets/js/jquery.slicknav.min.js' %}"></script>
+        <script src="{% static 'js/jquery.slicknav.min.js' %}"></script>    
 
 		<!-- Jquery Slick , Owl-Carousel Plugins -->
-        <script src="{% static 'assets/js/owl.carousel.min.js' %}"></script>
-        <script src="{% static 'assets/js/slick.min.js' %}"></script>
+        <script src="{% static 'js/owl.carousel.min.js' %}"></script>
+        <script src="{% static 'js/slick.min.js' %}"></script>
 
 		<!-- One Page, Animated-HeadLin -->
-        <script src="{% static 'assets/js/wow.min.js' %}"></script>
-		<script src="{% static 'assets/js/animated.headline.js' %}"></script>
-        <script src="{% static 'assets/js/jquery.magnific-popup.js' %}"></script>
+        <script src="{% static 'js/wow.min.js' %}"></script>
+		<script src="{% static 'js/animated.headline.js' %}"></script>
+        <script src="{% static 'js/jquery.magnific-popup.js' %}"></script>
 
 		<!-- Scrollup, nice-select, sticky -->
-        <script src="{% static 'assets/js/jquery.scrollUp.min.js' %}"></script>
-        <script src="{% static 'assets/js/jquery.nice-select.min.js' %}"></script>
-		<script src="{% static 'assets/js/jquery.sticky.js' %}"></script>
+        <script src="{% static 'js/jquery.scrollUp.min.js' %}"></script>
+        <script src="{% static 'js/jquery.nice-select.min.js' %}"></script>
+		<script src="{% static 'js/jquery.sticky.js' %}"></script>
         
         <!-- contact js -->
-        <script src="{% static 'assets/js/contact.js' %}"></script>
-        <script src="{% static 'assets/js/jquery.form.js' %}"></script>
-        <script src="{% static 'assets/js/jquery.validate.min.js' %}"></script>
-        <script src="{% static 'assets/js/mail-script.js' %}"></script>
-        <script src="{% static 'assets/js/jquery.ajaxchimp.min.js' %}"></script>
+        <script src="{% static 'js/contact.js' %}"></script>
+        <script src="{% static 'js/jquery.form.js' %}"></script>
+        <script src="{% static 'js/jquery.validate.min.js' %}"></script>
+        <script src="{% static 'js/mail-script.js' %}"></script>
+        <script src="{% static 'js/jquery.ajaxchimp.min.js' %}"></script>
         
 		<!-- Jquery Plugins, main Jquery -->	
-        <script src="{% static 'assets/js/plugins.js' %}"></script>
-        <script src="{% static 'assets/js/main.js' %}"></script>
+        <script src="{% static 'js/plugins.js' %}"></script>
+        <script src="{% static 'js/main.js' %}"></script>
         <script src="https://unpkg.com/@trevoreyre/autocomplete-js"></script>
 
 

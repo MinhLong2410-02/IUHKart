@@ -4,36 +4,52 @@ from django.contrib.auth.forms import UserCreationForm
 from django.db import transaction
 from django.forms import ModelForm
 from apps.product.models import Product
-
+from crispy_forms.helper import FormHelper
+from crispy_forms.layout import Layout, Field
 from .models import Vendor
+from django.contrib.auth import get_user_model
+User = get_user_model()
 
-class VendorSignUpForm(UserCreationForm):
-    name = forms.CharField(max_length=255, required=False, help_text='Full name of the vendor')
-    phone = forms.CharField(max_length=20, required=False, help_text='Contact phone number')
-    description = forms.CharField(widget=forms.Textarea, required=False, help_text='Short description about the vendor')
+class VendorSignUpForm(forms.ModelForm):
+    email = forms.EmailField(max_length=255, help_text='Enter a valid email address')
+    password = forms.CharField(widget=forms.PasswordInput, label="Password")
+    password2 = forms.CharField(widget=forms.PasswordInput, label="Confirm Password")
 
-    class Meta(UserCreationForm.Meta):
-        model = User
-        fields = ['email', 'password1', 'password2']
+    class Meta:
+        model = Vendor
+        fields = ['name', 'phone', 'description']
 
     def __init__(self, *args, **kwargs):
         super(VendorSignUpForm, self).__init__(*args, **kwargs)
-        self.fields['email'].required = True
+        self.fields['name'].required = False
+        self.fields['phone'].required = False
+        self.fields['description'].required = False
 
-    @transaction.atomic
+    def clean(self):
+        cleaned_data = super().clean()
+        password = cleaned_data.get("password")
+        password2 = cleaned_data.get("password2")
+
+        if password and password2 and password != password2:
+            self.add_error('password2', "Password must match.")
+        
+        return cleaned_data
+
     def save(self, commit=True):
-        user = super().save(commit=False)
+        user_data = {
+            'email': self.cleaned_data['email'],
+            'password': self.cleaned_data['password'],
+        }
+        user = User.objects.create_user(**user_data)
         user.is_vendor = True
+        user.set_password(self.cleaned_data['password'])  # Ensures the password is hashed
+        user.save()
+
+        vendor = super(VendorSignUpForm, self).save(commit=False)
+        vendor.user = user
         if commit:
-            user.save()
-            vendor = Vendor.objects.create(
-                user=user,
-                name=self.cleaned_data.get('name'),
-                phone=self.cleaned_data.get('phone'),
-                description=self.cleaned_data.get('description')
-            )
-            return vendor
-        return user
+            vendor.save()
+        return vendor
 
 class ProductForm(ModelForm):
 

@@ -161,3 +161,5 @@ cython_debug/
 #.idea/
 
 *.zip
+a.html
+*.ipynb

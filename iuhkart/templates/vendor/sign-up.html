@@ -7,46 +7,71 @@
         <meta name="viewport" content="width=device-width">
         <title>Sign up</title>
         <link href="https://cdn.jsdelivr.net/npm/tailwindcss/dist/tailwind.min.css" rel="stylesheet">
+        <link href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css" rel="stylesheet">
+        <script src="https://cdn.tailwindcss.com"></script>
+        <script>
+            tailwind.config = {
+            theme: {
+                extend: {
+                colors: {
+                    clifford: '#da373d',
+                }
+                }
+            }
+            }
+        </script>
     </head>
     
-    <body>
-        {% if messages %} 
-            {% for message in messages %}
-            <div class="notification is-success is-toast">{{ message }}</div>
-            {% endfor %} 
-        {% endif %}
-        <div class="bg-indigo-200 min-h-screen flex flex-col">
-            <div class="max-w-5xl mx-auto flex-1 flex flex-col items-center justify-center">
-                <div class="bg-blue-100 px-6 py-8 rounded shadow-md text-black w-full">
-                    <p class="text-center text-3xl font-bold">REGISTER TO BECOME VENDOR</p>
-                    <p class="text-center font-bold">Open Your Online Store On IUHKART Right Now</p>
-                    <br>
-                    <form method="POST" enctype="multipart/form-data">
-                            {% csrf_token %}
-                            {{ form|crispy }}
-                        <button
-                            type="submit"
-                            class="w-full text-center py-3 rounded bg-green-400 text-white hover:bg-green-dark focus:outline-none my-1">
-                            Create Account
-                        </button>
-                    </form>
-                
-                    <div class="text-center text-sm text-grey-dark mt-4">
-                    <input type="checkbox" class="form-checkbox" >
-                       I've read and understood Lomofy's 
-                       <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>
-                        <a class="no-underline border-b border-grey-dark text-grey-dark" href="#">
-                            Terms of Service
-                        </a> and 
-                    </div>
+    <body class="m-4">
+        <div class="min-h-screen flex items-center justify-center bg-[#e0e5ec] p-4">
+            {% if messages %} 
+                {% for message in messages %}
+                <div class="notification is-success is-toast">{{ message }}</div>
+                {% endfor %} 
+            {% endif %}
+            <div class="w-1/2 bg-[#efeff1] flex items-center justify-center relative">
+                <img
+                    src="{% static 'assets/img/iuhkart.png' %}"
+                    class="max-w-full max-h-full rounded-md"
+                    width="400"
+                    height="400"
+                />
+                </div>
+            <div class="w-1/2 flex flex-col px-10 py-8">
+                <h2 class="text-3xl font-bold text-[#4a5c6b] mb-10">REGISTER TO BECOME VENDOR</h2>
+                <div class=" gap-2 flex items-center justify-between mb-4">
+                    <div class="bg-blue-100 px-6 py-8 rounded shadow-md text-black w-full">
+                        <div class="space-y-4 mb-6 ">
+                            <form method="POST" enctype="multipart/form-data">
+                                {% csrf_token %}
+                                    {{ form|crispy }}
+                            <button
+                                type="submit"
+                                class="w-full text-center py-3 rounded bg-green-400 text-white hover:bg-green-dark focus:outline-none my-1">
+                                Create Account
+                            </button>
+                            </form>
+                        </div>
+                        
+                        
+                    
+                        <div class="text-center text-sm text-grey-dark mt-4">
+                        <input type="checkbox" class="form-checkbox" >
+                        I've read and understood Lomofy's 
+                        <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>
+                            <a class="no-underline border-b border-grey-dark text-grey-dark" href="#">
+                                Terms of Service
+                            </a> and 
+                        </div>
 
-                <div class="text-grey-dark mt-6 pl-7 text-center">
-                    Have an account?
-                    <a class="no-underline border-b border-blue text-blue-800" 
-                    href="{% url 'vendor:vendor_sign_in' %}">Sign In</a>
+                    <div class="text-grey-dark mt-6 pl-7 text-center">
+                        Have an account?
+                        <a class="no-underline border-b border-blue text-blue-800" 
+                        href="{% url 'vendor:vendor_sign_in' %}">Sign In</a>
+                    </div>
                 </div>
             </div>
         </div>
-        </div>
+        
     </body>
 </html>
