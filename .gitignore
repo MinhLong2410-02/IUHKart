@@ -163,3 +163,7 @@ cython_debug/
 *.zip
 a.html
 *.ipynb
+
+# qdrant
+search/__pycache__/
+search/qdrant_db/

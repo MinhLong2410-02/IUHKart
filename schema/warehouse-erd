@@ -1,0 +1,113 @@
+Table dim_product {
+  product_id int [pk, not null]
+  product_name varchar(255)
+  original_price float
+  price float
+  stock int
+  brand varchar(255)
+  slug varchar(255)
+  vendor_id int [not null] 
+  category_id int [not null] 
+}
+
+Table fact_discount {
+  discount_id int [pk, not null]
+  name varchar(255)
+  percent float
+  start datetime
+  end datetime
+  product_id int [not null]
+  vendor_id int [not null]
+}
+
+Table dim_vendor {
+  vendor_id int [primary key, not null]
+  name varchar(255)
+  address_id int [not null]
+}
+
+Table dim_customer {
+  customer_id int pk
+  fullname varchar(30)
+  email varchar(50)
+  date_of_birth date
+  phone varchar(20)
+  age tinyint
+  avatar_url varchar(200)
+  address_id int [not null]
+}
+
+Table dim_order {
+  order_id int [primary key, not null]
+  order_number varchar(255)
+  shipping_date date
+  order_date date
+  order_amount float
+  order_status varchar(255)
+  customer_id int [not null]
+}
+
+Table fact_order_product {
+  order_product_id int [pk, not null]
+  product_id int [not null]
+  order_id int [not null]
+  quantity int
+}
+
+Table dim_category {
+  category_id int [pk, not null]
+  category_name varchar(255)
+  slug varchar(255)
+}
+
+Table fact_address_customer {
+  address_customer_id int [pk, not null]
+  is_default bool
+  customer_id int [not null]
+  address_id int [not null]
+}
+
+Table address {
+  address_id int [pk, not null]
+  address_detail varchar(200)
+  province_id int [not null]
+}
+
+table province{
+  province_id int [pk, not null]
+  province_name varchar(50)
+  province_name_en varchar(50)
+  type varchar(10)
+}
+
+table district{
+  district_id int [pk, not null]
+  type varchar(15)
+  district_name_en varchar(50)
+  province_id int [not null]
+}
+
+table ward{
+  ward_id int [pk, not null]
+  ward_name varchar(50)
+  ward_name_en varchar(50)
+  type varchar(10)
+  district_id int [not null]
+  province_id int [not null]
+}
+
+Ref: dim_product.vendor_id > dim_vendor.vendor_id
+Ref: dim_product.category_id > dim_category.category_id
+Ref: dim_order.customer_id > dim_customer.customer_id
+Ref: fact_order_product.order_id > dim_order.order_id
+Ref: fact_order_product.product_id > dim_product.product_id
+Ref: fact_discount.product_id > dim_product.product_id
+Ref: fact_discount.vendor_id > dim_vendor.vendor_id
+
+Ref: dim_vendor.address_id > address.address_id
+Ref: province.province_id > address.province_id
+Ref: district.province_id > province.province_id
+Ref: ward.district_id > district.district_id
+Ref: ward.province_id > province.province_id
+Ref: fact_address_customer.address_id > address.address_id
+Ref: fact_address_customer.customer_id > dim_customer.customer_id
