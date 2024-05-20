@@ -2,6 +2,7 @@ from rest_framework import generics, permissions
 from apps.address.serializers import *
 
 class ProvinceListView(generics.ListAPIView):
+    permission_classes = [permissions.IsAuthenticated]
     queryset = Province.objects.all()
     serializer_class = ProvinceSerializer
 
