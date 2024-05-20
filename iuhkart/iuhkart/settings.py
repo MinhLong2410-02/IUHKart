@@ -44,13 +44,12 @@ DEFAULT_APPS  = [
 ]
 
 THIRD_PARTY_APPS = [
-    'crispy_forms',
-    'crispy_tailwind'
+    'rest_framework',
+    'rest_framework_simplejwt'
 ]
 
 LOCAL_APPS = [
-    'apps.vendor',
-    'apps.customers',
+    'apps.account',
     'apps.product',
     'apps.address',
 ]
@@ -142,17 +141,23 @@ USE_I18N = True
 
 USE_TZ = True
 
-AUTH_USER_MODEL = "customers.User"
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/5.0/howto/static-files/
+AUTH_USER_MODEL = "account.User"
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+}
+SIMPLE_JWT = {
+    'USER_ID_FIELD': 'id',
+    'USER_ID_CLAIM': 'user_id',
+    'AUTH_HEADER_TYPES': ('Bearer',),
+}
 
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / "staticfiles"
 STATICFILES_DIRS = [BASE_DIR / 'static']
 STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
-# CRISPY_TEMPLATE_PACK = "bootstrap4"
-CRISPY_ALLOWED_TEMPLATE_PACKS = "tailwind"
-CRISPY_TEMPLATE_PACK = "tailwind"
 
 
 
@@ -171,12 +176,3 @@ EMAIL_PORT = 587
 EMAIL_HOST_USER = 'aiclub.iuh@gmail.com'
 EMAIL_HOST_PASSWORD = "abc"
 EMAIL_USE_TLS = True
-
-JAZZMIN_SETTINGS={
-    "site_title":"IUHKart",
-    "site_header": "IUHKart",
-    "site_brand": "Administration",
-    "welcome_sign": "Welcome to the Vendor Page",
-    "login_logo": "/images/logo.png",
-    "show_ui_builder": True,
-}

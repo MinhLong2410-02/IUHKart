@@ -1,8 +1,7 @@
 from iuhkart.wsgi import *
 from django.contrib.auth import get_user_model
 from apps.product.models import Category, Product
-from apps.vendor.models import Vendor
-from apps.customers.models import Customer, User
+from apps.account.models import Vendor, Customer, User
 from apps.address.models import Province, District, Ward
 import pandas as pd
 from django.contrib.auth.hashers import make_password

@@ -1,7 +1,6 @@
 from django.db import models
 from autoslug import AutoSlugField
-from apps.vendor.models import Vendor
-from apps.customers.models import Customer
+from apps.account.models import Vendor, Customer
 # Create your models here.
 class Category(models.Model):
     category_id = models.AutoField(primary_key=True)
