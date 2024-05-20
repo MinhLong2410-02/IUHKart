@@ -8,3 +8,5 @@ Pillow
 azure-storage-blob
 django-autoslug
 djangorestframework-simplejwt
+drf-yasg
+setuptools
