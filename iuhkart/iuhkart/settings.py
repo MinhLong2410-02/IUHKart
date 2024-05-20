@@ -28,7 +28,10 @@ SECRET_KEY = 'django-insecure-)fl4jbp8qids&ut)=(a@55tw-^7&&kbhl*_5_0f!2$euge10d=
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOWED_ORIGINS  = ['https://3f70-2405-4802-811d-8a80-10b8-2988-6f1b-1e57.ngrok-free.app']
+CORS_ORIGIN_ALLOW_ALL = True   
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -44,9 +47,10 @@ DEFAULT_APPS  = [
 ]
 
 THIRD_PARTY_APPS = [
-    'drf_yasg',
+    'corsheaders',
     'rest_framework',
-    'rest_framework_simplejwt'
+    'rest_framework_simplejwt',
+    'drf_spectacular',
 ]
 
 LOCAL_APPS = [
@@ -61,6 +65,7 @@ INSTALLED_APPS = DEFAULT_APPS + LOCAL_APPS + THIRD_PARTY_APPS
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -148,6 +153,23 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+}
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Snippets API',
+    'DESCRIPTION': 'Test description',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+    'SWAGGER_UI_SETTINGS': {
+        'persistAuthorization': True,
+    },
+    'COMPONENT_SPLIT_REQUEST': True,
+    'POSTPROCESSING_HOOKS': [
+        'drf_spectacular.hooks.postprocess_schema_enums'
+    ],
+    'ENUM_NAME_OVERRIDES': {},
+    'SORT_OPERATION_PARAMETERS': True,
+    'DISABLE_ERRORS_AND_WARNINGS': False,
 }
 SIMPLE_JWT = {
     'USER_ID_FIELD': 'id',
