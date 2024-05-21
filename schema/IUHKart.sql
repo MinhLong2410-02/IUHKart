@@ -33,7 +33,8 @@ CREATE TABLE "product" (
 CREATE TABLE "product_image" (
   "product_img_id" int PRIMARY KEY,
   "product_id" int,
-  "product_img_url" varchar
+  "product_img_url" varchar,
+  "is_main" bool
 );
 
 CREATE TABLE "discount" (
