@@ -176,7 +176,7 @@ SIMPLE_JWT = {
     'USER_ID_FIELD': 'id',
     'USER_ID_CLAIM': 'user_id',
     'AUTH_HEADER_TYPES': ('Bearer',),
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60)
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=30),
 }
 STATIC_URL = '/static/'
 
