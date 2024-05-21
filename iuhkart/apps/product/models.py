@@ -4,6 +4,7 @@ from apps.account.models import Vendor, Customer
 from apps.custom_storage import AzureProductStorage
 # Create your models here.
 class Category(models.Model):
+    # This table can't add more rows by default
     category_id = models.AutoField(primary_key=True)
     category_name = models.CharField(max_length=50)
     slug = AutoSlugField(max_length=100, populate_from='category_name')
@@ -27,7 +28,6 @@ class Product(models.Model):
     product_description = models.TextField()
     
     created_by = models.ForeignKey(Vendor, on_delete=models.CASCADE, null=False)
-    customer = models.ForeignKey(Customer, related_name="customer", on_delete=models.CASCADE, null=True)
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
     
     def __str__(self) -> str:
@@ -40,6 +40,22 @@ class Product(models.Model):
 
 class ProductImages(models.Model):
     product_image_id = models.AutoField(primary_key=True)
-    product_id = models.ForeignKey(Product, on_delete=models.CASCADE)
+    product_id = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='images')
     image_url = models.ImageField(storage=AzureProductStorage(), max_length=255)
     is_main = models.BooleanField(default=False)
+    class Meta:
+        db_table = 'product_images'
+        verbose_name_plural = 'Product Images'
+        ordering = ['product_id', '-is_main']
+
+class Review(models.Model):
+    review_id = models.AutoField(primary_key=True)
+    product_id = models.ForeignKey(Product, on_delete=models.CASCADE)
+    customer_id = models.ForeignKey(Customer, on_delete=models.CASCADE)
+    review_content = models.TextField()
+    review_rating = models.PositiveIntegerField()
+    review_date = models.DateTimeField(auto_now_add=True)
+    class Meta:
+        db_table = 'review'
+        verbose_name_plural = 'Reviews'
+        ordering = ['-review_date']
