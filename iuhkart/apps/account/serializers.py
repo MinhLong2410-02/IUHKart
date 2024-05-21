@@ -2,6 +2,7 @@ from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from apps.account.models import Customer, Vendor
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from datetime import date
 
 User = get_user_model()
 
@@ -30,13 +31,22 @@ class CustomerSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Customer
-        fields = ('id', 'user', 'fullname', 'phone', 'date_of_birth', 'age', 'avatar_url')
+        fields = ('id', 'user', 'fullname', 'phone', 'date_of_birth', 'avatar_url')
 
     def create(self, validated_data):
         user_data = validated_data.pop('user')
         user = UserSerializer.create(UserSerializer(), validated_data=user_data)
-        customer = Customer.objects.create(user=user, **validated_data)
+        
+        date_of_birth = validated_data.pop('date_of_birth')
+        age = self.calculate_age(date_of_birth)
+        
+        customer = Customer.objects.create(user=user, date_of_birth=date_of_birth, age=age, **validated_data)
         return customer
+
+    def calculate_age(self, birthdate):
+        today = date.today()
+        age = today.year - birthdate.year - ((today.month, today.day) < (birthdate.month, birthdate.day))
+        return age
 
 class VendorSerializer(serializers.ModelSerializer):
     user = UserSerializer()

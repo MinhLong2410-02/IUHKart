@@ -1,5 +1,6 @@
 from rest_framework import generics, permissions
-from rest_framework_simplejwt.views import TokenObtainPairView
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+
 from apps.account.models import User, Customer, Vendor
 from apps.account.serializers import UserSerializer, CustomerSerializer, VendorSerializer, MyTokenObtainPairSerializer
 
