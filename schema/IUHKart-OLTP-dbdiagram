@@ -73,8 +73,9 @@ Table cart {
 
 Table review {
   review_id int [primary key, not null]
-  description text
-  ratings varchar(255) //enum('1', '2', '3', '4', '5') // Possible values: '1', '2', '3', '4', '5'
+  review_content text
+  review_rating varchar(255) //enum('1', '2', '3', '4', '5') // Possible values: '1', '2', '3', '4', '5'
+  review_date timestamp
   product_id int [not null]  
   customer_id int [not null]  
 }
@@ -105,13 +106,6 @@ Table category {
   category_name varchar(255)
   slug varchar(255)
   category_img_url varchar(255)
-}
-
-Table category_product{
-  category_product_id int pk
-  category_id int
-  product_id int
-
 }
 
 
@@ -159,8 +153,6 @@ Ref: ward.district_id > district.district_id
 Ref: ward.province_id > province.province_id
 Ref: user.user_id - vendor.vendor_id
 Ref: user.user_id - customer.customer_id
-Ref: category_product.category_id > category.category_id
-Ref: category_product.product_id > product.product_id
 Ref: transaction.transaction_id < product_discount.transaction_id
 Ref: transaction.payment_id - payment.payment_id
 Ref: transaction.order_id - order.order_id

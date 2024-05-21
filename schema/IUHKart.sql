@@ -70,8 +70,9 @@ CREATE TABLE "cart" (
 
 CREATE TABLE "review" (
   "review_id" int PRIMARY KEY NOT NULL,
-  "description" text,
-  "ratings" varchar(255),
+  "review_content" text,
+  "review_rating" varchar(255),
+  "review_date" timestamp,
   "product_id" int NOT NULL,
   "customer_id" int NOT NULL
 );
@@ -103,12 +104,6 @@ CREATE TABLE "category" (
   "category_name" varchar(255),
   "slug" varchar(255),
   "category_img_url" varchar(255)
-);
-
-CREATE TABLE "category_product" (
-  "category_product_id" int PRIMARY KEY,
-  "category_id" int,
-  "product_id" int
 );
 
 CREATE TABLE "transaction" (
@@ -159,10 +154,6 @@ ALTER TABLE "ward" ADD FOREIGN KEY ("province_id") REFERENCES "province" ("provi
 ALTER TABLE "vendor" ADD FOREIGN KEY ("vendor_id") REFERENCES "user" ("user_id");
 
 ALTER TABLE "customer" ADD FOREIGN KEY ("customer_id") REFERENCES "user" ("user_id");
-
-ALTER TABLE "category_product" ADD FOREIGN KEY ("category_id") REFERENCES "category" ("category_id");
-
-ALTER TABLE "category_product" ADD FOREIGN KEY ("product_id") REFERENCES "product" ("product_id");
 
 ALTER TABLE "product_discount" ADD FOREIGN KEY ("transaction_id") REFERENCES "transaction" ("transaction_id");
 
