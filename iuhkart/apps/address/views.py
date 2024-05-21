@@ -1,5 +1,6 @@
 from rest_framework import generics, permissions
-from apps.address.serializers import *
+from apps.address.models import Province, District, Ward, Address
+from apps.address.serializers import ProvinceSerializer, DistrictSerializer, WardSerializer, AddressSerializer
 
 class ProvinceListView(generics.ListAPIView):
     permission_classes = [permissions.IsAuthenticated]
@@ -8,20 +9,19 @@ class ProvinceListView(generics.ListAPIView):
 
 class DistrictListView(generics.ListAPIView):
     serializer_class = DistrictSerializer
-
+    permission_classes = [permissions.IsAuthenticated]
     def get_queryset(self):
         province_id = self.kwargs.get('province_id')
         return District.objects.filter(province_id=province_id)
 
 class WardListView(generics.ListAPIView):
     serializer_class = WardSerializer
-
+    permission_classes = [permissions.IsAuthenticated]
     def get_queryset(self):
-        province_id = self.kwargs.get('province_id')
-        return Ward.objects.filter(province_id=province_id)
+        district_id = self.kwargs.get('district_id')
+        return Ward.objects.filter(district_id=district_id)
 
 class AddressUpdateView(generics.UpdateAPIView):
-    queryset = Address.objects.all()
     serializer_class = AddressSerializer
     permission_classes = [permissions.IsAuthenticated]
 
