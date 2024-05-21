@@ -1,13 +1,13 @@
 from iuhkart.wsgi import *
 from django.contrib.auth import get_user_model
 from apps.product.models import Category, Product
-from apps.vendor.models import Vendor
-from apps.customers.models import Customer, User
+from apps.account.models import Vendor, Customer, User
 from apps.address.models import Province, District, Ward
 import pandas as pd
 from django.contrib.auth.hashers import make_password
-import json, random
+import json, random, sqlite3
 import os
+from rest_framework_simplejwt.tokens import RefreshToken
 os.system('migrate.bat')
 
 import ssl
@@ -17,22 +17,12 @@ path = {
     'province': 'https://raw.githubusercontent.com/MinhLong2410-02/VN-province-api-test/main/province.csv',
     'district': 'https://raw.githubusercontent.com/MinhLong2410-02/VN-province-api-test/main/district.csv',
     'ward': 'https://raw.githubusercontent.com/MinhLong2410-02/VN-province-api-test/main/ward.csv',
-    'category': '../schema/Database/categories.csv', # 'https://raw.githubusercontent.com/MinhLong2410-02/IUHKart/main/schema/Database/categories.csv?token=GHSAT0AAAAAACNO47DOPCF3BEIKDNAK5KSUZRMTRGA'
+    'category': '../schema/Database/categories.csv',
     'product': '../schema/Database/products.csv',
 }
 
-# def insert_data(model, csv_path):
-#     df = pd.read_csv(csv_path)
-#     fields = df.columns
-#     df = df.to_dict('records')
-#     model_objs = [model(
-#         **{field: rc[field] for field in fields}
-#     ) for rc in df]
-#     model.objects.bulk_create(model_objs)
-#     print(f'✅ Done inserting {model.__name__} data.')
-
 ########################
-# Adress
+# Address
 ########################
 def insert_address():
     try:
@@ -134,39 +124,52 @@ def insert_product():
 ########################
 # user - vendor
 ########################
-user1 = User.objects.create_user(
-        email='minhlong2002@gmail.com',
-        password=make_password('123'),
-        is_vendor=True,
+def create_user_with_jwt(email, password, is_vendor, name, phone, description):
+    user = User.objects.create_user(
+        email=email,
+        password=password,  # No need to hash the password here
+        is_vendor=is_vendor,
     )
-vendor1 = Vendor.objects.create(
-        user=user1,
-        name='Minh Long',
-        phone='1234567890',
-        description='This is a description for Vendor One.'
+    vendor = Vendor.objects.create(
+        user=user,
+        name=name,
+        phone=phone,
+        description=description
     )
-user2 = User.objects.create_user(
-    email='vanhau20022018@gmail.com',
-    password=make_password('123'),
+    refresh = RefreshToken.for_user(user)
+    access_token = str(refresh.access_token)
+    refresh_token = str(refresh)
+    return user, vendor, access_token, refresh_token
+
+user1, vendor1, token1, refresh1 = create_user_with_jwt(
+    email='minhlong2002@gmail.com',
+    password='123',  # Pass the plain password
     is_vendor=True,
+    name='Minh Long',
+    phone='1234567890',
+    description='This is a description for Vendor One.'
 )
-vendor2 = Vendor.objects.create(
-    user=user2,
+print(f'User: {user1.email}, Access Token: {token1}, Refresh Token: {refresh1}')
+
+user2, vendor2, token2, refresh2 = create_user_with_jwt(
+    email='vanhau20022018@gmail.com',
+    password='123',  # Pass the plain password
+    is_vendor=True,
     name='Văn Hậu',
     phone='1234567891',
     description='This is a description for Vendor Two.'
 )
-user3 = User.objects.create_user(
+print(f'User: {user2.email}, Access Token: {token2}, Refresh Token: {refresh2}')
+
+user3, vendor3, token3, refresh3 = create_user_with_jwt(
     email='quachnam311@gmail.com',
-    password=make_password('123'),
+    password='123',  # Pass the plain password
     is_vendor=True,
-)
-vendor3 = Vendor.objects.create(
-    user=user3,
     name='Qx Nam',
     phone='0398089311',
     description='This is a description for Vendor Three.'
 )
+print(f'User: {user3.email}, Access Token: {token3}, Refresh Token: {refresh3}')
 
 insert_address()
 insert_category()

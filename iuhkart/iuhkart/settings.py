@@ -12,8 +12,8 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 
 from pathlib import Path
 from dotenv import load_dotenv
-import os
 from os import environ
+from datetime import timedelta
 load_dotenv('./.env')
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -28,7 +28,10 @@ SECRET_KEY = 'django-insecure-)fl4jbp8qids&ut)=(a@55tw-^7&&kbhl*_5_0f!2$euge10d=
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOWED_ORIGINS  = ['https://3f70-2405-4802-811d-8a80-10b8-2988-6f1b-1e57.ngrok-free.app']
+CORS_ORIGIN_ALLOW_ALL = True   
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -44,13 +47,14 @@ DEFAULT_APPS  = [
 ]
 
 THIRD_PARTY_APPS = [
-    'crispy_forms',
-    'crispy_tailwind'
+    'corsheaders',
+    'rest_framework',
+    'rest_framework_simplejwt',
+    'drf_spectacular',
 ]
 
 LOCAL_APPS = [
-    'apps.vendor',
-    'apps.customers',
+    'apps.account',
     'apps.product',
     'apps.address',
 ]
@@ -61,6 +65,7 @@ INSTALLED_APPS = DEFAULT_APPS + LOCAL_APPS + THIRD_PARTY_APPS
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -142,23 +147,57 @@ USE_I18N = True
 
 USE_TZ = True
 
-AUTH_USER_MODEL = "customers.User"
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/5.0/howto/static-files/
+AUTH_USER_MODEL = "account.User"
 
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+}
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'IUHKart Snippets API',
+    'DESCRIPTION': 'Swagger for IUHKart Backend API',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+    'SWAGGER_UI_SETTINGS': {
+        'persistAuthorization': True,
+    },
+    'COMPONENT_SPLIT_REQUEST': True,
+    'POSTPROCESSING_HOOKS': [
+        'drf_spectacular.hooks.postprocess_schema_enums',
+    ],
+    'ENUM_NAME_OVERRIDES': {},
+    'SORT_OPERATION_PARAMETERS': True,
+    'DISABLE_ERRORS_AND_WARNINGS': False,
+}
+
+SIMPLE_JWT = {
+    'USER_ID_FIELD': 'id',
+    'USER_ID_CLAIM': 'user_id',
+    'AUTH_HEADER_TYPES': ('Bearer',),
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=30),
+}
 STATIC_URL = '/static/'
-STATIC_ROOT = BASE_DIR / "staticfiles"
-STATICFILES_DIRS = [BASE_DIR / 'static']
-STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
-CRISPY_TEMPLATE_PACK = "bootstrap4"
-CRISPY_ALLOWED_TEMPLATE_PACKS = "tailwind"
-CRISPY_TEMPLATE_PACK = "tailwind"
-
 
 
 # MEDIA_URL = '/media/'
 # MEDIA_ROOT = BASE_DIR / 'media' 
+DEFAULT_FILE_STORAGE = 'storages.backends.azure_storage.AzureStorage'
+AZURE_ACCOUNT_NAME = environ.get('AZURE_ACCOUNT_NAME')
+AZURE_ACCOUNT_KEY = environ.get('AZURE_ACCOUNT_KEY')
+AZURE_CUSTOM_DOMAIN = f'{AZURE_ACCOUNT_NAME}.blob.core.windows.net'
+DEFAULT_FILE_STORAGE = 'storages.backends.azure_storage.AzureStorage'
+AZURE_CONNECTION_STRING = environ.get('AZURE_CONNECTION_STRING')
 
+# Specify Azure storage settings
+class AzureStorageSettings:
+    def __init__(self):
+        self.account_name = AZURE_ACCOUNT_NAME
+        self.account_key = AZURE_ACCOUNT_KEY
+        self.custom_domain = AZURE_CUSTOM_DOMAIN
+
+AZURE_STORAGE_SETTINGS = AzureStorageSettings()
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
@@ -171,12 +210,3 @@ EMAIL_PORT = 587
 EMAIL_HOST_USER = 'aiclub.iuh@gmail.com'
 EMAIL_HOST_PASSWORD = "abc"
 EMAIL_USE_TLS = True
-
-JAZZMIN_SETTINGS={
-    "site_title":"IUHKart",
-    "site_header": "IUHKart",
-    "site_brand": "Administration",
-    "welcome_sign": "Welcome to the Vendor Page",
-    "login_logo": "/images/logo.png",
-    "show_ui_builder": True,
-}

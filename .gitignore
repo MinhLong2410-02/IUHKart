@@ -161,6 +161,8 @@ cython_debug/
 #.idea/
 
 *.zip
+a.html
+*.ipynb
 
 # qdrant
 search/__pycache__/

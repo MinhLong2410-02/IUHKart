@@ -1,7 +1,6 @@
 from django.db import models
 from autoslug import AutoSlugField
-from apps.vendor.models import Vendor
-from apps.customers.models import Customer
+from apps.account.models import Vendor, Customer
 # Create your models here.
 class Category(models.Model):
     category_id = models.AutoField(primary_key=True)
@@ -26,7 +25,7 @@ class Product(models.Model):
     slug = AutoSlugField(max_length=255, populate_from='product_name')
     product_description = models.TextField()
     
-    created_by = models.ForeignKey(Vendor, on_delete=models.CASCADE)
+    created_by = models.ForeignKey(Vendor, on_delete=models.CASCADE, null=False)
     customer = models.ForeignKey(Customer, related_name="customer", on_delete=models.CASCADE, null=True)
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
     
@@ -42,3 +41,4 @@ class ProductImages(models.Model):
     product_image_id = models.AutoField(primary_key=True)
     product_id = models.ForeignKey(Product, on_delete=models.CASCADE)
     image_url = models.URLField(max_length=255)
+    is_main = models.BooleanField(default=False)

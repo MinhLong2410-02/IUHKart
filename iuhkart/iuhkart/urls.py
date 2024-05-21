@@ -16,12 +16,22 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-# from apps.vendor.forms import CustomAuthForm
-from django.contrib.auth.views import LoginView
+from drf_spectacular.views import (
+    SpectacularAPIView,
+    SpectacularRedocView,
+    SpectacularSwaggerView,
+)
 
-urlpatterns = [
+swagger_urlpatterns = [
+    path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
+    path('swagger/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
+    path('api/schema/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc')
+]
+
+urlpatterns = swagger_urlpatterns + [
     path('admin/', admin.site.urls),
-    path('vendor/',include('apps.vendor.urls')),
-    path('customer/', include('apps.customers.urls')),
+    path('user/',include('apps.account.urls')),
+    path('address/',include('apps.address.urls')),
+    
     path('product/', include('apps.product.urls')),
 ]
