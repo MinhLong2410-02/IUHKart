@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from apps.account.models import User
 from apps.account.serializers import *
+from drf_spectacular.utils import extend_schema
 
 class RegisterCustomerView(generics.CreateAPIView):
     queryset = User.objects.all()
@@ -28,6 +29,12 @@ class UpdateCustomerAvatarView(generics.UpdateAPIView):
 
     def get_object(self):
         return self.request.user.customer
+    @extend_schema(
+        exclude=True,
+        methods=['GET', 'PATCH']
+    )
+    def patch(self, request, *args, **kwargs):
+        pass
 
 class UpdateVendorLogoView(generics.UpdateAPIView):
     serializer_class = VendorLogoUploadSerializer
@@ -35,3 +42,30 @@ class UpdateVendorLogoView(generics.UpdateAPIView):
 
     def get_object(self):
         return self.request.user.vendor
+    
+    @extend_schema(
+        exclude=True,
+        methods=['GET', 'PATCH']
+    )
+    def patch(self, request, *args, **kwargs):
+        pass
+class CustomerUpdateAPIView(generics.RetrieveUpdateAPIView):
+    serializer_class = CustomerDOBUpdateSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_object(self):
+        return self.request.user.customer
+    
+    @extend_schema(
+        exclude=True,
+        methods=['GET', 'PATCH']
+    )
+    def get(self, request, *args, **kwargs):
+        pass
+
+    @extend_schema(
+        exclude=True,
+        methods=['GET', 'PATCH']
+    )
+    def patch(self, request, *args, **kwargs):
+        pass
