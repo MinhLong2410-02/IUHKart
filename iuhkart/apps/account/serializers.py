@@ -31,7 +31,7 @@ class CustomerSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Customer
-        fields = ('id', 'user', 'fullname', 'phone', 'date_of_birth', 'avatar_url')
+        fields = ('id', 'user', 'fullname', 'phone', 'date_of_birth')
 
     def create(self, validated_data):
         user_data = validated_data.pop('user')
@@ -66,3 +66,25 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
         data = super().validate(attrs)
         data['role'] = 'customer' if self.user.is_customer else 'vendor' if self.user.is_vendor else 'unknown'
         return data
+
+class CustomerAvatarUploadSerializer(serializers.ModelSerializer):
+    avatar_url = serializers.ImageField()
+    class Meta:
+        model = Customer
+        fields = ['avatar_url']
+
+    def validate_avatar_url(self, value):
+        if value.size > 1024 * 1024 * 5:
+            raise serializers.ValidationError("Avatar size should not exceed 5MB.")
+        return value
+
+class VendorLogoUploadSerializer(serializers.ModelSerializer):
+    logo_url = serializers.ImageField()
+    class Meta:
+        model = Vendor
+        fields = ['logo_url']
+
+    def validate_logo_url(self, value):
+        if value.size > 1024 * 1024 * 5:
+            raise serializers.ValidationError("Logo size should not exceed 5MB.")
+        return value

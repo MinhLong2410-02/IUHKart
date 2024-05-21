@@ -12,8 +12,8 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 
 from pathlib import Path
 from dotenv import load_dotenv
-import os
 from os import environ
+from datetime import timedelta
 load_dotenv('./.env')
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -165,28 +165,39 @@ SPECTACULAR_SETTINGS = {
     },
     'COMPONENT_SPLIT_REQUEST': True,
     'POSTPROCESSING_HOOKS': [
-        'drf_spectacular.hooks.postprocess_schema_enums'
+        'drf_spectacular.hooks.postprocess_schema_enums',
     ],
     'ENUM_NAME_OVERRIDES': {},
     'SORT_OPERATION_PARAMETERS': True,
     'DISABLE_ERRORS_AND_WARNINGS': False,
 }
+
 SIMPLE_JWT = {
     'USER_ID_FIELD': 'id',
     'USER_ID_CLAIM': 'user_id',
     'AUTH_HEADER_TYPES': ('Bearer',),
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60)
 }
-
 STATIC_URL = '/static/'
-STATIC_ROOT = BASE_DIR / "staticfiles"
-STATICFILES_DIRS = [BASE_DIR / 'static']
-STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
-
 
 
 # MEDIA_URL = '/media/'
 # MEDIA_ROOT = BASE_DIR / 'media' 
+DEFAULT_FILE_STORAGE = 'storages.backends.azure_storage.AzureStorage'
+AZURE_ACCOUNT_NAME = environ.get('AZURE_ACCOUNT_NAME')
+AZURE_ACCOUNT_KEY = environ.get('AZURE_ACCOUNT_KEY')
+AZURE_CUSTOM_DOMAIN = f'{AZURE_ACCOUNT_NAME}.blob.core.windows.net'
+DEFAULT_FILE_STORAGE = 'storages.backends.azure_storage.AzureStorage'
+AZURE_CONNECTION_STRING = environ.get('AZURE_CONNECTION_STRING')
 
+# Specify Azure storage settings
+class AzureStorageSettings:
+    def __init__(self):
+        self.account_name = AZURE_ACCOUNT_NAME
+        self.account_key = AZURE_ACCOUNT_KEY
+        self.custom_domain = AZURE_CUSTOM_DOMAIN
+
+AZURE_STORAGE_SETTINGS = AzureStorageSettings()
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field

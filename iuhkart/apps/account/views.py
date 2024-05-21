@@ -1,8 +1,9 @@
 from rest_framework import generics, permissions
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
-
-from apps.account.models import User, Customer, Vendor
-from apps.account.serializers import UserSerializer, CustomerSerializer, VendorSerializer, MyTokenObtainPairSerializer
+from rest_framework.response import Response
+from rest_framework import status
+from apps.account.models import User
+from apps.account.serializers import *
 
 class RegisterCustomerView(generics.CreateAPIView):
     queryset = User.objects.all()
@@ -20,3 +21,17 @@ class RegisterVendorView(generics.CreateAPIView):
 
 class MyTokenObtainPairView(TokenObtainPairView):
     serializer_class = MyTokenObtainPairSerializer
+
+class UpdateCustomerAvatarView(generics.UpdateAPIView):
+    serializer_class = CustomerAvatarUploadSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_object(self):
+        return self.request.user.customer
+
+class UpdateVendorLogoView(generics.UpdateAPIView):
+    serializer_class = VendorLogoUploadSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_object(self):
+        return self.request.user.vendor

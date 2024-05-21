@@ -5,10 +5,9 @@ from apps.account.models import Vendor, Customer, User
 from apps.address.models import Province, District, Ward
 import pandas as pd
 from django.contrib.auth.hashers import make_password
-import json, random
+import json, random, sqlite3
 import os
 from rest_framework_simplejwt.tokens import RefreshToken
-
 os.system('migrate.bat')
 
 import ssl

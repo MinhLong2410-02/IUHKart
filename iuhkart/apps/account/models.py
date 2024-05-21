@@ -3,6 +3,7 @@ from django.contrib.auth.models import AbstractBaseUser
 from apps.address.models import Address
 from apps.account.manager import UserManager
 from django.utils.translation import gettext_lazy as _
+from apps.custom_storage import AzureCustomerStorage, AzureVendorStorage
 # Create your models here.
 class User(AbstractBaseUser):
     username = None
@@ -27,7 +28,7 @@ class Customer(models.Model):
     fullname = models.CharField(max_length=255)
     date_of_birth = models.DateField(blank=True, null=True)
     age = models.SmallIntegerField()
-    avatar_url = models.CharField(max_length=255, blank=True, null=True)
+    avatar_url = models.ImageField(storage=AzureCustomerStorage(), max_length=255, blank=True, null=True)
     class Meta:
         verbose_name_plural = "Customers"
         db_table = 'customer'
@@ -38,6 +39,7 @@ class Vendor(models.Model):
     name = models.CharField(max_length=255, blank=True, null=True)
     phone = models.CharField(max_length=20, blank=True, null=True)
     description = models.TextField(blank=True, null=True)
+    logo_url = models.ImageField(storage=AzureVendorStorage(), blank=True, null=True)
     class Meta:
         verbose_name_plural = "Vendors"
         db_table = 'vendor'
