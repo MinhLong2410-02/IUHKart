@@ -1,6 +1,7 @@
 from rest_framework import generics, permissions
 from apps.address.models import Province, District, Ward, Address
 from apps.address.serializers import ProvinceSerializer, DistrictSerializer, WardSerializer, AddressSerializer
+from drf_spectacular.utils import extend_schema
 
 class ProvinceListView(generics.ListAPIView):
     permission_classes = [permissions.IsAuthenticated]
@@ -27,3 +28,10 @@ class AddressUpdateView(generics.UpdateAPIView):
 
     def get_object(self):
         return self.request.user.address
+    @extend_schema(
+        exclude=True,
+        methods=['GET', 'PATCH']
+    )
+    def patch(self, request, *args, **kwargs):
+        pass
+    
