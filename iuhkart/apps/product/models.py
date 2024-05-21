@@ -1,6 +1,7 @@
 from django.db import models
 from autoslug import AutoSlugField
 from apps.account.models import Vendor, Customer
+from apps.custom_storage import AzureProductStorage
 # Create your models here.
 class Category(models.Model):
     category_id = models.AutoField(primary_key=True)
@@ -40,5 +41,5 @@ class Product(models.Model):
 class ProductImages(models.Model):
     product_image_id = models.AutoField(primary_key=True)
     product_id = models.ForeignKey(Product, on_delete=models.CASCADE)
-    image_url = models.URLField(max_length=255)
+    image_url = models.ImageField(storage=AzureProductStorage(), max_length=255)
     is_main = models.BooleanField(default=False)
