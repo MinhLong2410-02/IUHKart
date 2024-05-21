@@ -156,8 +156,8 @@ REST_FRAMEWORK = {
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
 SPECTACULAR_SETTINGS = {
-    'TITLE': 'Snippets API',
-    'DESCRIPTION': 'Test description',
+    'TITLE': 'IUHKart Snippets API',
+    'DESCRIPTION': 'Swagger for IUHKart Backend API',
     'VERSION': '1.0.0',
     'SERVE_INCLUDE_SCHEMA': False,
     'SWAGGER_UI_SETTINGS': {
