@@ -42,3 +42,11 @@ class ProductImages(models.Model):
     product_id = models.ForeignKey(Product, on_delete=models.CASCADE)
     image_url = models.URLField(max_length=255)
     is_main = models.BooleanField(default=False)
+
+    def __str__(self) -> str:
+        return f"{self.product_image_id} - {self.product_id} - {self.image_url} - {self.is_main}"
+    
+    class Meta:
+        db_table = 'product_images'
+        verbose_name_plural = 'ProductImages'
+        ordering = ['-product_image_id']
