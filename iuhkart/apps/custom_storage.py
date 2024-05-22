@@ -15,3 +15,6 @@ class AzureCustomerStorage(AzureCustomStorage):
 
 class AzureVendorStorage(AzureCustomStorage):
     azure_container = 'vendor'  
+    
+class AzureProductStorage(AzureCustomStorage):
+    azure_container = 'product'  
