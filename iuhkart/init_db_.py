@@ -1,6 +1,6 @@
 from iuhkart.wsgi import *
 from django.contrib.auth import get_user_model
-from apps.product.models import Category, Product
+from apps.product.models import Category, Product, ProductImages
 from apps.account.models import Vendor, Customer, User
 from apps.address.models import Province, District, Ward
 import pandas as pd
@@ -19,6 +19,7 @@ path = {
     'ward': 'https://raw.githubusercontent.com/MinhLong2410-02/VN-province-api-test/main/ward.csv',
     'category': '../schema/Database/categories.csv',
     'product': '../schema/Database/products.csv',
+    'product_image': '../schema/Database/product_images.csv',
 }
 
 ########################
@@ -121,6 +122,37 @@ def insert_product():
     except Exception as e:
         print(f'❌ {Product.__name__} - {e}')
 
+def insert_product_image():
+    try:
+        df = pd.read_csv(path['product_image'])
+
+        # process
+        df.drop_duplicates(subset=['product_img_id', 'product_id'], inplace=True)
+        df_ = df['product_id'].value_counts().to_frame().reset_index()
+        limit5 = df_[df_['count']<=5]['product_id'].values
+        unlimit5 = df_[df_['count']>5]['product_id'].values
+        df['is_main'] = df['product_id'].apply(lambda x: True if x in limit5 else False)
+        for _id in unlimit5:
+            product_img_id_5 = df[df['product_id']==_id].sample(5)['product_img_id'].values
+            df['is_main'] = df['product_img_id'].apply(lambda x: True if x in product_img_id_5 else False)
+        del df_, limit5, unlimit5
+        df.columns = ['product_image_id', 'product_id', 'image_url', 'is_main']
+
+        # convert to dict
+        df = df.to_dict('records')
+        product_cache = {x.product_id: x for x in Product.objects.all()}
+
+        model_objs = [ProductImages(
+            product_image_id=rc['product_image_id'],
+            product_id=product_cache[rc['product_id']],
+            image_url=rc['image_url'],
+            is_main=rc['is_main']
+        ) for rc in df]
+        ProductImages.objects.bulk_create(model_objs)
+        print(f'✅ {ProductImages.__name__}')
+    except Exception as e:
+        print(f'❌ {ProductImages.__name__} - {e}')
+
 ########################
 # user - vendor
 ########################
@@ -174,3 +206,4 @@ print(f'User: {user3.email}, Access Token: {token3}, Refresh Token: {refresh3}')
 insert_address()
 insert_category()
 insert_product()
+insert_product_image()
