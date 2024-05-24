@@ -1,8 +1,0 @@
-﻿version: '3.9'
-services:
-  cloudflare:
-    image: cloudflare/cloudflared:latest
-    container_name: metabase-cloudflare
-    restart: always
-    command: tunnel --no-autoupdate run --token eyJhIjoiODZlYTNjZjEwNmRlMTU3Yjc2NTg0YzgyODgyNDdmMTciLCJ0IjoiMjkwNDAwODQtZmM4NS00YmFhLTk1OTUtODA0NDc3ZTY1OTA3IiwicyI6IlpqZzFaV0UwWm1JdFpESTBNaTAwTUdSaExUZ3habVV0WVdaa05UazNOV0kyTVdVMSJ9
-
