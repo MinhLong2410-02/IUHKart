@@ -11,7 +11,7 @@ services:
     restart: unless-stopped
 
   qdrant_fastapi:
-    build: ./app
+    build: ./services/app
     ports:
       - "8008:8000"
     env_file:
@@ -22,7 +22,7 @@ services:
     depends_on:
       - qdrant_db
     volumes:
-      - ./app:/app
+      - ./services/app:/app
       - ./services/qdrant-db-volume:/qdrant/storage
     restart: unless-stopped
 
