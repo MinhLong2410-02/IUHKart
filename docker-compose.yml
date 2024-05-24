@@ -10,7 +10,7 @@ services:
       - ./services/qdrant-db-volume:/qdrant/storage
     restart: unless-stopped
 
-  fastapi:
+  qdrant_fastapi:
     build: ./app
     ports:
       - "8008:8000"
@@ -57,7 +57,7 @@ services:
     volumes:
       - ./iuhkart:/app
     restart: unless-stopped
-    
+
 networks:
   iuhkart-network:
     name: iuhkart
