@@ -26,12 +26,13 @@ services:
       - ./services/qdrant-db-volume:/qdrant/storage
     restart: unless-stopped
 
-  iuhkart_cloudflare:
+  cloudflare:
     image: cloudflare/cloudflared:latest
     container_name: iuhkart-cloudflare
     restart: unless-stopped
     command: tunnel --no-autoupdate run --token eyJhIjoiODZlYTNjZjEwNmRlMTU3Yjc2NTg0YzgyODgyNDdmMTciLCJ0IjoiMjkwNDAwODQtZmM4NS00YmFhLTk1OTUtODA0NDc3ZTY1OTA3IiwicyI6IlpqZzFaV0UwWm1JdFpESTBNaTAwTUdSaExUZ3habVV0WVdaa05UazNOV0kyTVdVMSJ9
-
+    networks:
+      - iuhkart-network
   metabase:
     image: metabase/metabase:latest
     container_name: metabase
@@ -45,7 +46,7 @@ services:
       - MB_DB_FILE=/metabase-data/metabase.db
     restart: unless-stopped
 
-  iuhkart_django_main:
+  django_main:
     build: ./iuhkart
     ports:
       - "8009:8000"
