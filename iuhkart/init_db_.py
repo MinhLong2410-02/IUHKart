@@ -1,18 +1,20 @@
 from iuhkart.wsgi import *
+from iuhkart.settings import *
 from django.contrib.auth import get_user_model
 from apps.product.models import Category, Product, ProductImages
 from apps.account.models import Vendor, Customer, User
-from apps.address.models import Province, District, Ward
+from apps.address.models import Province, District, Ward, Address
 import pandas as pd
 from django.contrib.auth.hashers import make_password
 import json, random, sqlite3
 import os
 from rest_framework_simplejwt.tokens import RefreshToken
-os.system('migrate.bat')
+
 
 import ssl
 ssl._create_default_https_context = ssl._create_stdlib_context
-
+print(F'✅ STATUS: {PROJECT_STATUS}')
+os.system('migrate.bat')
 path = {
     'province': 'https://raw.githubusercontent.com/MinhLong2410-02/VN-province-api-test/main/province.csv',
     'district': 'https://raw.githubusercontent.com/MinhLong2410-02/VN-province-api-test/main/district.csv',
@@ -99,7 +101,7 @@ def insert_product():
     try:
         df = pd.read_csv(path['product'])
         # process
-        vendor_id_list = [1, 2, 3]
+        vendor_id_list = [1, 2]
         df['vendor_id'] = df['vendor_id'].apply(lambda _: random.choice(vendor_id_list))
         df = df.drop_duplicates('product_id')
 
@@ -120,6 +122,7 @@ def insert_product():
         Product.objects.bulk_create(model_objs)
         print(f'✅ {Product.__name__}')
     except Exception as e:
+        print(e)
         print(f'❌ {Product.__name__} - {e}')
 
 def insert_product_image():
@@ -153,14 +156,17 @@ def insert_product_image():
     except Exception as e:
         print(f'❌ {ProductImages.__name__} - {e}')
 
+insert_address()
+insert_category()
+
 ########################
-# user - vendor
+# user - vendor - customer
 ########################
-def create_user_with_jwt(email, password, is_vendor, name, phone, description):
+def create_vendor_with_jwt(email, password, name, phone, description):
     user = User.objects.create_user(
         email=email,
         password=password,  # No need to hash the password here
-        is_vendor=is_vendor,
+        is_vendor=True,
     )
     vendor = Vendor.objects.create(
         user=user,
@@ -173,37 +179,65 @@ def create_user_with_jwt(email, password, is_vendor, name, phone, description):
     refresh_token = str(refresh)
     return user, vendor, access_token, refresh_token
 
-user1, vendor1, token1, refresh1 = create_user_with_jwt(
+def create_customer_with_jwt(email, password, fullname, phone, date_of_birth):
+    user = User.objects.create_user(
+        email=email,
+        password=password,  # No need to hash the password here
+        is_customer=True,
+    )
+    customer = Customer.objects.create(
+        user=user,
+        fullname=fullname,
+        phone=phone,
+        date_of_birth=date_of_birth,
+        # age is calculated by the date_of_birth
+        age = 2024 - int(date_of_birth.split('-')[0])
+    )
+    province = Province.objects.get(province_id=79)
+    district = District.objects.get(province_id=province, district_id=764)
+    ward = Ward.objects.get(district_id=district, ward_id=26899)
+    Address.objects.create(
+        province_id=province,
+        district_id=district,
+        ward_id=ward,
+        address_detail='13/1 Phường 11, quận Gò Vấp, TP.HCM',
+    )
+    address = Address.objects.get(address_detail='13/1 Phường 11, quận Gò Vấp, TP.HCM')
+    user.address = address
+    user.save()
+    refresh = RefreshToken.for_user(user)
+    access_token = str(refresh.access_token)
+    refresh_token = str(refresh)
+    return user, customer, access_token, refresh_token
+
+user1, vendor1, token1, refresh1 = create_vendor_with_jwt(
     email='minhlong2002@gmail.com',
     password='123',  # Pass the plain password
-    is_vendor=True,
     name='Minh Long',
     phone='1234567890',
     description='This is a description for Vendor One.'
 )
 print(f'User: {user1.email}, Access Token: {token1}, Refresh Token: {refresh1}')
 
-user2, vendor2, token2, refresh2 = create_user_with_jwt(
+user2, customer2, token2, refresh2 = create_customer_with_jwt(
     email='vanhau20022018@gmail.com',
     password='123',  # Pass the plain password
-    is_vendor=True,
-    name='Văn Hậu',
-    phone='1234567891',
-    description='This is a description for Vendor Two.'
+    fullname='Văn Hậu',
+    phone='0987654321',
+    date_of_birth='2002-02-20',
 )
+
 print(f'User: {user2.email}, Access Token: {token2}, Refresh Token: {refresh2}')
 
-user3, vendor3, token3, refresh3 = create_user_with_jwt(
+user3, vendor3, token3, refresh3 = create_vendor_with_jwt(
     email='quachnam311@gmail.com',
     password='123',  # Pass the plain password
-    is_vendor=True,
     name='Qx Nam',
     phone='0398089311',
     description='This is a description for Vendor Three.'
 )
 print(f'User: {user3.email}, Access Token: {token3}, Refresh Token: {refresh3}')
 
-insert_address()
-insert_category()
+
 insert_product()
 insert_product_image()
