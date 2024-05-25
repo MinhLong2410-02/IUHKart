@@ -1,12 +1,9 @@
 from django.db import models
-from apps.product.models import Product, Customer
 
 class Cart(models.Model):
     cart_id = models.AutoField(primary_key=True)
-    customer_id = models.OneToOneField(Customer, on_delete=models.CASCADE)
-    product_id = models.ManyToManyField(Product, through='CartProduct')
-    grand_total = models.DecimalField(max_digits=10, decimal_places=2)
-    items_total = models.PositiveIntegerField()
+    grand_total = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    items_total = models.PositiveIntegerField(default=0)
     class Meta:
         db_table = 'cart'
         verbose_name_plural = 'Carts'
@@ -14,6 +11,9 @@ class Cart(models.Model):
 
 class CartProduct(models.Model):
     cart_product_id = models.AutoField(primary_key=True)
-    cart_id = models.ForeignKey(Cart, on_delete=models.CASCADE)
-    product_id = models.ForeignKey(Product, on_delete=models.CASCADE)
+    cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name='cart_products', db_column='cart_id')
+    product = models.ForeignKey('product.Product', on_delete=models.CASCADE, db_column='product_id')
     quantity = models.PositiveIntegerField()
+    class Meta:
+        db_table = 'cart_product'
+        ordering = ['-cart_id']

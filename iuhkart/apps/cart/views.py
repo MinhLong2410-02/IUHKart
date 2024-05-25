@@ -1,47 +1,74 @@
-from rest_framework import status, generics, viewsets, permissions
+from rest_framework import status, generics, permissions
 from rest_framework.response import Response
 from apps.cart.models import Cart, CartProduct
-from apps.cart.serializers import CartSerializer, CartProductSerializer, UpdateCartProductSerializer
+from apps.account.models import Customer
+from apps.cart.serializers import *
+from django.db.models import Sum, F
+from drf_spectacular.utils import extend_schema
 
-class CartViewSet(viewsets.ModelViewSet):
-    queryset = Cart.objects.all()
-    serializer_class = CartSerializer
+
+class ProductAddToCartView(generics.CreateAPIView):
+    queryset = CartProduct.objects.all()
+    serializer_class = AddCartProductSerializer
     permission_classes = [permissions.IsAuthenticated]
 
-    
+    def perform_create(self, serializer):
+        serializer.save()
     def create(self, request, *args, **kwargs):
-        # Implement logic to create a cart
-        return super().create(request, *args, **kwargs)
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
 
-    def destroy(self, request, *args, **kwargs):
-        # Implement logic to delete a product from the cart or the whole cart
-        pk = kwargs.get('pk')
-        cart_product = CartProduct.objects.filter(cart_product_id=pk)
-        if cart_product.exists():
-            cart_product.delete()
-            return Response({'status': 'product removed'}, status=status.HTTP_204_NO_CONTENT)
-        return Response({'error': 'Not found'}, status=status.HTTP_404_NOT_FOUND)
-
-    def update(self, request, *args, **kwargs):
-        # Update product quantity in the cart
-        cart_product_id = request.data.get('cart_product_id')
-        quantity = request.data.get('quantity')
-        cart_product = CartProduct.objects.get(pk=cart_product_id)
-        serializer = UpdateCartProductSerializer(cart_product, data={'quantity': quantity}, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-class CartDetailsView(generics.RetrieveAPIView):
-    queryset = Cart.objects.all()
-    serializer_class = CartSerializer
+        # Fetch the updated cart data
+        cart = request.user.customer.cart
+        cart_serializer = CartSerializer(cart)
+        return Response(cart_serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+class ProductDeleteFromCartView(generics.DestroyAPIView):
+    queryset = CartProduct.objects.all()
     permission_classes = [permissions.IsAuthenticated]
-    def get(self, request, *args, **kwargs):
-        customer = request.user.customer
+    serializer_class = CartSerializer  
+
+    def delete(self, request, product_id):
+        cart = request.user.customer.cart
         try:
-            cart = Cart.objects.get(customer_id=customer)
-            serializer = self.get_serializer(cart)
-            return Response(serializer.data)
+            cart_product = CartProduct.objects.get(cart_id=cart, product_id=product_id)  # Find the CartProduct entry
+            cart_product.delete()
+            cart.items_total = CartProduct.objects.filter(cart=cart).aggregate(total_quantity=Sum('quantity'))['total_quantity'] or 0
+            cart.grand_total = CartProduct.objects.filter(cart=cart).aggregate(total_price=Sum(F('product__original_price') * F('quantity')))['total_price'] or 0.00
+            cart.save()
+
+            serializer = CartSerializer(cart)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except CartProduct.DoesNotExist:
+            return Response({'error': 'Product not found in cart'}, status=status.HTTP_404_NOT_FOUND)
+class ProductQuantityUpdateView(generics.UpdateAPIView):
+    queryset = CartProduct.objects.all()
+    serializer_class = UpdateCartProductSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_object(self):
+        # Get the CartProduct based on the product_id and the user's cart
+        product_id = self.kwargs.get('product_id')
+        user = self.request.user
+        cart = user.customer.cart  # Assuming a direct relation like user.customer.cart exists
+        return CartProduct.objects.get(cart=cart, product=product_id)
+    
+    @extend_schema(
+        exclude=True,
+        methods=['PATCH']
+    )
+    def patch(self, request, *args, **kwargs):
+        pass
+
+class CartDetailView(generics.RetrieveAPIView):
+    serializer_class = GetCartSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_object(self):
+        # Ensure that you handle the case where a customer or cart does not exist
+        customer = Customer.objects.get(user=self.request.user)
+        try:
+            return customer.cart  # Assumes customer.cart is valid and exists
         except Cart.DoesNotExist:
-            return Response({"error": "Cart not found"}, status=status.HTTP_404_NOT_FOUND)
+            return Response({'error': 'Cart not found.'}, status=status.HTTP_404_NOT_FOUND)

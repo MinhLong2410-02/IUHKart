@@ -1,6 +1,5 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser
-from apps.address.models import Address
 from apps.account.manager import UserManager
 from django.utils.translation import gettext_lazy as _
 from apps.custom_storage import AzureCustomerStorage, AzureVendorStorage
@@ -8,7 +7,7 @@ from apps.custom_storage import AzureCustomerStorage, AzureVendorStorage
 class User(AbstractBaseUser):
     username = None
     email = models.EmailField(_('email address'), unique=True, max_length=255)
-    address = models.OneToOneField(Address, models.DO_NOTHING, blank=True, null=True)
+    address = models.OneToOneField('address.Address', models.DO_NOTHING, blank=True, null=True)
     is_customer = models.BooleanField(default=False)
     is_vendor = models.BooleanField(default=False)
     
@@ -23,7 +22,7 @@ class User(AbstractBaseUser):
 
 class Customer(models.Model):
     phone = models.CharField(max_length=17, blank=True, null=True)
-    
+    cart = models.OneToOneField('cart.Cart', on_delete=models.CASCADE, blank=True, null=True, db_column='cart_id')
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='customer', blank=True, null=True)
     fullname = models.CharField(max_length=255)
     date_of_birth = models.DateField(blank=True, null=True)

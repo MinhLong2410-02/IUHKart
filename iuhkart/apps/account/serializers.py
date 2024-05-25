@@ -1,6 +1,8 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from apps.account.models import Customer, Vendor
+from apps.cart.models import Cart
+
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from datetime import date
 
@@ -66,10 +68,12 @@ class CustomerSerializer(serializers.ModelSerializer):
             age = self.calculate_age(date_of_birth)
         else:
             age = None
-        customer = Customer.objects.create(user=user, date_of_birth=date_of_birth, age=age, **validated_data)
+        cart = Cart.objects.create()
+        customer = Customer.objects.create(user=user, cart_id = cart, date_of_birth=date_of_birth, age=age, **validated_data)
         user.is_customer = True
         if not self.isUserIsVendor(user):
             user.save()
+            
         return customer
 
     def calculate_age(self, birthdate):
@@ -99,7 +103,12 @@ class VendorSerializer(serializers.ModelSerializer):
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
     def validate(self, attrs):
         data = super().validate(attrs)
-        data['role'] = 'customer' if self.user.is_customer else 'vendor' if self.user.is_vendor else 'unknown'
+        roles = []
+        if self.user.is_customer:
+            roles.append('customer')
+        if self.user.is_vendor:
+            roles.append('vendor')
+        data['role'] = roles
         return data
 
 class CustomerAvatarUploadSerializer(serializers.ModelSerializer):
