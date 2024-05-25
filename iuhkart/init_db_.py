@@ -217,7 +217,7 @@ user1, vendor1, token1, refresh1 = create_vendor_with_jwt(
     phone='1234567890',
     description='This is a description for Vendor One.'
 )
-print(f'User: {user1.email}, Access Token: {token1}, Refresh Token: {refresh1}')
+print(f'✅ Vendor: {user1.email}, Access Token: {token1}, Refresh Token: {refresh1}')
 
 user2, customer2, token2, refresh2 = create_customer_with_jwt(
     email='vanhau20022018@gmail.com',
@@ -227,7 +227,7 @@ user2, customer2, token2, refresh2 = create_customer_with_jwt(
     date_of_birth='2002-02-20',
 )
 
-print(f'User: {user2.email}, Access Token: {token2}, Refresh Token: {refresh2}')
+print(f'✅ Customer: {user2.email}, Access Token: {token2}, Refresh Token: {refresh2}')
 
 user3, vendor3, token3, refresh3 = create_vendor_with_jwt(
     email='quachnam311@gmail.com',
@@ -236,8 +236,7 @@ user3, vendor3, token3, refresh3 = create_vendor_with_jwt(
     phone='0398089311',
     description='This is a description for Vendor Three.'
 )
-print(f'User: {user3.email}, Access Token: {token3}, Refresh Token: {refresh3}')
-
+print(f'✅ Vendor: {user3.email}, Access Token: {token3}, Refresh Token: {refresh3}')
 
 insert_product()
 insert_product_image()
