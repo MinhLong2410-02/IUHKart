@@ -30,9 +30,9 @@ class CustomerProductSerializer(serializers.ModelSerializer):
         
     @extend_schema_field(ProductImageSerializer(allow_null=True))
     def get_images(self, obj):
-        image = obj.images.filter(is_main=True).first()
-        if image:
-            return ProductImageSerializer(image).data
+        main_image = ProductImages.objects.filter(product_id = obj.product_id).first()
+        if main_image:
+            return ProductImageSerializer(main_image).data
         return None
 
 class ProductCreateSerializer(serializers.ModelSerializer):
