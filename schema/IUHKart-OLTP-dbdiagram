@@ -70,6 +70,12 @@ Table cart {
   items_total int
 }
 
+Table cart_product{
+  cart_product_id int [primary key, not null]
+  cart_id int [not null]
+  product_id int [not null]
+  quantity int
+}
 
 Table review {
   review_id int [primary key, not null]
@@ -147,6 +153,8 @@ table ward{
   type varchar(10) //enum: ward, commune, town
 }
 
+Ref: cart_product.cart_id < cart.cart_id
+Ref: cart_product.product_id < product.product_id
 Ref: province.province_id - address.province_id
 Ref: district.province_id > province.province_id
 Ref: ward.district_id > district.district_id
@@ -171,6 +179,3 @@ Ref: cart.product_id > product.product_id
 Ref: review.customer_id > customer.customer_id
 Ref: review.product_id > product.product_id
 Ref: product_image.product_id > product.product_id
-
-// Ref: payment.order_id > order.order_id
-// Ref: "customer"."customer_id" < "customer"."FullName"

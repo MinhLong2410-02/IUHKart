@@ -68,6 +68,13 @@ CREATE TABLE "cart" (
   "items_total" int
 );
 
+CREATE TABLE "cart_product" (
+  "cart_product_id" int PRIMARY KEY NOT NULL,
+  "cart_id" int NOT NULL,
+  "product_id" int NOT NULL,
+  "quantity" int
+);
+
 CREATE TABLE "review" (
   "review_id" int PRIMARY KEY NOT NULL,
   "review_content" text,
@@ -142,6 +149,10 @@ CREATE TABLE "ward" (
   "district_id" int,
   "type" varchar(10)
 );
+
+ALTER TABLE "cart" ADD FOREIGN KEY ("cart_id") REFERENCES "cart_product" ("cart_id");
+
+ALTER TABLE "product" ADD FOREIGN KEY ("product_id") REFERENCES "cart_product" ("product_id");
 
 ALTER TABLE "address" ADD FOREIGN KEY ("province_id") REFERENCES "province" ("province_id");
 
