@@ -4,6 +4,8 @@ from django.contrib.auth import get_user_model
 from apps.product.models import Category, Product, ProductImages
 from apps.account.models import Vendor, Customer, User
 from apps.address.models import Province, District, Ward, Address
+from apps.cart.models import Cart
+
 import pandas as pd
 from django.contrib.auth.hashers import make_password
 import json, random, sqlite3
@@ -185,12 +187,13 @@ def create_customer_with_jwt(email, password, fullname, phone, date_of_birth):
         password=password,  # No need to hash the password here
         is_customer=True,
     )
+    cart = Cart.objects.create()
     customer = Customer.objects.create(
         user=user,
         fullname=fullname,
         phone=phone,
         date_of_birth=date_of_birth,
-        # age is calculated by the date_of_birth
+        cart = cart,
         age = 2024 - int(date_of_birth.split('-')[0])
     )
     province = Province.objects.get(province_id=79)
@@ -208,6 +211,9 @@ def create_customer_with_jwt(email, password, fullname, phone, date_of_birth):
     refresh = RefreshToken.for_user(user)
     access_token = str(refresh.access_token)
     refresh_token = str(refresh)
+    
+    # Cart.objects.create(customer=customer)
+    
     return user, customer, access_token, refresh_token
 
 user1, vendor1, token1, refresh1 = create_vendor_with_jwt(
