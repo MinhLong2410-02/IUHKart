@@ -62,8 +62,6 @@ CREATE TABLE "payment" (
 
 CREATE TABLE "cart" (
   "cart_id" int PRIMARY KEY NOT NULL,
-  "product_id" int NOT NULL,
-  "customer_id" int UNIQUE NOT NULL,
   "grand_total" float,
   "items_total" int
 );
@@ -93,6 +91,7 @@ CREATE TABLE "vendor" (
 
 CREATE TABLE "customer" (
   "customer_id" int PRIMARY KEY,
+  "cart_id" int,
   "fullname" varchar(30),
   "date_of_birth" date,
   "age" smallint,
@@ -150,9 +149,9 @@ CREATE TABLE "ward" (
   "type" varchar(10)
 );
 
-ALTER TABLE "cart" ADD FOREIGN KEY ("cart_id") REFERENCES "cart_product" ("cart_id");
+ALTER TABLE "cart_product" ADD FOREIGN KEY ("cart_id") REFERENCES "cart" ("cart_id");
 
-ALTER TABLE "product" ADD FOREIGN KEY ("product_id") REFERENCES "cart_product" ("product_id");
+ALTER TABLE "cart_product" ADD FOREIGN KEY ("product_id") REFERENCES "product" ("product_id");
 
 ALTER TABLE "address" ADD FOREIGN KEY ("province_id") REFERENCES "province" ("province_id");
 
@@ -192,9 +191,7 @@ ALTER TABLE "user" ADD FOREIGN KEY ("address_id") REFERENCES "address" ("address
 
 ALTER TABLE "order" ADD FOREIGN KEY ("address_id") REFERENCES "address" ("address_id");
 
-ALTER TABLE "customer" ADD FOREIGN KEY ("customer_id") REFERENCES "cart" ("customer_id");
-
-ALTER TABLE "cart" ADD FOREIGN KEY ("product_id") REFERENCES "product" ("product_id");
+ALTER TABLE "customer" ADD FOREIGN KEY ("cart_id") REFERENCES "cart" ("cart_id");
 
 ALTER TABLE "review" ADD FOREIGN KEY ("customer_id") REFERENCES "customer" ("customer_id");
 
