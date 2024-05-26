@@ -18,7 +18,7 @@ class RegisterVendorView(generics.CreateAPIView):
     serializer_class = VendorSerializer
 
     def perform_create(self, serializer):
-        user = serializer.save(user__is_vendor=True)
+        user = serializer.save()
 
 class MyTokenObtainPairView(TokenObtainPairView):
     serializer_class = MyTokenObtainPairSerializer
