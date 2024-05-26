@@ -5,15 +5,32 @@ from rest_framework import status
 from apps.account.models import User
 from apps.account.serializers import *
 from drf_spectacular.utils import extend_schema
+from rest_framework_simplejwt.tokens import RefreshToken
 
 class RegisterCustomerView(generics.CreateAPIView):
     queryset = User.objects.all()
     serializer_class = CustomerSerializer
-
+    def create(self, request, *args, **kwargs):
+        response = super().create(request, *args, **kwargs)
+        user = User.objects.get(email=response.data['user']['email'])
+        refresh = RefreshToken.for_user(user)
+        return Response({
+            'refresh': str(refresh),
+            'access': str(refresh.access_token),
+            'customer': response.data
+        }, status=status.HTTP_201_CREATED)
 class RegisterVendorView(generics.CreateAPIView):
     queryset = User.objects.all()
     serializer_class = VendorSerializer
-
+    def create(self, request, *args, **kwargs):
+        response = super().create(request, *args, **kwargs)
+        user = User.objects.get(email=response.data['user']['email'])
+        refresh = RefreshToken.for_user(user)
+        return Response({
+            'refresh': str(refresh),
+            'access': str(refresh.access_token),
+            'vendor': response.data
+        }, status=status.HTTP_201_CREATED)
 class MyTokenObtainPairView(TokenObtainPairView):
     serializer_class = MyTokenObtainPairSerializer
 

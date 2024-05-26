@@ -69,7 +69,7 @@ class CustomerSerializer(serializers.ModelSerializer):
         else:
             age = None
         cart = Cart.objects.create()
-        customer = Customer.objects.create(user=user, cart_id = cart, date_of_birth=date_of_birth, age=age, **validated_data)
+        customer = Customer.objects.create(user=user, cart = cart, date_of_birth=date_of_birth, age=age, **validated_data)
         user.is_customer = True
         if not self.isUserIsVendor(user):
             user.save()
