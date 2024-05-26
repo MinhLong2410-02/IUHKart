@@ -10,15 +10,9 @@ class RegisterCustomerView(generics.CreateAPIView):
     queryset = User.objects.all()
     serializer_class = CustomerSerializer
 
-    def perform_create(self, serializer):
-        user = serializer.save(user__is_customer=True)
-
 class RegisterVendorView(generics.CreateAPIView):
     queryset = User.objects.all()
     serializer_class = VendorSerializer
-
-    def perform_create(self, serializer):
-        user = serializer.save()
 
 class MyTokenObtainPairView(TokenObtainPairView):
     serializer_class = MyTokenObtainPairSerializer
