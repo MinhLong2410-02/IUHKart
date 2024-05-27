@@ -1,8 +1,9 @@
 from django.db import models
 
 class Address(models.Model):
-    address_id = models.IntegerField(primary_key=True)
+    address_id = models.AutoField(primary_key=True)
     province_id = models.OneToOneField('Province', models.DO_NOTHING, db_column='province_id', blank=True, null=True)
+    district_id = models.OneToOneField('District', models.DO_NOTHING, db_column='district_id', blank=True, null=True)
     ward_id = models.OneToOneField('Ward', models.DO_NOTHING, db_column='ward_id', blank=True, null=True)
     
     address_detail = models.CharField(max_length=200, blank=True, null=True)

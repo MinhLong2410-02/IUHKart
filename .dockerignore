@@ -1,0 +1,14 @@
+# ignore folders
+schema/
+Ecommerce-Management-DBMS_Project-/
+search/
+.venv/
+.git/
+# ignore files
+*.bat
+*.sh    
+requirements.txt
+*.pyc
+*.ipynb_checkpoints
+*.ipynb
+.gitignore

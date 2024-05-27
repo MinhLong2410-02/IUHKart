@@ -57,6 +57,7 @@ LOCAL_APPS = [
     'apps.account',
     'apps.product',
     'apps.address',
+    'apps.cart',
 ]
 
 INSTALLED_APPS = DEFAULT_APPS + LOCAL_APPS + THIRD_PARTY_APPS
@@ -96,8 +97,8 @@ WSGI_APPLICATION = 'iuhkart.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
-
-if environ.get('STATUS') == 'DEV':
+PROJECT_STATUS = environ.get('STATUS')
+if PROJECT_STATUS == 'DEV':
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',

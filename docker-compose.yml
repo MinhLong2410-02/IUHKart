@@ -1,0 +1,92 @@
+version: '3.0'
+services:
+  qdrant_db:
+    image: qdrant/qdrant:v1.4.1
+    ports:
+      - "6336:6333"
+    networks:
+      - iuhkart-network
+    volumes:
+      - ./services/qdrant-db-volume:/qdrant/storage
+    restart: unless-stopped
+  mongo_db:
+    image: mongo:latest
+    command: mongod --auth
+    container_name: mongo_db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: admin
+      MONGO_INITDB_DATABASE: customer-keep-track
+      MONGO_DATA_DIR: /data/db
+      MONGO_LOG_DIR: /dev/null
+    ports:
+      - "27017:27017"
+    networks:
+      - iuhkart-network
+    volumes:
+      - ./services/mongo-db-volume:/data/db
+    restart: unless-stopped
+  qdrant_fastapi:
+    build: ./services/app
+    ports:
+      - "8008:8000"
+    env_file:
+      - ./services/.env
+    working_dir: /app
+    networks:
+      - iuhkart-network
+    depends_on:
+      - qdrant_db
+      - mongo_db
+    volumes:
+      - ./services/app:/app
+      - ./services/qdrant-db-volume:/qdrant/storage
+    restart: unless-stopped
+
+  cloudflare:
+    image: cloudflare/cloudflared:latest
+    container_name: iuhkart-cloudflare
+    restart: unless-stopped
+    command: tunnel --no-autoupdate run --token eyJhIjoiODZlYTNjZjEwNmRlMTU3Yjc2NTg0YzgyODgyNDdmMTciLCJ0IjoiMjkwNDAwODQtZmM4NS00YmFhLTk1OTUtODA0NDc3ZTY1OTA3IiwicyI6IlpqZzFaV0UwWm1JdFpESTBNaTAwTUdSaExUZ3habVV0WVdaa05UazNOV0kyTVdVMSJ9
+    networks:
+      - iuhkart-network
+    depends_on:
+      - django_main
+  metabase:
+    image: metabase/metabase:latest
+    container_name: metabase
+    ports:
+      - "3000:3000"
+    networks:
+      - iuhkart-network
+    volumes:
+      - ./services/metabase-data:/metabase-data
+    environment:
+      - MB_DB_FILE=/metabase-data/metabase.db
+    restart: unless-stopped
+
+  django_main:
+    build: ./iuhkart
+    ports:
+      - "8009:8000"
+    env_file:
+      - ./iuhkart/.env
+    working_dir: /app
+    networks:
+      - iuhkart-network
+    volumes:
+      - ./iuhkart:/app
+    restart: unless-stopped
+    depends_on:
+      - qdrant_fastapi
+      - mongo_db
+  
+networks:
+  iuhkart-network:
+    name: iuhkart
+    driver: bridge
+
+volumes:
+  qdrant-db-volume:
+  metabase-data:
+  mongo-db-volume:
