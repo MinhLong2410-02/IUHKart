@@ -2,3 +2,4 @@ fastapi
 uuid
 requests
 qdrant_client
+pydantic

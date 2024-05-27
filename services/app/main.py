@@ -1,39 +1,15 @@
 from fastapi import FastAPI, HTTPException
-import os, requests
+from app.schemas import InsertPointRequestBody, UpdatePointRequestBody
 from uuid import uuid4
-from dotenv import load_dotenv
-from qdrant_client import QdrantClient, models
-from qdrant_client.http.models import Distance, VectorParams, PointStruct
+from app.qdrant_base import client, _check_exist, _get_points, PointStruct, models, getTextEmbedding
 
 app = FastAPI()
-client = QdrantClient(host='qdrant_db', port=6333)
 
-def _check_exist(collection_name):
-    return collection_name in [c.name for c in client.get_collections().collections]
-
-def _get_points(collection_name, product_id):
-    res = client.scroll(
-        collection_name=collection_name,
-        scroll_filter=models.Filter(
-            must=[
-                models.FieldCondition(
-                    key="product_id",
-                    match=models.MatchValue(value=product_id),
-                )
-            ]
-        )
-    )[0]
-    return res
 
 ## ----- Base -----
 @app.get("/")
 async def root():
     return {"message": "api-qdrant"}
-
-@app.get("/env")
-async def check_env():
-    load_dotenv()
-    return os.environ
 
 ## ----- CRUD -----
 @app.get("/collections", status_code=200)
@@ -53,49 +29,21 @@ async def get_points(collection_name:str=None):
     res = [i.payload for i in res]
     return  {'payloads': res}
 
-# create a new collection
-@app.post("/collections/create", status_code=201)
-async def create_collection(collection_name:str=None):
-    '''tạo 1 collection mới, nếu đã tồn tại thì thôi'''
-    if collection_name is None:
-        raise HTTPException(status_code=404, detail="Collection name not found!")
-    res = 'existed'
-    if collection_name not in [c.name for c in client.get_collections().collections]:
-        client.create_collection(
-            collection_name=collection_name,
-            vectors_config=VectorParams(size=384, distance=Distance.COSINE)
-        )
-        res = 'success'
-    return {'detail': res}
-
-# delete a collection
-@app.delete("/collections/delete", status_code=200)
-async def delete_collection(collection_name:str=None):
-    '''xóa 1 collection, nếu không tồn tại thì thôi'''
-    if collection_name is None:
-        raise HTTPException(status_code=404, detail="Collection name not found!")
-    res = 'not found'
-    if collection_name in [c.name for c in client.get_collections().collections]:
-        client.delete_collection(collection_name)
-        res = 'deleted'
-    return {'detail': res}
-
 # insert a new point
 @app.post("/collections/{collection_name}/insert", status_code=201)
-async def insert_point(collection_name:str=None, slug:str=None, product_id:int=None, product_name:str=None, product_url:str=None):
+async def insert_point(collection_name:str, request: InsertPointRequestBody):
     '''thêm 1 point mới vào collection_name'''
-    if slug is None:
-        raise HTTPException(status_code=404, detail="Slug not found!")
+    
     if collection_name is None or _check_exist(collection_name)==False:
         raise HTTPException(status_code=404, detail="Collection name not found!")
-    response = requests.get(str(os.getenv('TEXT_EMBEDDING_URL')) + '?q=' + slug)
-    vector = response.json()['embedding'] if response.status_code == 200 else None
+    vector = getTextEmbedding(request.slug)
+    
     if vector is None:
         return {'detail': 'Vector is None'}
     payload = {
-        'product_id': product_id,
-        'product_name': product_name,
-        'product_url': product_url
+        'product_id': request.product_id,
+        'product_name': request.product_name,
+        'product_image_url': request.product_image_url
     }
     point = PointStruct(id=str(uuid4()),
                         vector=vector,
@@ -106,29 +54,25 @@ async def insert_point(collection_name:str=None, slug:str=None, product_id:int=N
 
 # update a point
 @app.put("/collections/{collection_name}/update", status_code=200)
-async def update_point(collection_name:str=None, slug:str=None, product_id:int=None, product_name:str=None, product_url:str=None):
-    '''cập nhật 1 point trong collection_name, neu khong them param thi giu param cu theo product_id'''
-    if collection_name is None or _check_exist(collection_name)==False:
+async def update_point(collection_name: str, request: UpdatePointRequestBody):
+    '''Update a point in collection_name'''
+    if not _check_exist(collection_name):
         raise HTTPException(status_code=404, detail="Collection name not found!")
-    points = _get_points(collection_name, product_id)
-    p = points[0]
+    points = _get_points(collection_name, request.product_id)
     if len(points) == 0:
-        return {'detail': 'ID not found!'}
+        raise HTTPException(status_code=404, detail="Product ID not found!")
+    p = points[0]
     vector = p.vector
-    if slug:
-        response = requests.get(str(os.getenv('TEXT_EMBEDDING_URL')) + '?q=' + slug)
-        vector = response.json()['embedding'] if response.status_code == 200 else None
+    if request.slug:
+        vector = getTextEmbedding(request.slug)
         if vector is None:
             return {'detail': 'Vector is None'}
     payload = p.payload
-    if product_name:
-        payload["product_name"] = product_name
-    if product_url:
-        payload["product_url"] = product_url
-    point = PointStruct(id=p.id,
-        vector=vector,
-        payload=payload
-    )
+    if request.product_name:
+        payload["product_name"] = request.product_name
+    if request.product_image_url:
+        payload["product_image_url"] = request.product_image_url
+    point = PointStruct(id=p.id, vector=vector, payload=payload)
     client.upsert(collection_name=collection_name, points=[point])
     return {'payload': payload}
 
@@ -163,8 +107,8 @@ async def search(collection_name:str=None, slug:str=None, limit:int=10, thresh:f
         raise HTTPException(status_code=404, detail="Slug not found!")
     if collection_name is None or _check_exist(collection_name)==False:
         raise HTTPException(status_code=404, detail="Collection name not found!")
-    response = requests.get(str(os.getenv('TEXT_EMBEDDING_URL')) + '?q=' + slug)
-    vector = response.json()['embedding'] if response.status_code == 200 else None
+    
+    vector = getTextEmbedding(slug)
     if vector is None:
         return {'detail': 'Vector is None'}
     res = client.search(
