@@ -66,9 +66,8 @@ class CartDetailView(generics.RetrieveAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_object(self):
-        # Ensure that you handle the case where a customer or cart does not exist
         customer = Customer.objects.get(user=self.request.user)
         try:
-            return customer.cart  # Assumes customer.cart is valid and exists
+            return customer.cart 
         except Cart.DoesNotExist:
             return Response({'error': 'Cart not found.'}, status=status.HTTP_404_NOT_FOUND)

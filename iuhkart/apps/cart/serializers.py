@@ -2,7 +2,6 @@ from rest_framework import serializers
 from apps.cart.models import Cart, CartProduct
 from apps.product.models import Product, ProductImages
 from django.db.models import Sum, F
-
 class ProductImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductImages
