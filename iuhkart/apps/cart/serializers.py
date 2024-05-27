@@ -40,13 +40,21 @@ class AddCartProductSerializer(serializers.ModelSerializer):
 
         # Retrieve the cart from the user (context passed in view)
         cart = self.context['request'].user.customer.cart
-
-        # Create the CartProduct instance
-        cart_product = CartProduct.objects.create(
+        stock = product.stock
+        if quantity > stock:
+            quantity = stock
+        
+        
+        # Check if the product is already in the cart
+        cart_product, created = CartProduct.objects.update_or_create(
             cart=cart,
             product=product,
-            quantity=quantity
+            defaults={'quantity': quantity}  # This updates the quantity if the row exists
         )
+        if created:
+            cart_product.quantity = quantity
+            cart_product.save()
+        cart_product = CartProduct.objects.filter(cart=cart, product=product).first()
 
         cart.items_total += quantity
         cart.grand_total += product.original_price * quantity
