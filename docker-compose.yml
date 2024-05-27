@@ -9,7 +9,23 @@ services:
     volumes:
       - ./services/qdrant-db-volume:/qdrant/storage
     restart: unless-stopped
-
+  mongo_db:
+    image: mongo:latest
+    command: mongod --auth
+    container_name: mongo_db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: admin
+      MONGO_INITDB_DATABASE: customer-keep-track
+      MONGO_DATA_DIR: /data/db
+      MONGO_LOG_DIR: /dev/null
+    ports:
+      - "27017:27017"
+    networks:
+      - iuhkart-network
+    volumes:
+      - ./services/mongo-db-volume:/data/db
+    restart: unless-stopped
   qdrant_fastapi:
     build: ./services/app
     ports:
@@ -21,6 +37,7 @@ services:
       - iuhkart-network
     depends_on:
       - qdrant_db
+      - mongo_db
     volumes:
       - ./services/app:/app
       - ./services/qdrant-db-volume:/qdrant/storage
@@ -33,6 +50,8 @@ services:
     command: tunnel --no-autoupdate run --token eyJhIjoiODZlYTNjZjEwNmRlMTU3Yjc2NTg0YzgyODgyNDdmMTciLCJ0IjoiMjkwNDAwODQtZmM4NS00YmFhLTk1OTUtODA0NDc3ZTY1OTA3IiwicyI6IlpqZzFaV0UwWm1JdFpESTBNaTAwTUdSaExUZ3habVV0WVdaa05UazNOV0kyTVdVMSJ9
     networks:
       - iuhkart-network
+    depends_on:
+      - django_main
   metabase:
     image: metabase/metabase:latest
     container_name: metabase
@@ -58,7 +77,10 @@ services:
     volumes:
       - ./iuhkart:/app
     restart: unless-stopped
-
+    depends_on:
+      - qdrant_fastapi
+      - mongo_db
+  
 networks:
   iuhkart-network:
     name: iuhkart
@@ -67,3 +89,4 @@ networks:
 volumes:
   qdrant-db-volume:
   metabase-data:
+  mongo-db-volume:
