@@ -1,23 +1,23 @@
 from fastapi import FastAPI, HTTPException
-from app.schemas import InsertPointRequestBody, UpdatePointRequestBody
+from schemas import InsertPointRequestBody, UpdatePointRequestBody
 from uuid import uuid4
-from app.qdrant_base import client, _check_exist, _get_points, PointStruct, models, getTextEmbedding
+from qdrant_base import client, _check_exist, _get_points, PointStruct, models, getTextEmbedding
 
-fastapi_app = FastAPI()
+app = FastAPI()
 
 
 ## ----- Base -----
-@fastapi_app.get("/")
+@app.get("/")
 async def root():
     return {"message": "api-qdrant"}
 
 ## ----- CRUD -----
-@fastapi_app.get("/collections", status_code=200)
+@app.get("/collections", status_code=200)
 async def get_collections():
     '''xem tất cả các collection hiện có'''
     return {'collections': [c.name for c in client.get_collections().collections]}
 
-@fastapi_app.get("/collections/{collection_name}", status_code=200)
+@app.get("/collections/{collection_name}", status_code=200)
 async def get_points(collection_name:str=None):
     '''xem tất cả point trong collection_name'''
     if collection_name is None or _check_exist(collection_name)==False:
@@ -30,7 +30,7 @@ async def get_points(collection_name:str=None):
     return  {'payloads': res}
 
 # insert a new point
-@fastapi_app.post("/collections/{collection_name}/insert", status_code=201)
+@app.post("/collections/{collection_name}/insert", status_code=201)
 async def insert_point(collection_name:str, request: InsertPointRequestBody):
     '''thêm 1 point mới vào collection_name'''
     
@@ -53,7 +53,7 @@ async def insert_point(collection_name:str, request: InsertPointRequestBody):
     return {'payload': payload}
 
 # update a point
-@fastapi_app.put("/collections/{collection_name}/update", status_code=200)
+@app.put("/collections/{collection_name}/update", status_code=200)
 async def update_point(collection_name: str, request: UpdatePointRequestBody):
     '''Update a point in collection_name'''
     if not _check_exist(collection_name):
@@ -77,7 +77,7 @@ async def update_point(collection_name: str, request: UpdatePointRequestBody):
     return {'payload': payload}
 
 # delete a point
-@fastapi_app.delete("/collections/{collection_name}/delete", status_code=200)
+@app.delete("/collections/{collection_name}/delete", status_code=200)
 async def delete_point(collection_name:str=None, product_id:int=None):
     '''xóa 1 point theo product_id trong collection_name'''
     if collection_name is None or _check_exist(collection_name)==False:
@@ -100,7 +100,7 @@ async def delete_point(collection_name:str=None, product_id:int=None):
     return {'detail': 'deleted'}
 
 # search
-@fastapi_app.get("/collections/{collection_name}/search", status_code=200)
+@app.get("/collections/{collection_name}/search", status_code=200)
 async def search(collection_name:str=None, slug:str=None, limit:int=10, thresh:float=0.0):
     '''tìm kiếm các point gần nhất với slug trong collection_name, lấy theo giới hạn và ngưỡng'''
     if slug is None:
