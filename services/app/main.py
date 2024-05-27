@@ -1,7 +1,7 @@
 from fastapi import FastAPI, HTTPException
-from app.schemas import InsertPointRequestBody, UpdatePointRequestBody
+from .schemas import InsertPointRequestBody, UpdatePointRequestBody
 from uuid import uuid4
-from app.qdrant_base import client, _check_exist, _get_points, PointStruct, models, getTextEmbedding
+from .qdrant_base import client, _check_exist, _get_points, PointStruct, models, getTextEmbedding
 
 app = FastAPI()
 
