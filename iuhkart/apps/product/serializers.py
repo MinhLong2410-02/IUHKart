@@ -1,6 +1,13 @@
 from rest_framework import serializers
-from apps.product.models import Product, ProductImages
+from apps.product.models import Product, ProductImages, Category
 from drf_spectacular.utils import extend_schema_field
+
+class CategorySerializer(serializers.ModelSerializer):
+    category_id = serializers.IntegerField(required=False)
+
+    class Meta:
+        model = Category
+        fields = ['category_id', 'category_name', 'category_img_url']
 class ProductImageSerializer(serializers.ModelSerializer):
     image_url = serializers.ImageField()
 

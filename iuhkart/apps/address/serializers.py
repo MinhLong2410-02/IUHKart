@@ -32,9 +32,9 @@ class AddressSerializer(serializers.ModelSerializer):
         }
 
     def update(self, instance, validated_data):
-        instance.province = validated_data.get('province', instance.province)
-        instance.district = validated_data.get('district', instance.district)
-        instance.ward = validated_data.get('ward', instance.ward)
+        instance.province_id = validated_data.get('province_id', instance.province)
+        instance.district_id = validated_data.get('district_id', instance.district)
+        instance.ward_id = validated_data.get('ward_id', instance.ward)
         instance.address_detail = validated_data.get('address_detail', instance.address_detail)
         instance.save()
         return instance

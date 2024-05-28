@@ -11,6 +11,27 @@ from drf_spectacular.openapi import OpenApiParameter
 # Create your views here.
 
 @extend_schema(
+    parameters=[
+        OpenApiParameter(
+            name='category_id',
+            type=int,
+            location=OpenApiParameter.QUERY,
+            required=False,
+            description='If category_id is None, all categories will be returned. Otherwise, only the category with the specified category_id will be returned.'
+        )
+    ]
+)
+class CategoryListView(generics.ListAPIView):
+    serializer_class = CategorySerializer
+    queryset = Category.objects.all()
+    permission_classes = [permissions.AllowAny]
+    def get_queryset(self, *args, **kwargs):
+        queryset = super().get_queryset()  
+        category_id = self.request.query_params.get('category_id', None)
+        if category_id is not None:
+            queryset = queryset.filter(category_id=category_id)
+        return queryset
+@extend_schema(
     summary="Get all vendor's products.",
     description="This endpoint allows the authenticated vendor to retrieve a paginated list of their products.",
     parameters=[
@@ -26,6 +47,13 @@ from drf_spectacular.openapi import OpenApiParameter
             location=OpenApiParameter.QUERY,
             description='Number of products per page. Default is 10.',
         ),
+        OpenApiParameter(
+            name='category_id',
+            type=int,
+            location=OpenApiParameter.QUERY,
+            required=False,
+            description='If category_id is None, all product will be returned.'
+        )
     ],
 )
 class VendorProductListView(generics.ListAPIView):
@@ -35,6 +63,9 @@ class VendorProductListView(generics.ListAPIView):
 
     def get_queryset(self):
         vendor = self.request.user.vendor
+        category_id = self.request.query_params.get('category_id', None)
+        if category_id is not None:
+            return Product.objects.filter(created_by=vendor, category=category_id).select_related('created_by', 'category').prefetch_related('images')
         return Product.objects.filter(created_by=vendor).select_related('created_by', 'category').prefetch_related('images')
 
 @extend_schema(
@@ -53,6 +84,13 @@ class VendorProductListView(generics.ListAPIView):
             location=OpenApiParameter.QUERY,
             description='Number of products per page. Default is 10.',
         ),
+        OpenApiParameter(
+            name='category_id',
+            type=int,
+            location=OpenApiParameter.QUERY,
+            required=False,
+            description='If category_id is None, all product will be returned.'
+        )
     ],
 )
 class CustomerProductListView(generics.ListAPIView):
@@ -60,6 +98,12 @@ class CustomerProductListView(generics.ListAPIView):
     pagination_class = VendorProductResultsSetPagination
     permission_classes = [permissions.IsAuthenticated]
     queryset = Product.objects.all().select_related('created_by', 'category').prefetch_related('images')
+    def get_queryset(self):
+        queryset = super().get_queryset()  
+        category_id = self.request.query_params.get('category_id', None)
+        if category_id is not None:
+            return Product.objects.filter(category=category_id).select_related('created_by', 'category').prefetch_related('images')
+        return queryset
 
 class VendorProductCreateView(generics.CreateAPIView):
     serializer_class = ProductCreateSerializer

@@ -1,7 +1,7 @@
 from fastapi import FastAPI, HTTPException
 from schemas import InsertPointRequestBody, UpdatePointRequestBody
 from uuid import uuid4
-from qdrant_base import client, _check_exist, _get_points, PointStruct, models, getTextEmbedding
+from qdrant_base import client, _check_exist, _get_points, PointStruct, models, getTextEmbedding, VectorParams, Distance
 
 app = FastAPI()
 
@@ -98,6 +98,21 @@ async def delete_point(collection_name:str=None, product_id:int=None):
         )
     )
     return {'detail': 'deleted'}
+
+# create a new collection
+@app.post("/collections/create", status_code=201)
+async def create_collection(collection_name:str=None):
+    '''tạo 1 collection mới, nếu đã tồn tại thì thôi'''
+    if collection_name is None:
+        raise HTTPException(status_code=404, detail="Collection name not found!")
+    res = 'existed'
+    if collection_name not in [c.name for c in client.get_collections().collections]:
+        client.create_collection(
+            collection_name=collection_name,
+            vectors_config=VectorParams(size=384, distance=Distance.COSINE)
+        )
+        res = 'success'
+    return {'detail': res}
 
 # search
 @app.get("/collections/{collection_name}/search", status_code=200)
