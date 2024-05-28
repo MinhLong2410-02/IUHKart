@@ -7,6 +7,7 @@ from apps.address.models import Province, District, Ward, Address
 from apps.cart.models import Cart
 
 import pandas as pd
+import numpy as np
 import json, random, sqlite3
 import os
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -127,22 +128,24 @@ def insert_product():
         print(e)
         print(f'❌ {Product.__name__} - {e}')
 
+def assign_is_main(group):
+    num_images = len(group)
+    if num_images <= 3:
+        group['is_main'] = True
+    else:
+        main_indices = np.random.choice(group.index, 3, replace=False)
+        group['is_main'] = False
+        group.loc[main_indices, 'is_main'] = True
+    return group
 def insert_product_image():
     try:
         df = pd.read_csv(path['product_image'])
-
         # process
         df.drop_duplicates(subset=['product_img_id', 'product_id'], inplace=True)
-        df_ = df['product_id'].value_counts().to_frame().reset_index()
-        limit5 = df_[df_['count']<=5]['product_id'].values
-        unlimit5 = df_[df_['count']>5]['product_id'].values
-        df['is_main'] = df['product_id'].apply(lambda x: True if x in limit5 else False)
-        for _id in unlimit5:
-            product_img_id_5 = df[df['product_id']==_id].sample(5)['product_img_id'].values
-            df['is_main'] = df['product_img_id'].apply(lambda x: True if x in product_img_id_5 else False)
-        del df_, limit5, unlimit5
+        df = df.groupby('product_id', group_keys=False).apply(assign_is_main)
+        df.to_csv('test.csv', index=False)
         df.columns = ['product_image_id', 'product_id', 'image_url', 'is_main']
-
+        df.to_csv('../schema/Database/product_images_main.csv', index=False)
         # convert to dict
         df = df.to_dict('records')
         product_cache = {x.product_id: x for x in Product.objects.all()}
@@ -249,6 +252,7 @@ insert_product_image()
 
 ## vector database
 def init_qdrant():
+    broken_products = []
     collection_name='product'
     requests.delete(f'https://qdrant-iuhkart.aiclubiuh.com/collections/delete?collection_name={collection_name}')
     requests.post(f'https://qdrant-iuhkart.aiclubiuh.com/collections/create?collection_name={collection_name}')
@@ -259,9 +263,9 @@ def init_qdrant():
     for _, iter in loop:
         product_image = product_image_df[(product_image_df['product_id']==iter['product_id']) & (product_image_df['is_main']==True)]
         if product_image.shape[0] == 0:
-            print(iter['product_id'], iter['product_name'])
+            broken_products.append((iter['product_id'], iter['product_name']))
             continue
-        image_url = product_image['product_img_url'].values[0]
+        image_url = product_image['image_url'].values[0]
         request_body = {
             'slug': iter['slug'],
             'product_id': iter['product_id'],
@@ -273,5 +277,6 @@ def init_qdrant():
                             headers={"Content-Type": "application/json"}
                 )
         loop.set_postfix(status_code='success' if res.status_code == 201 else 'fail')
-
+    df = pd.DataFrame(broken_products, columns=['product_id', 'product_name'])
+    df.to_csv('broken_products.csv', index=False)
 init_qdrant()
