@@ -14,8 +14,8 @@ CREATE TABLE "fact_discount" (
   "discount_id" int PRIMARY KEY NOT NULL,
   "name" varchar(255),
   "percent" float,
-  "start" datetime,
-  "end" datetime,
+  "start" date,
+  "end" date,
   "product_id" int NOT NULL,
   "vendor_id" int NOT NULL
 );
@@ -32,7 +32,7 @@ CREATE TABLE "dim_customer" (
   "email" varchar(50),
   "date_of_birth" date,
   "phone" varchar(20),
-  "age" tinyint,
+  "age" smallint,
   "avatar_url" varchar(200),
   "address_id" int NOT NULL
 );
@@ -112,7 +112,7 @@ ALTER TABLE "fact_discount" ADD FOREIGN KEY ("vendor_id") REFERENCES "dim_vendor
 
 ALTER TABLE "dim_vendor" ADD FOREIGN KEY ("address_id") REFERENCES "address" ("address_id");
 
-ALTER TABLE "province" ADD FOREIGN KEY ("province_id") REFERENCES "address" ("province_id");
+ALTER TABLE "address" ADD FOREIGN KEY ("province_id") REFERENCES "province" ("province_id");
 
 ALTER TABLE "district" ADD FOREIGN KEY ("province_id") REFERENCES "province" ("province_id");
 

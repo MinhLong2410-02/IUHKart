@@ -12,7 +12,6 @@ import json, random, sqlite3
 import os
 from rest_framework_simplejwt.tokens import RefreshToken
 
-
 import ssl
 ssl._create_default_https_context = ssl._create_stdlib_context
 print(F'✅ STATUS: {PROJECT_STATUS}')
@@ -246,3 +245,35 @@ print(f'✅ Vendor: {user3.email}, Access Token: {token3}, Refresh Token: {refre
 
 insert_product()
 insert_product_image()
+
+## vector database
+from pydantic import BaseModel
+import requests
+from tqdm import tqdm
+class InsertPointRequestBody(BaseModel):
+    slug: str
+    product_id: int
+    product_name: str
+    product_url: str
+def init_qdrant():
+    collection_name='product'
+    res = requests.delete(f'https://qdrant-iuhkart.aiclubiuh.com/collections/delete?collection_name={collection_name}')
+    res = requests.post(f'https://qdrant-iuhkart.aiclubiuh.com/collections/create?collection_name={collection_name}')
+    df = pd.read_csv('../schema/Database/products.csv')
+    df = df[['product_id', 'product_name', 'slug']]
+    loop = tqdm(df.iterrows(), total=df.shape[0], desc='Inserting', colour='green')
+    for _, iter in loop:
+        request_body = InsertPointRequestBody(
+            slug=iter['slug'],
+            product_id=iter['product_id'],
+            product_name=f"{iter['product_name']}",
+            product_url=f"https://example.com/{iter['product_id']}"
+        )
+        json_body = request_body.json()
+        res = requests.post(f'https://qdrant-iuhkart.aiclubiuh.com/collections/{collection_name}/insert',
+                            data=json_body, 
+                            headers={"Content-Type": "application/json"}
+                )
+        loop.set_postfix(status_code = 'success' if res.status_code == 201 else 'fail')
+
+init_qdrant()

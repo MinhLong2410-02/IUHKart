@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils import timezone
 from autoslug import AutoSlugField
 from apps.custom_storage import AzureProductStorage
 # Create your models here.
@@ -25,6 +26,7 @@ class Product(models.Model):
     brand = models.CharField(max_length=255)
     slug = AutoSlugField(max_length=255, populate_from='product_name')
     product_description = models.TextField()
+    date_created = models.DateField(auto_now_add=True)
     
     created_by = models.ForeignKey('account.Vendor', on_delete=models.CASCADE, null=False)
     category = models.ForeignKey(Category, on_delete=models.CASCADE)

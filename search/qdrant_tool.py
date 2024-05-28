@@ -1,19 +1,20 @@
 from qdrant_client import QdrantClient
 from qdrant_client.http.models import Distance, VectorParams, PointStruct
-import requests, uuid
+import requests, os
+from dotenv import load_dotenv
+from uuid import uuid4
 from tqdm import tqdm
+# load_dotenv('./.env')
 
 class QdrantTool:
-    def __init__(self, **kwargs):
+    def __init__(self, url="https://qdrant-iuhkart.aiclubiuh.com/"):
         '''
         params:
         - {'path': name_db} for in locally
         - {'host': host, 'port': port} for in server
+        - {'url': url} for in server
         '''
-        if 'path' in kwargs.keys():
-            self.client = QdrantClient(path=kwargs['path'])
-        else:
-            self.client = QdrantClient(host=kwargs['host'], port=kwargs['port'])
+        self.client = QdrantClient(url)
         self.url_embedding = "http://9net.ddns.net:9008/embedding?q={text_embedding}"
         self.all_collection_name = [c.name for c in self.client.get_collections().collections]
 
@@ -35,7 +36,7 @@ class QdrantTool:
                 content = it.to_dict()
                 rep = requests.get(self.url_embedding.format(text_embedding=content['slug']))
                 vector = rep.json()['embedding']
-                point = PointStruct(id=str(uuid.uuid4()),
+                point = PointStruct(id=str(uuid4()),
                                     vector=vector,
                                     payload=content
                         )
@@ -56,3 +57,6 @@ class QdrantTool:
     def close(self,):
         self.client.close()
         print('👋 bye')
+
+if __name__=='__main__':
+    print(os.getenv('QDRANT_URL'))
