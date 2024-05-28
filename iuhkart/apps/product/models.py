@@ -46,15 +46,3 @@ class ProductImages(models.Model):
         db_table = 'product_images'
         verbose_name_plural = 'Product Images'
         ordering = ['product_id', '-is_main']
-
-class Review(models.Model):
-    review_id = models.AutoField(primary_key=True)
-    product_id = models.ForeignKey(Product, on_delete=models.CASCADE)
-    customer_id = models.ForeignKey('account.Customer', on_delete=models.CASCADE)
-    review_content = models.TextField()
-    review_rating = models.PositiveIntegerField()
-    review_date = models.DateTimeField(auto_now_add=True)
-    class Meta:
-        db_table = 'review'
-        verbose_name_plural = 'Reviews'
-        ordering = ['-review_date']
