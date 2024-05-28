@@ -28,6 +28,7 @@ class Customer(models.Model):
     date_of_birth = models.DateField(blank=True, null=True)
     age = models.SmallIntegerField()
     avatar_url = models.ImageField(storage=AzureCustomerStorage(), max_length=255, blank=True, null=True)
+    date_join = models.DateField(auto_now_add=True)
     class Meta:
         verbose_name_plural = "Customers"
         db_table = 'customer'
@@ -39,6 +40,7 @@ class Vendor(models.Model):
     phone = models.CharField(max_length=20, blank=True, null=True)
     description = models.TextField(blank=True, null=True)
     logo_url = models.ImageField(storage=AzureVendorStorage(), blank=True, null=True)
+    date_join = models.DateField(auto_now_add=True)
     class Meta:
         verbose_name_plural = "Vendors"
         db_table = 'vendor'
