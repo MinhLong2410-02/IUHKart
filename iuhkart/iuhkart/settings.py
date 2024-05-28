@@ -43,7 +43,6 @@ DEFAULT_APPS  = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    # 'crispy_forms',
 ]
 
 THIRD_PARTY_APPS = [
@@ -58,6 +57,7 @@ LOCAL_APPS = [
     'apps.product',
     'apps.address',
     'apps.cart',
+    'apps.review',
 ]
 
 INSTALLED_APPS = DEFAULT_APPS + LOCAL_APPS + THIRD_PARTY_APPS
