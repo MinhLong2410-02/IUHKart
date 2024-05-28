@@ -2,6 +2,7 @@ from rest_framework import serializers
 from apps.cart.models import Cart, CartProduct
 from apps.product.models import Product, ProductImages
 from django.db.models import Sum, F
+from drf_spectacular.utils import extend_schema_field
 class ProductImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductImages
@@ -13,7 +14,7 @@ class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = ['product_id', 'product_name', 'original_price', 'main_image']
-
+    @extend_schema_field(serializers.ImageField())
     def get_main_image(self, obj):
         main_image = ProductImages.objects.filter(product_id = obj.product_id).first()
         if main_image:
