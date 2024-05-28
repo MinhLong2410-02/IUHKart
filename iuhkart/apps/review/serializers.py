@@ -4,4 +4,4 @@ from apps.review.models import Review
 class ReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Review
-        fields = ['review_id', 'review', 'rating', 'customer', 'created_at']
+        fields = ['review_id', 'review_rating', 'review_content', 'review_date', 'customer']
