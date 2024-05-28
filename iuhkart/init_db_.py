@@ -143,7 +143,6 @@ def insert_product_image():
         # process
         df.drop_duplicates(subset=['product_img_id', 'product_id'], inplace=True)
         df = df.groupby('product_id', group_keys=False).apply(assign_is_main)
-        df.to_csv('test.csv', index=False)
         df.columns = ['product_image_id', 'product_id', 'image_url', 'is_main']
         df.to_csv('../schema/Database/product_images_main.csv', index=False)
         # convert to dict
@@ -278,5 +277,5 @@ def init_qdrant():
                 )
         loop.set_postfix(status_code='success' if res.status_code == 201 else 'fail')
     df = pd.DataFrame(broken_products, columns=['product_id', 'product_name'])
-    df.to_csv('broken_products.csv', index=False)
+    df.to_csv('../schema/Database/broken_products.csv', index=False)
 init_qdrant()
