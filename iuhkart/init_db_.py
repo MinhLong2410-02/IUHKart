@@ -25,6 +25,8 @@ path = {
     'category': '../schema/Database/categories.csv',
     'product': '../schema/Database/products.csv',
     'product_image': '../schema/Database/product_images.csv',
+    'product_image_main': '../schema/Database/product_images_main.csv',
+    
 }
 
 ########################
@@ -139,12 +141,12 @@ def assign_is_main(group):
     return group
 def insert_product_image():
     try:
-        df = pd.read_csv(path['product_image'])
+        df = pd.read_csv(path['product_image_main'])
         # process
-        df.drop_duplicates(subset=['product_img_id', 'product_id'], inplace=True)
-        df = df.groupby('product_id', group_keys=False).apply(assign_is_main)
+        # df.drop_duplicates(subset=['product_img_id', 'product_id'], inplace=True)
+        # df = df.groupby('product_id', group_keys=False).apply(assign_is_main)
         df.columns = ['product_image_id', 'product_id', 'image_url', 'is_main']
-        df.to_csv('../schema/Database/product_images_main.csv', index=False)
+        # df.to_csv('../schema/Database/product_images_main.csv', index=False)
         # convert to dict
         df = df.to_dict('records')
         product_cache = {x.product_id: x for x in Product.objects.all()}
@@ -278,4 +280,4 @@ def init_qdrant():
         loop.set_postfix(status_code='success' if res.status_code == 201 else 'fail')
     df = pd.DataFrame(broken_products, columns=['product_id', 'product_name'])
     df.to_csv('../schema/Database/broken_products.csv', index=False)
-init_qdrant()
+# init_qdrant()
