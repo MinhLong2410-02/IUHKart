@@ -7,8 +7,5 @@ del /s /q apps\review\migrations\*_initial.py
 del /s /q apps\discount\migrations\*_initial.py
 del /s /q apps\order\migrations\*_initial.py
 
-
-
-del db.sqlite3
 python manage.py makemigrations
 python manage.py migrate

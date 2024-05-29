@@ -6,8 +6,6 @@ rm -rf apps/review/migrations/*_initial.py
 rm -rf apps/discount/migrations/*_initial.py
 rm -rf apps/order/migrations/*_initial.py
 
-
-rm -f db.sqlite3
 python3 manage.py makemigrations
 
 python3 manage.py migrate

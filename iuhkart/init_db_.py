@@ -8,15 +8,47 @@ from apps.cart.models import Cart
 
 import pandas as pd
 import numpy as np
-import json, random, sqlite3
+import random, psycopg2
+from dotenv import load_dotenv
 import os
 from rest_framework_simplejwt.tokens import RefreshToken
-
 import ssl
 import requests
 from tqdm import tqdm
+
 ssl._create_default_https_context = ssl._create_stdlib_context
+
+load_dotenv('.env')
+PROJECT_STATUS = environ.get('STATUS')
+DB_NAME = os.getenv('NAME')
+DB_USER = os.getenv('USER')
+DB_PASS = os.getenv('PASSWORD')
+DB_HOST = 'localhost' if PROJECT_STATUS == 'DEV' else os.getenv('HOST')
+DB_PORT = os.getenv('PORT')
 print(F'✅ STATUS: {PROJECT_STATUS}')
+connection = psycopg2.connect(
+        dbname=DB_NAME,
+        user=DB_USER,
+        password=DB_PASS,
+        host=DB_HOST,
+        port=DB_PORT
+    )
+
+# Create a cursor object
+cursor = connection.cursor()
+
+# Execute a simple SQL query
+cursor.execute('''DO $$ 
+DECLARE
+    r RECORD;
+BEGIN
+    FOR r IN (SELECT tablename FROM pg_tables WHERE schemaname = current_schema()) LOOP
+        EXECUTE 'DROP TABLE IF EXISTS ' || quote_ident(r.tablename) || ' CASCADE';
+    END LOOP;
+END $$;''')
+cursor.close()
+connection.close()
+
 os.system('migrate.bat')
 path = {
     'province': 'https://raw.githubusercontent.com/MinhLong2410-02/VN-province-api-test/main/province.csv',
