@@ -6,6 +6,7 @@ CREATE TABLE "dim_product" (
   "stock" int,
   "brand" varchar(255),
   "slug" varchar(255),
+  "ratings" float,
   "vendor_id" int NOT NULL,
   "category_id" int NOT NULL
 );
@@ -14,8 +15,8 @@ CREATE TABLE "fact_discount" (
   "discount_id" int PRIMARY KEY NOT NULL,
   "name" varchar(255),
   "percent" float,
-  "start" date,
-  "end" date,
+  "start" datetime,
+  "end" datetime,
   "product_id" int NOT NULL,
   "vendor_id" int NOT NULL
 );
@@ -23,6 +24,7 @@ CREATE TABLE "fact_discount" (
 CREATE TABLE "dim_vendor" (
   "vendor_id" int PRIMARY KEY NOT NULL,
   "name" varchar(255),
+  "ratings" float,
   "address_id" int NOT NULL
 );
 
@@ -32,7 +34,7 @@ CREATE TABLE "dim_customer" (
   "email" varchar(50),
   "date_of_birth" date,
   "phone" varchar(20),
-  "age" smallint,
+  "age" tinyint,
   "avatar_url" varchar(200),
   "address_id" int NOT NULL
 );
@@ -52,6 +54,14 @@ CREATE TABLE "fact_order_product" (
   "product_id" int NOT NULL,
   "order_id" int NOT NULL,
   "quantity" int
+);
+
+CREATE TABLE "fact_review" (
+  "review_id" int PRIMARY KEY NOT NULL,
+  "description" text,
+  "ratings" float,
+  "product_id" int NOT NULL,
+  "customer_id" int NOT NULL
 );
 
 CREATE TABLE "dim_category" (
@@ -110,9 +120,13 @@ ALTER TABLE "fact_discount" ADD FOREIGN KEY ("product_id") REFERENCES "dim_produ
 
 ALTER TABLE "fact_discount" ADD FOREIGN KEY ("vendor_id") REFERENCES "dim_vendor" ("vendor_id");
 
+ALTER TABLE "fact_review" ADD FOREIGN KEY ("customer_id") REFERENCES "dim_customer" ("customer_id");
+
+ALTER TABLE "fact_review" ADD FOREIGN KEY ("product_id") REFERENCES "dim_product" ("product_id");
+
 ALTER TABLE "dim_vendor" ADD FOREIGN KEY ("address_id") REFERENCES "address" ("address_id");
 
-ALTER TABLE "address" ADD FOREIGN KEY ("province_id") REFERENCES "province" ("province_id");
+ALTER TABLE "province" ADD FOREIGN KEY ("province_id") REFERENCES "address" ("province_id");
 
 ALTER TABLE "district" ADD FOREIGN KEY ("province_id") REFERENCES "province" ("province_id");
 

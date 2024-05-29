@@ -24,6 +24,7 @@ CREATE TABLE "product" (
   "category_id" int NOT NULL,
   "original_price" float,
   "stock" int,
+  "ratings" float,
   "brand" varchar(255),
   "slug" varchar(255),
   "product_description" text,
@@ -33,8 +34,7 @@ CREATE TABLE "product" (
 CREATE TABLE "product_image" (
   "product_img_id" int PRIMARY KEY,
   "product_id" int,
-  "product_img_url" varchar,
-  "is_main" bool
+  "product_img_url" varchar
 );
 
 CREATE TABLE "discount" (
@@ -62,22 +62,16 @@ CREATE TABLE "payment" (
 
 CREATE TABLE "cart" (
   "cart_id" int PRIMARY KEY NOT NULL,
+  "product_id" int NOT NULL,
+  "customer_id" int UNIQUE NOT NULL,
   "grand_total" float,
   "items_total" int
 );
 
-CREATE TABLE "cart_product" (
-  "cart_product_id" int PRIMARY KEY NOT NULL,
-  "cart_id" int NOT NULL,
-  "product_id" int NOT NULL,
-  "quantity" int
-);
-
 CREATE TABLE "review" (
   "review_id" int PRIMARY KEY NOT NULL,
-  "review_content" text,
-  "review_rating" varchar(255),
-  "review_date" timestamp,
+  "description" text,
+  "ratings" varchar(255),
   "product_id" int NOT NULL,
   "customer_id" int NOT NULL
 );
@@ -86,12 +80,12 @@ CREATE TABLE "vendor" (
   "vendor_id" int PRIMARY KEY,
   "vendor_name" varchar(255),
   "description" text,
+  "ratings" float,
   "vendor_logo" varchar(200)
 );
 
 CREATE TABLE "customer" (
   "customer_id" int PRIMARY KEY,
-  "cart_id" int,
   "fullname" varchar(30),
   "date_of_birth" date,
   "age" smallint,
@@ -110,6 +104,12 @@ CREATE TABLE "category" (
   "category_name" varchar(255),
   "slug" varchar(255),
   "category_img_url" varchar(255)
+);
+
+CREATE TABLE "category_product" (
+  "category_product_id" int PRIMARY KEY,
+  "category_id" int,
+  "product_id" int
 );
 
 CREATE TABLE "transaction" (
@@ -149,10 +149,6 @@ CREATE TABLE "ward" (
   "type" varchar(10)
 );
 
-ALTER TABLE "cart_product" ADD FOREIGN KEY ("cart_id") REFERENCES "cart" ("cart_id");
-
-ALTER TABLE "cart_product" ADD FOREIGN KEY ("product_id") REFERENCES "product" ("product_id");
-
 ALTER TABLE "address" ADD FOREIGN KEY ("province_id") REFERENCES "province" ("province_id");
 
 ALTER TABLE "district" ADD FOREIGN KEY ("province_id") REFERENCES "province" ("province_id");
@@ -164,6 +160,10 @@ ALTER TABLE "ward" ADD FOREIGN KEY ("province_id") REFERENCES "province" ("provi
 ALTER TABLE "vendor" ADD FOREIGN KEY ("vendor_id") REFERENCES "user" ("user_id");
 
 ALTER TABLE "customer" ADD FOREIGN KEY ("customer_id") REFERENCES "user" ("user_id");
+
+ALTER TABLE "category_product" ADD FOREIGN KEY ("category_id") REFERENCES "category" ("category_id");
+
+ALTER TABLE "category_product" ADD FOREIGN KEY ("product_id") REFERENCES "product" ("product_id");
 
 ALTER TABLE "product_discount" ADD FOREIGN KEY ("transaction_id") REFERENCES "transaction" ("transaction_id");
 
@@ -191,7 +191,9 @@ ALTER TABLE "user" ADD FOREIGN KEY ("address_id") REFERENCES "address" ("address
 
 ALTER TABLE "order" ADD FOREIGN KEY ("address_id") REFERENCES "address" ("address_id");
 
-ALTER TABLE "customer" ADD FOREIGN KEY ("cart_id") REFERENCES "cart" ("cart_id");
+ALTER TABLE "customer" ADD FOREIGN KEY ("customer_id") REFERENCES "cart" ("customer_id");
+
+ALTER TABLE "cart" ADD FOREIGN KEY ("product_id") REFERENCES "product" ("product_id");
 
 ALTER TABLE "review" ADD FOREIGN KEY ("customer_id") REFERENCES "customer" ("customer_id");
 
