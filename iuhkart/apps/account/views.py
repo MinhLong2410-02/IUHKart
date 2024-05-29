@@ -13,6 +13,7 @@ class RegisterCustomerView(generics.CreateAPIView):
         response = super().create(request, *args, **kwargs)
         user = User.objects.get(email=response.data['user']['email'])
         refresh = RefreshToken.for_user(user)
+        BankAccount.objects.create(vendor=user.vendor)
         return Response({
             'refresh': str(refresh),
             'access': str(refresh.access_token),
@@ -91,3 +92,17 @@ class VendorDetailView(generics.RetrieveAPIView):
         instance = self.get_object()
         serializer = self.get_serializer(instance)
         return Response(serializer.data)
+
+class UpdateBankAccountView(generics.UpdateAPIView):
+    queryset = BankAccount.objects.all()
+    serializer_class = BankAccountSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_object(self):
+        # Ensure the vendor can only access their own bank account information
+        vendor = self.request.user.vendor
+        bank_account, _ = BankAccount.objects.get_or_create(vendor=vendor)  # Create if not exists
+        return bank_account
+
+    def patch(self, request, *args, **kwargs):
+        return self.partial_update(request, *args, **kwargs)
