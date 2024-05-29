@@ -3,6 +3,8 @@ rm -rf apps/product/migrations/*_initial.py
 rm -rf apps/address/migrations/*_initial.py
 rm -rf apps/cart/migrations/*_initial.py
 rm -rf apps/review/migrations/*_initial.py
+rm -rf apps/discount/migrations/*_initial.py
+rm -rf apps/order/migrations/*_initial.py
 
 
 rm -f db.sqlite3
