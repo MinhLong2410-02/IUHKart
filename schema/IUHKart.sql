@@ -24,8 +24,10 @@ CREATE TABLE "product" (
   "category_id" int NOT NULL,
   "original_price" float,
   "stock" int,
+  "ratings" float,
   "brand" varchar(255),
   "slug" varchar(255),
+  "date_add" date,
   "product_description" text,
   "customer" int
 );
@@ -100,7 +102,8 @@ CREATE TABLE "customer" (
   "fullname" varchar(30),
   "date_of_birth" date,
   "age" smallint,
-  "avatar_url" varchar(200)
+  "avatar_url" varchar(200),
+  "date_join" date
 );
 
 CREATE TABLE "user" (

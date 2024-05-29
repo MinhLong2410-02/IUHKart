@@ -260,7 +260,7 @@ def init_qdrant():
     df = pd.read_csv('../schema/Database/products.csv')
     product_image_df = pd.read_csv('../schema/Database/product_images_main.csv')
     df = df[['product_id', 'product_name', 'slug']]
-    loop = tqdm(df.iterrows(), total=df.shape[0], desc='Inserting', colour='green')
+    loop = tqdm(df.iterrows(), total=df.shape[0], desc='Insert to qdrantDB', colour='green')
     for _, iter in loop:
         product_image = product_image_df[(product_image_df['product_id']==iter['product_id']) & (product_image_df['is_main']==True)]
         if product_image.shape[0] == 0:

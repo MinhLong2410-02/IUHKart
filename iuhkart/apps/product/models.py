@@ -29,6 +29,7 @@ class Product(models.Model):
     date_created = models.DateField(auto_now_add=True)
     
     created_by = models.ForeignKey('account.Vendor', on_delete=models.CASCADE, null=False)
+    date_add = models.DateField(default=timezone.now)
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
     
     def __str__(self) -> str:
