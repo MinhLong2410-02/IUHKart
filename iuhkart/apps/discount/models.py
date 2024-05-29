@@ -6,7 +6,7 @@ class Discount(models.Model):
     name = models.CharField(max_length=100)
     discount_percent = models.DecimalField(max_digits=5, decimal_places=2)
     products = models.ManyToManyField('product.Product', through='ProductDiscount')
-
+    date_created = models.DateField(auto_now_add=True)
     class Meta:
         db_table = 'discount'
 
