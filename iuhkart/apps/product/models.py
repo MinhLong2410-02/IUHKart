@@ -28,7 +28,7 @@ class Product(models.Model):
     product_description = models.TextField()
     date_created = models.DateField(auto_now_add=True)
     
-    created_by = models.ForeignKey('account.Vendor', on_delete=models.CASCADE, null=False)
+    created_by = models.ForeignKey('account.Vendor', on_delete=models.CASCADE, null=False, db_column='vendor_id')
     date_add = models.DateField(default=timezone.now)
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
     
