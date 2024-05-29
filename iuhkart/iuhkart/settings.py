@@ -57,7 +57,10 @@ LOCAL_APPS = [
     'apps.product',
     'apps.address',
     'apps.cart',
+    'apps.discount',
     'apps.review',
+    'apps.order',
+    
 ]
 
 INSTALLED_APPS = DEFAULT_APPS + LOCAL_APPS + THIRD_PARTY_APPS
