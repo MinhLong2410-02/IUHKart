@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
-from apps.account.models import Customer, Vendor
+from apps.account.models import Customer, Vendor, BankAccount
 from apps.cart.models import Cart
 
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
@@ -139,3 +139,15 @@ class DetailedVendorSerializer(serializers.ModelSerializer):
     class Meta:
         model = Vendor
         fields = ('id', 'user', 'name', 'phone', 'description', 'logo_url', 'date_join')
+
+class BankAccountSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BankAccount
+        fields = ['bank_name', 'account_number', 'account_holder_name', 'branch_name']
+        extra_kwargs = {
+            'account_number': {'write_only': True}  # For security reasons, you might want to make the account number write-only
+        }
+
+    def validate_account_number(self, value):
+        # Add validation for the account number if necessary, e.g., check format or encrypt
+        return value

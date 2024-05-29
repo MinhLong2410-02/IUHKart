@@ -43,6 +43,18 @@ class Vendor(models.Model):
     description = models.TextField(blank=True, null=True)
     logo_url = models.ImageField(storage=AzureVendorStorage(), blank=True, null=True)
     date_join = models.DateField(auto_now_add=True)
+
     class Meta:
         verbose_name_plural = "Vendors"
         db_table = 'vendor'
+
+class BankAccount(models.Model):
+    bank_account_id = models.AutoField(primary_key=True, db_column='bank_account_id')
+    vendor = models.OneToOneField(Vendor, on_delete=models.CASCADE, related_name='bank_account', db_column='vendor_id')
+    bank_name = models.CharField(max_length=255, null=True)
+    account_number = models.CharField(max_length=255, null=True) 
+    account_holder_name = models.CharField(max_length=255, null=True)
+    branch_name = models.CharField(max_length=255, blank=True, null=True)
+    
+    class Meta:
+        db_table = 'bank_account'

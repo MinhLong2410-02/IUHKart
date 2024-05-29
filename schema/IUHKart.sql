@@ -1,3 +1,10 @@
+CREATE TYPE "transaction_status" AS ENUM (
+  'pending',
+  'completed',
+  'failed',
+  'refunded'
+);
+
 CREATE TABLE "order" (
   "order_id" int PRIMARY KEY NOT NULL,
   "order_number" varchar(255),
@@ -6,7 +13,8 @@ CREATE TABLE "order" (
   "order_amount" float,
   "order_status" varchar(255),
   "customer_id" int NOT NULL,
-  "address_id" int
+  "address_id" int,
+  "total_price" float
 );
 
 CREATE TABLE "order_product" (
@@ -57,14 +65,6 @@ CREATE TABLE "order_product_discount" (
   "order_product_discount" int PRIMARY KEY,
   "order_product_id" int,
   "discount_id" int
-);
-
-CREATE TABLE "payment" (
-  "payment_id" int PRIMARY KEY NOT NULL,
-  "order_id" int NOT NULL,
-  "payment_mode" varchar(255),
-  "customer_id" int NOT NULL,
-  "date_of_payment" date
 );
 
 CREATE TABLE "cart" (
@@ -124,7 +124,9 @@ CREATE TABLE "category" (
 CREATE TABLE "transaction" (
   "transaction_id" int PRIMARY KEY,
   "order_id" int UNIQUE,
-  "payment_id" int UNIQUE,
+  "transation_date" datetime,
+  "status" transaction_status,
+  "customer_id" int,
   "total_money" float
 );
 
@@ -160,6 +162,17 @@ CREATE TABLE "ward" (
   "type" varchar(10)
 );
 
+CREATE TABLE "bank_account" (
+  "bank_account_id" int PRIMARY KEY NOT NULL,
+  "vendor_id" int,
+  "bank_name" varchar(255),
+  "account_number" varchar(255),
+  "account_holder_name" varchar(255),
+  "branch_name" varchar(255)
+);
+
+ALTER TABLE "vendor" ADD FOREIGN KEY ("vendor_id") REFERENCES "bank_account" ("vendor_id");
+
 ALTER TABLE "order_product_discount" ADD FOREIGN KEY ("discount_id") REFERENCES "discount" ("discount_id");
 
 ALTER TABLE "order_product_discount" ADD FOREIGN KEY ("order_product_id") REFERENCES "order_product" ("order_product_id");
@@ -184,8 +197,6 @@ ALTER TABLE "vendor" ADD FOREIGN KEY ("vendor_id") REFERENCES "user" ("user_id")
 
 ALTER TABLE "customer" ADD FOREIGN KEY ("customer_id") REFERENCES "user" ("user_id");
 
-ALTER TABLE "payment" ADD FOREIGN KEY ("payment_id") REFERENCES "transaction" ("payment_id");
-
 ALTER TABLE "order" ADD FOREIGN KEY ("order_id") REFERENCES "transaction" ("order_id");
 
 ALTER TABLE "product_discount" ADD FOREIGN KEY ("discount_id") REFERENCES "discount" ("discount_id");
@@ -202,7 +213,7 @@ ALTER TABLE "product" ADD FOREIGN KEY ("vendor_id") REFERENCES "vendor" ("vendor
 
 ALTER TABLE "product" ADD FOREIGN KEY ("category_id") REFERENCES "category" ("category_id");
 
-ALTER TABLE "payment" ADD FOREIGN KEY ("customer_id") REFERENCES "customer" ("customer_id");
+ALTER TABLE "transaction" ADD FOREIGN KEY ("customer_id") REFERENCES "customer" ("customer_id");
 
 ALTER TABLE "user" ADD FOREIGN KEY ("address_id") REFERENCES "address" ("address_id");
 
