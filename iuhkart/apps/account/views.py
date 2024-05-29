@@ -6,7 +6,6 @@ from apps.account.models import User
 from apps.account.serializers import *
 from drf_spectacular.utils import extend_schema
 from rest_framework_simplejwt.tokens import RefreshToken
-from django.shortcuts import get_object_or_404
 class RegisterCustomerView(generics.CreateAPIView):
     queryset = User.objects.all()
     serializer_class = CustomerSerializer

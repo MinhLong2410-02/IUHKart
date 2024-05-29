@@ -3,6 +3,7 @@ from django.contrib.auth.models import AbstractBaseUser
 from apps.account.manager import UserManager
 from django.utils.translation import gettext_lazy as _
 from apps.custom_storage import AzureCustomerStorage, AzureVendorStorage
+from django.contrib.postgres.fields import ArrayField
 # Create your models here.
 class User(AbstractBaseUser):
     username = None
@@ -29,6 +30,7 @@ class Customer(models.Model):
     age = models.SmallIntegerField()
     avatar_url = models.ImageField(storage=AzureCustomerStorage(), max_length=255, blank=True, null=True)
     date_join = models.DateField(auto_now_add=True)
+    recommend_products = ArrayField(models.IntegerField(), blank=True, default=list, size=20, db_column='recommend_product_ids')
     class Meta:
         verbose_name_plural = "Customers"
         db_table = 'customer'
