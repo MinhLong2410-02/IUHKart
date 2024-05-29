@@ -43,6 +43,7 @@ DEFAULT_APPS  = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.postgres'
 ]
 
 THIRD_PARTY_APPS = [
@@ -102,12 +103,22 @@ WSGI_APPLICATION = 'iuhkart.wsgi.application'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 PROJECT_STATUS = environ.get('STATUS')
 if PROJECT_STATUS == 'DEV':
+    # DATABASES = {
+    #     'default': {
+    #         'ENGINE': 'django.db.backends.sqlite3',
+    #         'NAME': BASE_DIR / 'db.sqlite3',
+    #     }
+    # }
     DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
+            'default': {
+                'ENGINE': 'django.db.backends.postgresql',
+                'NAME': environ['NAME'],
+                'USER': environ['USER'],
+                'PASSWORD': environ['PASSWORD'],
+                'HOST': 'localhost',
+                'PORT': environ['PORT'],
+            }
         }
-    }
 else:
     DATABASES = {
             'default': {
