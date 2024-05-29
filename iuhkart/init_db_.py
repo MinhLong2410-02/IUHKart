@@ -344,4 +344,4 @@ def init_qdrant():
         loop.set_postfix(status_code='success' if res.status_code == 201 else 'fail')
     df = pd.DataFrame(broken_products, columns=['product_id', 'product_name'])
     df.to_csv('../schema/Database/broken_products.csv', index=False)
-# init_qdrant()
+init_qdrant()
