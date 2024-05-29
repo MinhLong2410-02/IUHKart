@@ -6,7 +6,7 @@ from drf_spectacular.openapi import OpenApiParameter
 # Create your views here.
 
 @extend_schema(
-    summary="Get all vendor's products.",
+    summary="Get a product's reviews from customer.",
     description="This endpoint allows the authenticated vendor to retrieve a paginated list of their products.",
     parameters=[
         OpenApiParameter(
