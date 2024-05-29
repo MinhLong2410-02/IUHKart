@@ -39,7 +39,8 @@ CREATE TABLE "product_image" (
 
 CREATE TABLE "discount" (
   "discount_id" int PRIMARY KEY,
-  "percentage" float
+  "name" varchar(100),
+  "discount_percent" float
 );
 
 CREATE TABLE "product_discount" (
@@ -47,9 +48,13 @@ CREATE TABLE "product_discount" (
   "product_id" int,
   "discount_id" int,
   "start_date" timestamp,
-  "end_date" timestamp,
-  "price_after_discount" float,
-  "transaction_id" int
+  "end_date" timestamp
+);
+
+CREATE TABLE "order_product_discount" (
+  "order_product_discount" int PRIMARY KEY,
+  "order_product_id" int,
+  "discount_id" int
 );
 
 CREATE TABLE "payment" (
@@ -149,6 +154,10 @@ CREATE TABLE "ward" (
   "type" varchar(10)
 );
 
+ALTER TABLE "order_product_discount" ADD FOREIGN KEY ("discount_id") REFERENCES "discount" ("discount_id");
+
+ALTER TABLE "order_product_discount" ADD FOREIGN KEY ("order_product_id") REFERENCES "order_product" ("order_product_id");
+
 ALTER TABLE "cart_product" ADD FOREIGN KEY ("cart_id") REFERENCES "cart" ("cart_id");
 
 ALTER TABLE "cart_product" ADD FOREIGN KEY ("product_id") REFERENCES "product" ("product_id");
@@ -164,8 +173,6 @@ ALTER TABLE "ward" ADD FOREIGN KEY ("province_id") REFERENCES "province" ("provi
 ALTER TABLE "vendor" ADD FOREIGN KEY ("vendor_id") REFERENCES "user" ("user_id");
 
 ALTER TABLE "customer" ADD FOREIGN KEY ("customer_id") REFERENCES "user" ("user_id");
-
-ALTER TABLE "product_discount" ADD FOREIGN KEY ("transaction_id") REFERENCES "transaction" ("transaction_id");
 
 ALTER TABLE "payment" ADD FOREIGN KEY ("payment_id") REFERENCES "transaction" ("payment_id");
 

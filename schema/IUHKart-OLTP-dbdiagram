@@ -41,7 +41,8 @@ Table product_image{
 
 Table discount{
   discount_id int pk
-  percentage float
+  name varchar(100)
+  discount_percent float
 }
 
 Table product_discount{
@@ -50,8 +51,12 @@ Table product_discount{
   discount_id int
   start_date timestamp
   end_date timestamp
-  price_after_discount float // Giá sau khi giảm
-  transaction_id int [null]
+}
+
+table order_product_discount{
+  order_product_discount int pk
+  order_product_id int
+  discount_id int
 }
 
 Table payment {
@@ -121,7 +126,6 @@ table transaction{
   total_money float
 }
 
-
 Table address {
   address_id int [pk, not null]
   province_id int
@@ -152,6 +156,8 @@ table ward{
   type varchar(10) //enum: ward, commune, town
 }
 
+ref: order_product_discount.discount_id > discount.discount_id
+ref: order_product_discount.order_product_id > order_product.order_product_id
 Ref: cart_product.cart_id > cart.cart_id
 Ref: cart_product.product_id > product.product_id
 Ref: province.province_id - address.province_id
@@ -160,7 +166,6 @@ Ref: ward.district_id > district.district_id
 Ref: ward.province_id > province.province_id
 Ref: user.user_id - vendor.vendor_id
 Ref: user.user_id - customer.customer_id
-Ref: transaction.transaction_id < product_discount.transaction_id
 Ref: transaction.payment_id - payment.payment_id
 Ref: transaction.order_id - order.order_id
 Ref: product_discount.discount_id > discount.discount_id
