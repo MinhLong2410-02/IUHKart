@@ -34,7 +34,7 @@ connection = psycopg2.connect(
         port=DB_PORT
     )
 
-# Create a cursor object
+connection.autocommit = True
 cursor = connection.cursor()
 
 # Execute a simple SQL query
@@ -46,6 +46,8 @@ BEGIN
         EXECUTE 'DROP TABLE IF EXISTS ' || quote_ident(r.tablename) || ' CASCADE';
     END LOOP;
 END $$;''')
+
+print(cursor.statusmessage)
 cursor.close()
 connection.close()
 
