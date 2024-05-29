@@ -6,7 +6,7 @@ from apps.account.models import User
 from apps.account.serializers import *
 from drf_spectacular.utils import extend_schema
 from rest_framework_simplejwt.tokens import RefreshToken
-
+from django.shortcuts import get_object_or_404
 class RegisterCustomerView(generics.CreateAPIView):
     queryset = User.objects.all()
     serializer_class = CustomerSerializer
@@ -80,3 +80,15 @@ class CustomerUpdateAPIView(generics.RetrieveUpdateAPIView):
     )
     def patch(self, request, *args, **kwargs):
         pass
+    
+class VendorDetailView(generics.RetrieveAPIView):
+    serializer_class = DetailedVendorSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_object(self):
+        return self.request.user.vendor
+
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)

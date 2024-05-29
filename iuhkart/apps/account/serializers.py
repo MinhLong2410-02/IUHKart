@@ -132,3 +132,10 @@ class VendorLogoUploadSerializer(serializers.ModelSerializer):
         if value.size > 1024 * 1024 * 5:
             raise serializers.ValidationError("Logo size should not exceed 5MB.")
         return value
+
+class DetailedVendorSerializer(serializers.ModelSerializer):
+    user = UserSerializer()
+
+    class Meta:
+        model = Vendor
+        fields = ('id', 'user', 'name', 'phone', 'description', 'logo_url', 'date_join')
