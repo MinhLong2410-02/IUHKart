@@ -20,7 +20,7 @@ CREATE TABLE "order_product" (
 CREATE TABLE "product" (
   "product_id" int PRIMARY KEY NOT NULL,
   "product_name" varchar(255),
-  "created_by" int NOT NULL,
+  "vendor_id" int NOT NULL,
   "category_id" int NOT NULL,
   "original_price" float,
   "stock" int,
@@ -28,8 +28,7 @@ CREATE TABLE "product" (
   "brand" varchar(255),
   "slug" varchar(255),
   "date_add" date,
-  "product_description" text,
-  "customer" int
+  "product_description" text
 );
 
 CREATE TABLE "product_image" (
@@ -42,15 +41,16 @@ CREATE TABLE "product_image" (
 CREATE TABLE "discount" (
   "discount_id" int PRIMARY KEY,
   "name" varchar(100),
-  "discount_percent" float
+  "discount_percent" float,
+  "date_created" date
 );
 
 CREATE TABLE "product_discount" (
   "product_discount_id" int PRIMARY KEY,
   "product_id" int,
   "discount_id" int,
-  "start_date" timestamp,
-  "end_date" timestamp
+  "start_date" date,
+  "end_date" date
 );
 
 CREATE TABLE "order_product_discount" (
@@ -103,7 +103,8 @@ CREATE TABLE "customer" (
   "date_of_birth" date,
   "age" smallint,
   "avatar_url" varchar(200),
-  "date_join" date
+  "date_join" date,
+  "recommend_product_ids" int[] DEFAULT '[]'
 );
 
 CREATE TABLE "user" (
@@ -197,7 +198,7 @@ ALTER TABLE "order_product" ADD FOREIGN KEY ("order_id") REFERENCES "order" ("or
 
 ALTER TABLE "order_product" ADD FOREIGN KEY ("product_id") REFERENCES "product" ("product_id");
 
-ALTER TABLE "product" ADD FOREIGN KEY ("created_by") REFERENCES "vendor" ("vendor_id");
+ALTER TABLE "product" ADD FOREIGN KEY ("vendor_id") REFERENCES "vendor" ("vendor_id");
 
 ALTER TABLE "product" ADD FOREIGN KEY ("category_id") REFERENCES "category" ("category_id");
 
