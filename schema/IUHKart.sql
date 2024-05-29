@@ -130,6 +130,8 @@ CREATE TABLE "transaction" (
 CREATE TABLE "address" (
   "address_id" int PRIMARY KEY NOT NULL,
   "province_id" int,
+  "district_id" int,
+  "ward_id" int,
   "address_detail" varchar(200)
 );
 
@@ -166,6 +168,10 @@ ALTER TABLE "cart_product" ADD FOREIGN KEY ("cart_id") REFERENCES "cart" ("cart_
 ALTER TABLE "cart_product" ADD FOREIGN KEY ("product_id") REFERENCES "product" ("product_id");
 
 ALTER TABLE "address" ADD FOREIGN KEY ("province_id") REFERENCES "province" ("province_id");
+
+ALTER TABLE "address" ADD FOREIGN KEY ("district_id") REFERENCES "district" ("district_id");
+
+ALTER TABLE "address" ADD FOREIGN KEY ("ward_id") REFERENCES "ward" ("ward_id");
 
 ALTER TABLE "district" ADD FOREIGN KEY ("province_id") REFERENCES "province" ("province_id");
 

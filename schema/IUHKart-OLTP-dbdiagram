@@ -132,6 +132,8 @@ table transaction{
 Table address {
   address_id int [pk, not null]
   province_id int
+  district_id int
+  ward_id int
   address_detail varchar(200)
 }
 
@@ -163,7 +165,9 @@ ref: order_product_discount.discount_id > discount.discount_id
 ref: order_product_discount.order_product_id > order_product.order_product_id
 Ref: cart_product.cart_id > cart.cart_id
 Ref: cart_product.product_id > product.product_id
-Ref: province.province_id - address.province_id
+Ref: address.province_id > province.province_id
+Ref: address.district_id > district.district_id
+Ref: address.ward_id > ward.ward_id
 Ref: district.province_id > province.province_id
 Ref: ward.district_id > district.district_id
 Ref: ward.province_id > province.province_id
