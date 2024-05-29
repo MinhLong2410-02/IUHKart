@@ -36,7 +36,7 @@ class PostgresTool():
         print("🖐 Closed connection")
 
     def query(self, sql_query):
-        # self.cur.execute("ROLLBACK")
+        self.cur.execute("ROLLBACK")
         self.cursor.execute(sql_query)
         rows = self.cursor.fetchall()
         print(tabulate(rows, headers=[desc[0] for desc in self.cursor.description], tablefmt='psql'))
@@ -57,18 +57,23 @@ class PostgresTool():
             print(f'❌ {e}')
         
     def get_columns(self, table_name):
-        # self.cursor.execute("ROLLBACK")
+        self.cursor.execute("ROLLBACK")
         self.cursor.execute("SELECT column_name FROM information_schema.columns WHERE table_schema = 'public' AND table_name = '{table_name}'".format(table_name=table_name))
         cols = [i[0] for i in self.cursor.fetchall()]
         return cols
 
     def get_all_table(self,):
-        # self.cursor.execute("ROLLBACK")
+        self.cursor.execute("ROLLBACK")
         self.cursor.execute("SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' AND table_type = 'BASE TABLE'")
         tables = [i[0] for i in self.cursor.fetchall()]
-        print(tables)
+        return tables
     
     def delete_table(self, table_names = []):
-        self.cursor.execute(f"DROP TABLE {', '.join(table_names)}")
-        print(f"🗑 Deleted")
+        self.cursor.execute("ROLLBACK")
+        for table in table_names:
+            try:
+                self.cursor.execute(f"DROP TABLE {table}")
+                print(f"🗑 Deleted {table}")
+            except Exception as e:
+                print(f"❌ {e}")
         self.conn.commit()
