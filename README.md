@@ -6,8 +6,12 @@ Final Project for K16DS's Data Platform subject
 - Nguyễn Văn Hậu: 20001665
 - Lưu Lương Vi Nhân: 20104821
 - Nguyễn Văn Nam: 21017711
-# ERD (might change)
+
+# Backend (Overview architecture system)
+![BE](schema/Overview.png)
+
+# DP (ERD data product)
 ![ERD Design](schema/DPD.png)
 
-# DWH (Data Warehouse)
+# DWH (ERD data warehouse)
 ![ERD WH](schema/DWH.png)
