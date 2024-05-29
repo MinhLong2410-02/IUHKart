@@ -166,8 +166,20 @@ insert_address()
 insert_category()
 
 ########################
-# user - vendor - customer
+# user - vendor - customer - address
 ########################
+def create_address(province_id, district_id, ward_id, address_detail):
+    province = Province.objects.get(province_id=province_id)
+    district = District.objects.get(province_id=province, district_id=district_id)
+    ward = Ward.objects.get(district_id=district, ward_id=ward_id)
+    address = Address.objects.create(
+        province_id=province,
+        district_id=district,
+        ward_id=ward,
+        address_detail=address_detail,
+    )
+    return address
+
 def create_vendor_with_jwt(email, password, name, phone, description):
     user = User.objects.create_user(
         email=email,
@@ -185,7 +197,7 @@ def create_vendor_with_jwt(email, password, name, phone, description):
     refresh_token = str(refresh)
     return user, vendor, access_token, refresh_token
 
-def create_customer_with_jwt(email, password, fullname, phone, date_of_birth):
+def create_customer_with_jwt(email, password, fullname, phone, date_of_birth, address):
     user = User.objects.create_user(
         email=email,
         password=password,  # No need to hash the password here
@@ -200,16 +212,7 @@ def create_customer_with_jwt(email, password, fullname, phone, date_of_birth):
         cart = cart,
         age = 2024 - int(date_of_birth.split('-')[0])
     )
-    province = Province.objects.get(province_id=79)
-    district = District.objects.get(province_id=province, district_id=764)
-    ward = Ward.objects.get(district_id=district, ward_id=26899)
-    Address.objects.create(
-        province_id=province,
-        district_id=district,
-        ward_id=ward,
-        address_detail='13/1 Phường 11, quận Gò Vấp, TP.HCM',
-    )
-    address = Address.objects.get(address_detail='13/1 Phường 11, quận Gò Vấp, TP.HCM')
+    
     user.address = address
     user.save()
     refresh = RefreshToken.for_user(user)
@@ -229,14 +232,15 @@ user1, vendor1, token1, refresh1 = create_vendor_with_jwt(
 )
 print(f'✅ Vendor: {user1.email}, Access Token: {token1}, Refresh Token: {refresh1}')
 
+address = create_address(79, 764, 26899, '13/1 Phường 11, đường Nguyễn Văn Hậu, quận Gò Vấp, TP.HCM')
 user2, customer2, token2, refresh2 = create_customer_with_jwt(
     email='vanhau20022018@gmail.com',
     password='123',  # Pass the plain password
     fullname='Văn Hậu',
     phone='0987654321',
     date_of_birth='2002-02-20',
+    address=address
 )
-
 print(f'✅ Customer: {user2.email}, Access Token: {token2}, Refresh Token: {refresh2}')
 
 user3, vendor3, token3, refresh3 = create_vendor_with_jwt(
@@ -247,6 +251,32 @@ user3, vendor3, token3, refresh3 = create_vendor_with_jwt(
     description='This is a description for Vendor Three.'
 )
 print(f'✅ Vendor: {user3.email}, Access Token: {token3}, Refresh Token: {refresh3}')
+
+address = create_address(79, 764, 26881, '69/96 Phường 12, đường Lê Thành Nghĩa, quận Gò Vấp, TP.HCM')
+user4, customer4, token4, refresh4 = create_customer_with_jwt(
+    email='nguyenvannam14056969@gmail.com',
+    password='123',  # Pass the plain password
+    fullname='Nguyễn VNam',
+    phone='0987654322',
+    date_of_birth='2003-07-31',
+    address=address
+    
+)
+print(f'✅ Customer: {user4.email}, Access Token: {token4}, Refresh Token: {refresh4}')
+
+
+address = create_address(79, 764, 26898, '69/96 Phường 79, đường Nhân Vi, quận Gò Vấp, TP.HCM')
+user5, customer5, token5, refresh5 = create_customer_with_jwt(
+    email='nhanvi212@gmail.com',
+    password='123',  # Pass the plain password
+    fullname='Lưu Lương Vi Nhân',
+    phone='0987654324',
+    date_of_birth='2002-03-20',
+    address=address
+    
+)
+print(f'✅ Customer: {user5.email}, Access Token: {token5}, Refresh Token: {refresh5}')
+
 
 insert_product()
 insert_product_image()
