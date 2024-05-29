@@ -18,7 +18,6 @@ Table order_product {
   quantity int
 }
 
-
 Table product {
   product_id int [pk, not null]
   product_name varchar(255)
@@ -29,6 +28,7 @@ Table product {
   ratings float
   brand varchar(255)
   slug varchar(255)
+  date_add date
   product_description text
   customer int 
 }
@@ -84,6 +84,7 @@ Table vendor {
   vendor_name varchar(255)
   description text
   ratings float
+  date_join date
   vendor_logo varchar(200)
 }
 Table customer {
@@ -91,6 +92,7 @@ Table customer {
   fullname varchar(30)
   date_of_birth date
   age smallint
+  date_join date
   avatar_url varchar(200)
 }
 
@@ -168,7 +170,7 @@ Ref: transaction.order_id - order.order_id
 Ref: product_discount.discount_id > discount.discount_id
 Ref: product_discount.product_id > product.product_id
 Ref: order.customer_id > customer.customer_id
-Ref: order_product.order_id > order.order_id
+Ref: order_product.order_id < order.order_id
 Ref: order_product.product_id > product.product_id
 Ref: product.created_by > vendor.vendor_id
 Ref: product.category_id > category.category_id

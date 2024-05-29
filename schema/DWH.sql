@@ -7,6 +7,7 @@ CREATE TABLE "dim_product" (
   "brand" varchar(255),
   "slug" varchar(255),
   "ratings" float,
+  "date_add" date,
   "vendor_id" int NOT NULL,
   "category_id" int NOT NULL
 );
@@ -25,6 +26,7 @@ CREATE TABLE "dim_vendor" (
   "vendor_id" int PRIMARY KEY NOT NULL,
   "name" varchar(255),
   "ratings" float,
+  "date_join" date,
   "address_id" int NOT NULL
 );
 
@@ -35,6 +37,7 @@ CREATE TABLE "dim_customer" (
   "date_of_birth" date,
   "phone" varchar(20),
   "age" tinyint,
+  "date_join" date,
   "avatar_url" varchar(200),
   "address_id" int NOT NULL
 );

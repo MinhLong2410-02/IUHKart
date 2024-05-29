@@ -17,7 +17,7 @@ async def get_collections():
     '''xem tất cả các collection hiện có'''
     return {'collections': [c.name for c in client.get_collections().collections]}
 
-@app.get("/collections/{collection_name}", status_code=200)
+@app.get("/collections/{collection_name}/", status_code=200)
 async def get_points(collection_name:str=None):
     '''xem tất cả point trong collection_name'''
     if collection_name is None or _check_exist(collection_name)==False:
@@ -43,7 +43,7 @@ async def insert_point(collection_name:str, request: InsertPointRequestBody):
     payload = {
         'product_id': request.product_id,
         'product_name': request.product_name,
-        'product_image_url': request.product_image_url
+        'product_url': request.product_url
     }
     point = PointStruct(id=str(uuid4()),
                         vector=vector,
@@ -70,8 +70,8 @@ async def update_point(collection_name: str, request: UpdatePointRequestBody):
     payload = p.payload
     if request.product_name:
         payload["product_name"] = request.product_name
-    if request.product_image_url:
-        payload["product_image_url"] = request.product_image_url
+    if request.product_url:
+        payload["product_url"] = request.product_url
     point = PointStruct(id=p.id, vector=vector, payload=payload)
     client.upsert(collection_name=collection_name, points=[point])
     return {'payload': payload}
@@ -111,8 +111,15 @@ async def create_collection(collection_name:str=None):
             collection_name=collection_name,
             vectors_config=VectorParams(size=384, distance=Distance.COSINE)
         )
-        res = 'success'
+        res = 'created'
     return {'detail': res}
+
+async def delete_collection(collection_name:str):
+    '''xóa 1 collection theo collection_name'''
+    if collection_name is None or _check_exist(collection_name)==False:
+        raise HTTPException(status_code=404, detail="Collection name not found!")
+    client.delete_collection(collection_name=collection_name)
+    return {'detail': 'deleted'}
 
 # search
 @app.get("/collections/{collection_name}/search", status_code=200)
@@ -133,3 +140,6 @@ async def search(collection_name:str=None, slug:str=None, limit:int=10, thresh:f
     )
     res = [{'score':i.score, 'payload':i.payload} for i in res if i.score >= thresh]
     return {'results': res}
+
+
+# ------- MONGODB -------

@@ -7,4 +7,7 @@ Final Project for K16DS's Data Platform subject
 - Lưu Lương Vi Nhân: 20104821
 - Nguyễn Văn Nam: 21017711
 # ERD (might change)
-![ERD Design](schema/erd.png)
+![ERD Design](schema/DPD.png)
+
+# DWH (Data Warehouse)
+![ERD WH](schema/DWH.png)

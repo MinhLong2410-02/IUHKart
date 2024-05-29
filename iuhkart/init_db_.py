@@ -9,7 +9,7 @@ from apps.cart.models import Cart
 import pandas as pd
 from django.contrib.auth.hashers import make_password
 import json, random, sqlite3
-import os
+import os, random
 from rest_framework_simplejwt.tokens import RefreshToken
 
 import ssl
@@ -197,12 +197,12 @@ def create_customer_with_jwt(email, password, fullname, phone, date_of_birth):
     )
     province = Province.objects.get(province_id=79)
     district = District.objects.get(province_id=province, district_id=764)
-    ward = Ward.objects.get(district_id=district, ward_id=26899)
+    ward = Ward.objects.get(district_id=district, ward_id=random.randint(26869, 26903)) # 26899
     Address.objects.create(
         province_id=province,
         district_id=district,
         ward_id=ward,
-        address_detail='13/1 Phường 11, quận Gò Vấp, TP.HCM',
+        address_detail=f'13/1 Phường 11, quận Gò Vấp, TP.HCM', # 13
     )
     address = Address.objects.get(address_detail='13/1 Phường 11, quận Gò Vấp, TP.HCM')
     user.address = address
@@ -217,31 +217,43 @@ def create_customer_with_jwt(email, password, fullname, phone, date_of_birth):
 
 user1, vendor1, token1, refresh1 = create_vendor_with_jwt(
     email='minhlong2002@gmail.com',
-    password='123',  # Pass the plain password
+    password='123',
     name='Minh Long',
     phone='1234567890',
     description='This is a description for Vendor One.'
 )
-print(f'✅ Vendor: {user1.email}, Access Token: {token1}, Refresh Token: {refresh1}')
+print(f'✅ Vendor: {user1.email}')
+# print(f'✅ Vendor: {user1.email}, Access Token: {token1}, Refresh Token: {refresh1}')
 
 user2, customer2, token2, refresh2 = create_customer_with_jwt(
     email='vanhau20022018@gmail.com',
-    password='123',  # Pass the plain password
+    password='123',
     fullname='Văn Hậu',
     phone='0987654321',
     date_of_birth='2002-02-20',
 )
-
-print(f'✅ Customer: {user2.email}, Access Token: {token2}, Refresh Token: {refresh2}')
+print(f'✅ Customer: {user2.email}')
+# print(f'✅ Customer: {user2.email}, Access Token: {token2}, Refresh Token: {refresh2}')
 
 user3, vendor3, token3, refresh3 = create_vendor_with_jwt(
     email='quachnam311@gmail.com',
-    password='123',  # Pass the plain password
+    password='123',
     name='Qx Nam',
     phone='0398089311',
     description='This is a description for Vendor Three.'
 )
-print(f'✅ Vendor: {user3.email}, Access Token: {token3}, Refresh Token: {refresh3}')
+print(f'✅ Vendor: {user3.email}')
+# print(f'✅ Vendor: {user3.email}, Access Token: {token3}, Refresh Token: {refresh3}')
+
+# user4, customer4, token4, refresh4 = create_customer_with_jwt(
+#     email='nhanvi@gmail.com',
+#     password='123',
+#     fullname='Nhân Vi',
+#     phone='0825561671',
+#     date_of_birth='2002-02-20'
+# )
+# print(f'✅ Customer: {user4.email}')
+# print(f'✅ Vendor: {user4.email}, Access Token: {token4}, Refresh Token: {refresh4}')
 
 insert_product()
 insert_product_image()
@@ -261,7 +273,7 @@ def init_qdrant():
     res = requests.post(f'https://qdrant-iuhkart.aiclubiuh.com/collections/create?collection_name={collection_name}')
     df = pd.read_csv('../schema/Database/products.csv')
     df = df[['product_id', 'product_name', 'slug']]
-    loop = tqdm(df.iterrows(), total=df.shape[0], desc='Inserting', colour='green')
+    loop = tqdm(df.iterrows(), total=df.shape[0], desc='Insert to qdrantDB', colour='green')
     for _, iter in loop:
         request_body = InsertPointRequestBody(
             slug=iter['slug'],
@@ -276,4 +288,4 @@ def init_qdrant():
                 )
         loop.set_postfix(status_code = 'success' if res.status_code == 201 else 'fail')
 
-init_qdrant()
+# init_qdrant()
