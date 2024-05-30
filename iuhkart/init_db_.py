@@ -377,7 +377,7 @@ def create_order():
         # address_cache = {x.address_id: x for x in Address.objects.all()}
         df = df.to_dict('records')
         model_objs = [Order(
-            order_id = rc['order_id'],
+            # order_id = rc['order_id'],
             order_number = rc['order_number'],
             shipping_date = rc['shipping_date'],
             order_date = rc['order_date'],
@@ -420,7 +420,7 @@ def create_review():
         product_cache = {x.product_id: x for x in Product.objects.all()}
         df = df.to_dict('records')
         model_objs = [Review(
-            review_id = rc['review_id'],
+            # review_id = rc['review_id'],
             product=product_cache[rc['product_id']],
             customer = customer_cache[rc['customer_id']],
             review_rating = rc['review_rating'],
@@ -464,5 +464,5 @@ def init_qdrant():
     df = pd.DataFrame(broken_products, columns=['product_id', 'product_name'])
     df.to_csv('../schema/Database/broken_products.csv', index=False)
 
-# if PROJECT_STATUS == 'PROD':
-#     init_qdrant()
+if PROJECT_STATUS == 'PROD':
+    init_qdrant()
