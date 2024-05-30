@@ -26,6 +26,14 @@ services:
     volumes:
       - ./services/mongo-db-volume:/data/db
     restart: unless-stopped
+  iuhkart-redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    volumes:
+      - ./services/redis_data:/data
+    networks:
+      - iuhkart-network
   qdrant_fastapi:
     build: ./services/app
     ports:
@@ -43,15 +51,15 @@ services:
       - ./services/qdrant-db-volume:/qdrant/storage
     restart: unless-stopped
 
-  cloudflare:
-    image: cloudflare/cloudflared:latest
-    container_name: iuhkart-cloudflare
-    restart: unless-stopped
-    command: tunnel --no-autoupdate run --token eyJhIjoiODZlYTNjZjEwNmRlMTU3Yjc2NTg0YzgyODgyNDdmMTciLCJ0IjoiMjkwNDAwODQtZmM4NS00YmFhLTk1OTUtODA0NDc3ZTY1OTA3IiwicyI6IlpqZzFaV0UwWm1JdFpESTBNaTAwTUdSaExUZ3habVV0WVdaa05UazNOV0kyTVdVMSJ9
-    networks:
-      - iuhkart-network
-    depends_on:
-      - django_main
+  # cloudflare:
+  #   image: cloudflare/cloudflared:latest
+  #   container_name: iuhkart-cloudflare
+  #   restart: unless-stopped
+  #   command: tunnel --no-autoupdate run --token eyJhIjoiODZlYTNjZjEwNmRlMTU3Yjc2NTg0YzgyODgyNDdmMTciLCJ0IjoiMjkwNDAwODQtZmM4NS00YmFhLTk1OTUtODA0NDc3ZTY1OTA3IiwicyI6IlpqZzFaV0UwWm1JdFpESTBNaTAwTUdSaExUZ3habVV0WVdaa05UazNOV0kyTVdVMSJ9
+  #   networks:
+  #     - iuhkart-network
+  #   depends_on:
+  #     - django_main
   metabase:
     image: metabase/metabase:latest
     container_name: metabase
@@ -80,6 +88,7 @@ services:
     depends_on:
       - qdrant_fastapi
       - mongo_db
+      - iuhkart-redis
   
 networks:
   iuhkart-network:
