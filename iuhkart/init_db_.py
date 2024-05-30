@@ -339,7 +339,8 @@ def create_discount():
             name=rc['name'],
             discount_percent=rc['discount_percent'],
             start_date=rc['start_date'],
-            end_date=rc['end_date']
+            end_date=rc['end_date'],
+            vendor = Product.objects.get(product_id=rc['product_id']).created_by
         ) for rc in df]
         Discount.objects.bulk_create(model_objs)
         print(f'✅ {Discount.__name__}')
