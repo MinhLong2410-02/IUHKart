@@ -7,10 +7,6 @@ class Discount(models.Model):
     product = models.ForeignKey('product.Product', on_delete=models.CASCADE, db_column='product_id')
     name = models.CharField(max_length=100)
     discount_percent = models.DecimalField(max_digits=5, decimal_places=2)
-<<<<<<< Updated upstream
-    # products = models.ManyToManyField('product.Product', through='ProductDiscount')
-=======
->>>>>>> Stashed changes
     date_created = models.DateField(auto_now_add=True)
     start_date = models.DateField()
     end_date = models.DateField()
