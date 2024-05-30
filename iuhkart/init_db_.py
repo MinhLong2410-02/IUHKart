@@ -66,7 +66,7 @@ path = {
     'product': '../schema/Database/products.csv',
     'product_image': '../schema/Database/product_images.csv',
     'product_image_main': '../schema/Database/product_images_main.csv',
-    'discount': '../schema/Database/discount.csv',
+    'discount': '../schema/Database/discount_new.csv',
     'product_discount': '../schema/Database/product_discount.csv',
     'order_products': '../schema/Database/order_products.csv',
     'orders': '../schema/Database/orders.csv',
@@ -321,7 +321,6 @@ user5, customer5, token5, refresh5 = create_customer_with_jwt(
 )
 print(f'✅ Customer: {user5.email}, Access Token: {token5}, Refresh Token: {refresh5}')
 
-
 insert_product()
 insert_product_image()
 
@@ -329,12 +328,16 @@ insert_product_image()
 def create_discount():
     try:
         df = pd.read_csv(path['discount'])
+        product_cache = {x.product_id: x for x in Product.objects.all()}
         # convert to dict
         df = df.to_dict('records')
         model_objs = [Discount(
             discount_id=rc['discount_id'],
+            product=product_cache[rc['product_id']],
             name=rc['name'],
             discount_percent=rc['discount_percent'],
+            start_date=rc['start_date'],
+            end_date=rc['end_date']
         ) for rc in df]
         Discount.objects.bulk_create(model_objs)
         print(f'✅ {Discount.__name__}')
@@ -360,73 +363,73 @@ def create_discount():
 #     except Exception as e:
 #         print(f'❌ {ProductDiscount.__name__} - {e}')
 
-# create_discount()
+create_discount()
 # create_product_discount()
 
-# def create_order():
-#     try:
-#         df = pd.read_csv(path['orders'])
-#         # convert to dict
-#         customer_cache = {x.id: x for x in Customer.objects.all()}
-#         # address_cache = {x.address_id: x for x in Address.objects.all()}
-#         df = df.to_dict('records')
-#         model_objs = [Order(
-#             order_id = rc['order_id'],
-#             order_number = rc['order_number'],
-#             shipping_date = rc['shipping_date'],
-#             order_date = rc['order_date'],
-#             order_status = rc['order_status'],
-#             order_total = rc['total_price'],
-#             customer = customer_cache[rc['customer_id']],
-#         ) for rc in df]
-#         Order.objects.bulk_create(model_objs)
-#         print(f'✅ {Order.__name__}')
-#     except Exception as e:
-#         print(f'❌ {Order.__name__} - {e}')
+def create_order():
+    try:
+        df = pd.read_csv(path['orders'])
+        # convert to dict
+        customer_cache = {x.id: x for x in Customer.objects.all()}
+        # address_cache = {x.address_id: x for x in Address.objects.all()}
+        df = df.to_dict('records')
+        model_objs = [Order(
+            order_id = rc['order_id'],
+            order_number = rc['order_number'],
+            shipping_date = rc['shipping_date'],
+            order_date = rc['order_date'],
+            order_status = rc['order_status'],
+            order_total = rc['total_price'],
+            customer = customer_cache[rc['customer_id']],
+        ) for rc in df]
+        Order.objects.bulk_create(model_objs)
+        print(f'✅ {Order.__name__}')
+    except Exception as e:
+        print(f'❌ {Order.__name__} - {e}')
 
-# def create_order_product():
-#     try:
-#         df = pd.read_csv(path['order_products'])
-#         # convert to dict
-#         order_cache = {x.order_id: x for x in Order.objects.all()}
-#         product_cache = {x.product_id: x for x in Product.objects.all()}
-#         df = df.to_dict('records')
-#         model_objs = [OrderProduct(
-#             order_product_id=rc['order_product_id'],
-#             order=order_cache[rc['order_id']],
-#             product=product_cache[rc['product_id']],
-#             quantity=rc['quantity'],
-#             price=rc['price']
-#         ) for rc in df]
-#         OrderProduct.objects.bulk_create(model_objs)
-#         print(f'✅ {OrderProduct.__name__}')
-#     except Exception as e:
-#         print(f'❌ {OrderProduct.__name__} - {e}')
+def create_order_product():
+    try:
+        df = pd.read_csv(path['order_products'])
+        # convert to dict
+        order_cache = {x.order_id: x for x in Order.objects.all()}
+        product_cache = {x.product_id: x for x in Product.objects.all()}
+        df = df.to_dict('records')
+        model_objs = [OrderProduct(
+            order_product_id=rc['order_product_id'],
+            order=order_cache[rc['order_id']],
+            product=product_cache[rc['product_id']],
+            quantity=rc['quantity'],
+            price=rc['price']
+        ) for rc in df]
+        OrderProduct.objects.bulk_create(model_objs)
+        print(f'✅ {OrderProduct.__name__}')
+    except Exception as e:
+        print(f'❌ {OrderProduct.__name__} - {e}')
 
-# create_order()
-# create_order_product()
+create_order()
+create_order_product()
 
-# def create_review():
-#     try:
-#         df = pd.read_csv(path['review'])
-#         # convert to dict
-#         customer_cache = {x.id: x for x in Customer.objects.all()}
-#         product_cache = {x.product_id: x for x in Product.objects.all()}
-#         df = df.to_dict('records')
-#         model_objs = [Review(
-#             review_id = rc['review_id'],
-#             product=product_cache[rc['product_id']],
-#             customer = customer_cache[rc['customer_id']],
-#             review_rating = rc['review_rating'],
-#             review_date = rc['review_date'],
-#             review_content = rc['review_content']
-#         ) for rc in df]
-#         Review.objects.bulk_create(model_objs)
-#         print(f'✅ {Review.__name__}')
-#     except Exception as e:
-#         print(f'❌ {Review.__name__} - {e}')
+def create_review():
+    try:
+        df = pd.read_csv(path['review'])
+        # convert to dict
+        customer_cache = {x.id: x for x in Customer.objects.all()}
+        product_cache = {x.product_id: x for x in Product.objects.all()}
+        df = df.to_dict('records')
+        model_objs = [Review(
+            review_id = rc['review_id'],
+            product=product_cache[rc['product_id']],
+            customer = customer_cache[rc['customer_id']],
+            review_rating = rc['review_rating'],
+            review_date = rc['review_date'],
+            review_content = rc['review_content']
+        ) for rc in df]
+        Review.objects.bulk_create(model_objs)
+        print(f'✅ {Review.__name__}')
+    except Exception as e:
+        print(f'❌ {Review.__name__} - {e}')
 
-# create_review()
+create_review()
 
 ## vector database
 def init_qdrant():
@@ -458,5 +461,5 @@ def init_qdrant():
     df = pd.DataFrame(broken_products, columns=['product_id', 'product_name'])
     df.to_csv('../schema/Database/broken_products.csv', index=False)
 
-if PROJECT_STATUS == 'PROD':
-    init_qdrant()
+# if PROJECT_STATUS == 'PROD':
+#     init_qdrant()
