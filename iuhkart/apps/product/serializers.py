@@ -13,7 +13,7 @@ class ProductImageSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ProductImages
-        fields = ['product_image_id', 'image_url']
+        fields = ['product_image_id', 'image_url', 'is_main']
 class ProductImageCreateUpdateSerializer(serializers.ModelSerializer):
     image_url = serializers.ImageField()
 
