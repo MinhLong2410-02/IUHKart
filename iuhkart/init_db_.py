@@ -165,6 +165,8 @@ def insert_product():
             original_price=rc['original_price'],
             stock=rc['stock'],
             brand=rc['brand'],
+            ratings=rc['ratings'],
+            date_add=rc['date_add'],
             created_by=vendor_cache[rc['vendor_id']],
             category=category_cache[rc['category_id']]
         ) for rc in df]

@@ -2,11 +2,11 @@ CREATE TABLE "dim_product" (
   "product_id" int PRIMARY KEY NOT NULL,
   "product_name" varchar(255),
   "original_price" float,
-  "price" float,
   "stock" int,
   "brand" varchar(255),
+  "slug" varchar(255),
   "ratings" float,
-  "date_add" date,
+  "date_created" date,
   "vendor_id" int NOT NULL,
   "category_id" int NOT NULL
 );
@@ -14,21 +14,16 @@ CREATE TABLE "dim_product" (
 CREATE TABLE "dim_vendor" (
   "vendor_id" int PRIMARY KEY NOT NULL,
   "name" varchar(255),
-  "ratings" float,
   "date_join" date
 );
 
 CREATE TABLE "dim_customer" (
   "customer_id" int PRIMARY KEY,
   "fullname" varchar(30),
-  "email" varchar(50),
   "date_of_birth" date,
-  "phone" varchar(20),
   "age" int,
   "date_join" date,
-  "avatar_url" varchar(200),
-  "address_id" int NOT NULL,
-  "list_product_rs" varchar(255)
+  "recommend_product_ids" varchar(255)
 );
 
 CREATE TABLE "dim_order" (
@@ -36,7 +31,7 @@ CREATE TABLE "dim_order" (
   "order_number" varchar(255),
   "shipping_date" date,
   "order_date" date,
-  "order_amount" float,
+  "order_total" float,
   "total_price" float,
   "order_status" varchar(255),
   "customer_id" int NOT NULL
@@ -51,8 +46,9 @@ CREATE TABLE "fact_order_product" (
 
 CREATE TABLE "fact_review" (
   "review_id" int PRIMARY KEY NOT NULL,
-  "description" text,
-  "ratings" float,
+  "review_content" text,
+  "review_rating" int,
+  "review_date" date,
   "product_id" int NOT NULL,
   "customer_id" int NOT NULL
 );

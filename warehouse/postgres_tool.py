@@ -1,6 +1,7 @@
 import psycopg2
 from tabulate import tabulate
-
+import pandas as pd
+import numpy as np
 
 class PostgresTool():
     def __init__(self, host, user, port, password, database):
@@ -36,10 +37,12 @@ class PostgresTool():
         print("🖐 Closed connection")
 
     def query(self, sql_query):
-        self.cur.execute("ROLLBACK")
+        self.cursor.execute("ROLLBACK")
         self.cursor.execute(sql_query)
         rows = self.cursor.fetchall()
-        print(tabulate(rows, headers=[desc[0] for desc in self.cursor.description], tablefmt='psql'))
+        # print(tabulate(rows, headers=[desc[0] for desc in self.cursor.description], tablefmt='psql'))
+        df = pd.DataFrame(rows, columns=[desc[0] for desc in self.cursor.description])
+        return df
 
     def create_schema(self, sql_path='*.sql'):
         with open(sql_path, 'r') as f:
@@ -76,4 +79,18 @@ class PostgresTool():
                 print(f"🗑 Deleted {table}")
             except Exception as e:
                 print(f"❌ {e}")
+        self.conn.commit()
+
+    def push_data(self, df, table_name):
+        self.cursor.execute("ROLLBACK")
+        cols = self.get_columns(table_name)
+        df = df[cols]
+        datas = [tuple(i) for i in np.where(pd.isna(df), None, df).tolist()]
+        sql_insert = f"insert into {table_name} ({','.join(cols)}) values ({','.join(['%s']*len(cols))})"
+        self.cursor.executemany(sql_insert, datas)
+        self.conn.commit()
+
+    def truncate(self, table_name):
+        self.cursor.execute("ROLLBACK")
+        self.cursor.execute(f"TRUNCATE {table_name} CASCADE")
         self.conn.commit()
