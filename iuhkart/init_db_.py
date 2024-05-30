@@ -5,6 +5,8 @@ from apps.product.models import Category, Product, ProductImages
 from apps.account.models import Vendor, Customer, User
 from apps.address.models import Province, District, Ward, Address
 from apps.cart.models import Cart
+from apps.discount.models import Discount, ProductDiscount
+from apps.order.models import OrderProduct, Order
 
 import pandas as pd
 import numpy as np
@@ -51,7 +53,7 @@ print(cursor.statusmessage)
 cursor.close()
 connection.close()
 
-os.system('migrate.bat')
+os.system('sh migrate.sh')
 path = {
     'province': 'https://raw.githubusercontent.com/MinhLong2410-02/VN-province-api-test/main/province.csv',
     'district': 'https://raw.githubusercontent.com/MinhLong2410-02/VN-province-api-test/main/district.csv',
@@ -60,7 +62,10 @@ path = {
     'product': '../schema/Database/products.csv',
     'product_image': '../schema/Database/product_images.csv',
     'product_image_main': '../schema/Database/product_images_main.csv',
-    
+    'discount': '../schema/Database/discount.csv',
+    'product_discount': '../schema/Database/product_discount.csv',
+    'order_products': '../schema/Database/order_products.csv',
+    'orders': '../schema/Database/orders.csv'
 }
 
 ########################
@@ -315,6 +320,87 @@ print(f'✅ Customer: {user5.email}, Access Token: {token5}, Refresh Token: {ref
 insert_product()
 insert_product_image()
 
+# order
+def create_discount():
+    try:
+        df = pd.read_csv(path['discount'])
+        # convert to dict
+        df = df.to_dict('records')
+        model_objs = [Discount(
+            discount_id=rc['discount_id'],
+            name=rc['name'],
+            discount_percent=rc['discount_percent'],
+        ) for rc in df]
+        Discount.objects.bulk_create(model_objs)
+        print(f'✅ {Discount.__name__}')
+    except Exception as e:
+        print(f'❌ {Discount.__name__} - {e}')
+
+def create_product_discount():
+    try:
+        df = pd.read_csv(path['product_discount'])
+        # convert to dict
+        discount_cache = {x.discount_id: x for x in Discount.objects.all()}
+        product_cache = {x.product_id: x for x in Product.objects.all()}
+        df = df.to_dict('records')
+        model_objs = [ProductDiscount(
+            product_discount_id=rc['product_discount_id'],
+            product=product_cache[rc['product_id']],
+            discount=discount_cache[rc['discount_id']],
+            start_date=rc['start_date'],
+            end_date=rc['end_date']
+        ) for rc in df]
+        ProductDiscount.objects.bulk_create(model_objs)
+        print(f'✅ {ProductDiscount.__name__}')
+    except Exception as e:
+        print(f'❌ {ProductDiscount.__name__} - {e}')
+
+create_discount()
+create_product_discount()
+
+def create_order():
+    try:
+        df = pd.read_csv(path['orders'])
+        # convert to dict
+        customer_cache = {x.id: x for x in Customer.objects.all()}
+        # address_cache = {x.address_id: x for x in Address.objects.all()}
+        df = df.to_dict('records')
+        model_objs = [Order(
+            order_id = rc['order_id'],
+            order_number = rc['order_number'],
+            shipping_date = rc['shipping_date'],
+            order_date = rc['order_date'],
+            order_status = rc['order_status'],
+            order_total = rc['total_price'],
+            customer = customer_cache[rc['customer_id']],
+        ) for rc in df]
+        Order.objects.bulk_create(model_objs)
+        print(f'✅ {Order.__name__}')
+    except Exception as e:
+        print(f'❌ {Order.__name__} - {e}')
+
+def create_order_product():
+    try:
+        df = pd.read_csv(path['order_products'])
+        # convert to dict
+        order_cache = {x.order_id: x for x in Order.objects.all()}
+        product_cache = {x.product_id: x for x in Product.objects.all()}
+        df = df.to_dict('records')
+        model_objs = [OrderProduct(
+            order_product_id=rc['order_product_id'],
+            order=order_cache[rc['order_id']],
+            product=product_cache[rc['product_id']],
+            quantity=rc['quantity'],
+            price=rc['price']
+        ) for rc in df]
+        OrderProduct.objects.bulk_create(model_objs)
+        print(f'✅ {OrderProduct.__name__}')
+    except Exception as e:
+        print(f'❌ {OrderProduct.__name__} - {e}')
+
+create_order()
+create_order_product()
+
 ## vector database
 def init_qdrant():
     broken_products = []
@@ -344,4 +430,4 @@ def init_qdrant():
         loop.set_postfix(status_code='success' if res.status_code == 201 else 'fail')
     df = pd.DataFrame(broken_products, columns=['product_id', 'product_name'])
     df.to_csv('../schema/Database/broken_products.csv', index=False)
-init_qdrant()
+# init_qdrant()
