@@ -7,6 +7,7 @@ from apps.address.models import Province, District, Ward, Address
 from apps.cart.models import Cart
 from apps.discount.models import Discount, ProductDiscount
 from apps.order.models import OrderProduct, Order
+from apps.review.models import Review
 
 import pandas as pd
 import numpy as np
@@ -65,7 +66,8 @@ path = {
     'discount': '../schema/Database/discount.csv',
     'product_discount': '../schema/Database/product_discount.csv',
     'order_products': '../schema/Database/order_products.csv',
-    'orders': '../schema/Database/orders.csv'
+    'orders': '../schema/Database/orders.csv',
+    'review': '../schema/Database/review.csv'
 }
 
 ########################
@@ -400,6 +402,28 @@ def create_order_product():
 
 create_order()
 create_order_product()
+
+def create_review():
+    try:
+        df = pd.read_csv(path['review'])
+        # convert to dict
+        customer_cache = {x.id: x for x in Customer.objects.all()}
+        product_cache = {x.product_id: x for x in Product.objects.all()}
+        df = df.to_dict('records')
+        model_objs = [Review(
+            review_id = rc['review_id'],
+            product=product_cache[rc['product_id']],
+            customer = customer_cache[rc['customer_id']],
+            review_rating = rc['review_rating'],
+            review_date = rc['review_date'],
+            review_content = rc['review_content']
+        ) for rc in df]
+        Review.objects.bulk_create(model_objs)
+        print(f'✅ {Review.__name__}')
+    except Exception as e:
+        print(f'❌ {Review.__name__} - {e}')
+
+create_review()
 
 ## vector database
 def init_qdrant():
