@@ -3,7 +3,7 @@ from typing import Optional
 
 class InsertPointRequestBody(BaseModel):
     slug: str
-    product_id: str
+    product_id: int
     product_name: str
     product_image_url: str
     

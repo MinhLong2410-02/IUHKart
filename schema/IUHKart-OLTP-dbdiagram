@@ -43,17 +43,14 @@ Table product_image{
 
 Table discount{
   discount_id int pk
+  vendor_id int
+  product_id int
   name varchar(100)
   discount_percent float
   date_created date
-}
-
-Table product_discount{
-  product_discount_id int pk
-  product_id int
-  discount_id int
   start_date date
   end_date date
+  in_use bool
 }
 
 table order_product_discount{
@@ -172,6 +169,8 @@ table bank_account{
   branch_name varchar(255)
 }
 
+ref: discount.vendor_id > vendor.vendor_id
+ref: discount.product_id - product.product_id
 ref: bank_account.vendor_id - vendor.vendor_id
 ref: order_product_discount.discount_id > discount.discount_id
 ref: order_product_discount.order_product_id > order_product.order_product_id
@@ -186,8 +185,6 @@ Ref: ward.province_id > province.province_id
 Ref: user.user_id - vendor.vendor_id
 Ref: user.user_id - customer.customer_id
 Ref: transaction.order_id - order.order_id
-Ref: product_discount.discount_id > discount.discount_id
-Ref: product_discount.product_id > product.product_id
 Ref: order.customer_id > customer.customer_id
 Ref: order_product.order_id > order.order_id
 Ref: order_product.product_id > product.product_id

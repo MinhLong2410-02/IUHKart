@@ -23,6 +23,7 @@ class Order(models.Model):
     customer = models.ForeignKey('account.Customer', on_delete=models.CASCADE, db_column='customer_id')
     # products = models.ManyToManyField('product.Product', through='OrderProduct')
     address = models.OneToOneField('address.Address', on_delete=models.CASCADE, db_column='address_id', null=True, blank=True)
+    total_price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     class Meta:
         ordering = ['-order_date']
         db_table = 'order'
@@ -41,3 +42,24 @@ class OrderProduct(models.Model):
         db_table = 'order_product'
         ordering = ['-order_id']
         unique_together = (('order', 'product'),)
+
+class Transaction(models.Model):
+    TRANSACTION_STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('completed', 'Completed'),
+        ('failed', 'Failed'),
+        ('refunded', 'Refunded'),
+    ]
+
+    transaction_id = models.AutoField(primary_key=True)
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='payments')
+    transation_date = models.DateTimeField(auto_now_add=True)
+    total_money = models.DecimalField(max_digits=10, decimal_places=2)
+    status = models.CharField(max_length=50, choices=TRANSACTION_STATUS_CHOICES, default='pending')
+    customer = models.ForeignKey('account.Customer', on_delete=models.CASCADE, db_column='customer_id')
+    class Meta:
+        ordering = ['-transation_date']
+        db_table = 'transaction'
+
+    def __str__(self):
+        return f"{self.payment_id} - {self.order.order_number}"
