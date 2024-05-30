@@ -17,7 +17,7 @@ class Order(models.Model):
     order_id = models.AutoField(primary_key=True)
     order_number = models.CharField(max_length=50, unique=True, db_index=True)
     shipping_date = models.DateField(default=default_shipping_date)
-    order_date = models.DateField(auto_now_add=True)
+    order_date = models.DateField(default=now)
     order_status = models.CharField(max_length=50, choices=ORDER_STATUS_CHOICES, default='pending', db_index=True)
     order_total = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     customer = models.ForeignKey('account.Customer', on_delete=models.CASCADE, db_column='customer_id')
@@ -30,7 +30,6 @@ class Order(models.Model):
 
     def __str__(self):
         return self.order_number
-
 class OrderProduct(models.Model):
     order_product_id = models.AutoField(primary_key=True)
     order = models.ForeignKey(Order, on_delete=models.CASCADE, db_column='order_id')
@@ -53,7 +52,7 @@ class Transaction(models.Model):
 
     transaction_id = models.AutoField(primary_key=True)
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='payments')
-    transation_date = models.DateTimeField(auto_now_add=True)
+    transation_date = models.DateTimeField(default=now)
     total_money = models.DecimalField(max_digits=10, decimal_places=2)
     status = models.CharField(max_length=50, choices=TRANSACTION_STATUS_CHOICES, default='pending')
     customer = models.ForeignKey('account.Customer', on_delete=models.CASCADE, db_column='customer_id')

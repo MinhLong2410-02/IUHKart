@@ -4,6 +4,7 @@ from apps.account.manager import UserManager
 from django.utils.translation import gettext_lazy as _
 from apps.custom_storage import AzureCustomerStorage, AzureVendorStorage
 from django.contrib.postgres.fields import ArrayField
+from django.utils import timezone
 # Create your models here.
 class User(AbstractBaseUser):
     username = None
@@ -29,7 +30,7 @@ class Customer(models.Model):
     date_of_birth = models.DateField(blank=True, null=True)
     age = models.SmallIntegerField()
     avatar_url = models.ImageField(storage=AzureCustomerStorage(), max_length=255, blank=True, null=True)
-    date_join = models.DateField(auto_now_add=True)
+    date_join = models.DateField(default=timezone.now)
     recommend_products = ArrayField(models.IntegerField(), blank=True, default=list, size=20, db_column='recommend_product_ids')
     class Meta:
         verbose_name_plural = "Customers"
@@ -42,7 +43,7 @@ class Vendor(models.Model):
     phone = models.CharField(max_length=20, blank=True, null=True)
     description = models.TextField(blank=True, null=True)
     logo_url = models.ImageField(storage=AzureVendorStorage(), blank=True, null=True)
-    date_join = models.DateField(auto_now_add=True)
+    date_join = models.DateField(default=timezone.now)
 
     class Meta:
         verbose_name_plural = "Vendors"

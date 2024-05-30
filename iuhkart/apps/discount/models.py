@@ -1,5 +1,5 @@
 from django.db import models
-
+from django.utils import timezone
 # Create your models here.
 class Discount(models.Model):
     discount_id = models.AutoField(primary_key=True)
@@ -7,7 +7,7 @@ class Discount(models.Model):
     product = models.ForeignKey('product.Product', on_delete=models.CASCADE, db_column='product_id')
     name = models.CharField(max_length=100)
     discount_percent = models.DecimalField(max_digits=5, decimal_places=2)
-    date_created = models.DateField(auto_now_add=True)
+    date_created = models.DateField(default=timezone.now)
     start_date = models.DateField()
     end_date = models.DateField()
     in_use = models.BooleanField(default=True)
