@@ -16,12 +16,12 @@ class Order(models.Model):
 
     order_id = models.AutoField(primary_key=True)
     order_number = models.CharField(max_length=50, unique=True, db_index=True)
-    shipping_date = models.DateTimeField(default=default_shipping_date)
-    order_date = models.DateTimeField(auto_now_add=True)
+    shipping_date = models.DateField(default=default_shipping_date)
+    order_date = models.DateField(auto_now_add=True)
     order_status = models.CharField(max_length=50, choices=ORDER_STATUS_CHOICES, default='pending', db_index=True)
     order_total = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     customer = models.ForeignKey('account.Customer', on_delete=models.CASCADE, db_column='customer_id')
-    products = models.ManyToManyField('product.Product', through='OrderProduct')
+    # products = models.ManyToManyField('product.Product', through='OrderProduct')
     address = models.OneToOneField('address.Address', on_delete=models.CASCADE, db_column='address_id', null=True, blank=True)
     class Meta:
         ordering = ['-order_date']
