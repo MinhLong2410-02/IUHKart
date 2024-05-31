@@ -29,7 +29,7 @@ async def root(current_user: TokenData = Depends(get_current_user)):
 
 
 @app.post("/api/v1/keep-track", status_code=status.HTTP_202_ACCEPTED,)
-async def keepTrack(user_id: int, 
+async def keepTrack(
                   product: Product, 
                   current_user: TokenData = Depends(get_current_user)):
     user_id = current_user['user_id']  
