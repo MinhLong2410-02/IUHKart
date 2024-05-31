@@ -61,7 +61,7 @@ LOCAL_APPS = [
     'apps.discount',
     'apps.review',
     'apps.order',
-    
+    'apps.metabase'
 ]
 
 INSTALLED_APPS = DEFAULT_APPS + LOCAL_APPS + THIRD_PARTY_APPS
@@ -225,3 +225,7 @@ EMAIL_PORT = 587
 EMAIL_HOST_USER = 'aiclub.iuh@gmail.com'
 EMAIL_HOST_PASSWORD = "abc"
 EMAIL_USE_TLS = True
+
+#METABASE
+METABASE_SITE_URL = environ.get('METABASE_SITE_URL')
+METABASE_EMBEDDING_SECRET_KEY = environ.get('METABASE_EMBEDDING_SECRET_KEY')
