@@ -99,6 +99,18 @@ async def delete_point(collection_name:str=None, product_id:int=None):
     )
     return {'detail': 'deleted'}
 
+# delete a collection
+@app.delete("/collections/delete", status_code=200)
+async def delete_collection(collection_name:str=None):
+    '''xóa 1 collection, nếu không tồn tại thì thôi'''
+    if collection_name is None:
+        raise HTTPException(status_code=404, detail="Collection name not found!")
+    res = 'not found'
+    if collection_name in [c.name for c in client.get_collections().collections]:
+        client.delete_collection(collection_name)
+        res = 'deleted'
+    return {'detail': res}
+
 # create a new collection
 @app.post("/collections/create", status_code=201)
 async def create_collection(collection_name:str=None):
