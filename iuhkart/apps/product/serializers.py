@@ -26,14 +26,14 @@ class VendorProductSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Product
-        fields = ['product_id', 'product_name', 'product_description', 'original_price', 'stock', 'brand', 'slug', 'created_by', 'category', 'images']
+        fields = ['product_id', 'product_name', 'product_description', 'original_price', 'stock', 'brand', 'slug', 'created_by', 'category', 'images', 'ratings']
 
 class CustomerProductSerializer(serializers.ModelSerializer):
     images = serializers.SerializerMethodField()
 
     class Meta:
         model = Product
-        fields = ['product_id', 'product_name', 'product_description', 'original_price', 'stock', 'brand', 'slug', 'created_by', 'category', 'images']
+        fields = ['product_id', 'product_name', 'product_description', 'original_price', 'stock', 'brand', 'slug', 'created_by', 'category', 'images', 'ratings']
         
     @extend_schema_field(ProductImageSerializer(allow_null=True))
     def get_images(self, obj):
@@ -46,7 +46,7 @@ class CustomerSpecificProductSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Product
-        fields = ['product_id', 'product_name', 'product_description', 'original_price', 'stock', 'brand', 'slug', 'created_by', 'category', 'images']
+        fields = ['product_id', 'product_name', 'product_description', 'original_price', 'stock', 'brand', 'slug', 'created_by', 'category', 'images', 'ratings']
         
     @extend_schema_field(ProductImageSerializer(allow_null=True))
     def get_images(self, obj):
@@ -74,7 +74,7 @@ class ProductSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Product
-        fields = ['product_id', 'product_name', 'product_description', 'original_price', 'stock', 'brand', 'slug', 'created_by', 'category', 'images']
+        fields = ['product_id', 'product_name', 'product_description', 'original_price', 'stock', 'brand', 'slug', 'created_by', 'category', 'images', 'ratings']
 
 class ProductImagesSerializer(serializers.ModelSerializer):
     class Meta:

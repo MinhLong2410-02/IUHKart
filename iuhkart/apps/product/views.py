@@ -1,13 +1,12 @@
-from django.shortcuts import render
 from rest_framework.response import Response
 from rest_framework import generics, permissions, status
-from rest_framework.views import APIView
 from rest_framework.generics import GenericAPIView
 from apps.product.serializers import *
 from apps.product.pagination import VendorProductResultsSetPagination
+from apps.account.models import Customer
 from drf_spectacular.utils import extend_schema
 from drf_spectacular.openapi import OpenApiParameter
-
+from django.db.models import Case, When, IntegerField
 # Create your views here.
 
 @extend_schema(
@@ -99,12 +98,18 @@ class CustomerProductListView(generics.ListAPIView):
     permission_classes = [permissions.IsAuthenticated]
     queryset = Product.objects.all().select_related('created_by', 'category').prefetch_related('images')
     def get_queryset(self):
-        queryset = super().get_queryset()  
+        queryset = Product.objects.all().select_related('created_by', 'category').prefetch_related('images')
+        customer = self.request.user.customer
+
+        if customer.recommend_products:
+            preserved_order = Case(*[When(pk=pk, then=pos) for pos, pk in enumerate(customer.recommend_products)])
+            queryset = queryset.annotate(sort_order=preserved_order).order_by('sort_order')
+
         category_id = self.request.query_params.get('category_id', None)
         if category_id is not None:
-            return Product.objects.filter(category=category_id).select_related('created_by', 'category').prefetch_related('images')
-        return queryset
+            queryset = queryset.filter(category=category_id)
 
+        return queryset
 class CustomerOneProductView(generics.RetrieveAPIView):
     serializer_class = CustomerSpecificProductSerializer
     queryset = Product.objects.all()
