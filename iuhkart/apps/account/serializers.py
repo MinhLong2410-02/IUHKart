@@ -2,7 +2,6 @@ from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from apps.account.models import Customer, Vendor, BankAccount
 from apps.cart.models import Cart
-
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from datetime import date
 
@@ -104,11 +103,26 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
     def validate(self, attrs):
         data = super().validate(attrs)
         roles = []
-        if self.user.is_customer:
+        customer_id = None
+        vendor_id = None
+        
+        # Check if the user has a customer profile
+        if hasattr(self.user, 'customer'):
             roles.append('customer')
-        if self.user.is_vendor:
+            customer_id = self.user.customer.id
+        
+        # Check if the user has a vendor profile
+        if hasattr(self.user, 'vendor'):
             roles.append('vendor')
-        data['role'] = roles
+            vendor_id = self.user.vendor.id
+
+        # Add roles and IDs to the token data
+        data.update({
+            'role': roles,
+            'customer_id': customer_id,
+            'vendor_id': vendor_id
+        })
+
         return data
 
 class CustomerAvatarUploadSerializer(serializers.ModelSerializer):
