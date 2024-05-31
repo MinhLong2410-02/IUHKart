@@ -130,11 +130,11 @@ if __name__ == "__main__":
                     WHERE WHERE user_id = %s;
                 ''', 
                 connection = psycopg2.connect(
-                    dbname=oltp_config['NAME'],
-                    user=oltp_config['USER'],
-                    password=oltp_config['PASSWORD'],
-                    host=oltp_config['HOST'],
-                    port=oltp_config['PORT']
+                    dbname=oltp_config['database'],
+                    user=oltp_config['user'],
+                    password=oltp_config['password'],
+                    host=oltp_config['host'],
+                    port=oltp_config['port']
                 )
                 cursor = connection.cursor()
                 try:
