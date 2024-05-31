@@ -127,6 +127,21 @@ services:
       - mongo_db
       - iuhkart-redis
   
+  etl_data_warehouse:
+    build: ./warehouse
+    env_file:
+      - ./warehouse/.env
+    volumes:
+      - ./warehouse:/app
+    restart: unless-stopped
+    depends_on:
+      - mongo_db
+      - qdrant_db
+      - iuhkart-redis
+      - django_main
+    networks:
+      - iuhkart-network
+    
 networks:
   iuhkart-network:
     name: iuhkart

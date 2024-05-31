@@ -13,10 +13,7 @@ def write_log(text):
 
 def get_data(config):
     query_string = '''
-    select p.product_id, p.slug, p.category_id, p.ratings, p.original_price, p.stock, d.discount_percent, d.in_use
-    from product p
-    full outer join 
-        discount d on d.product_id = p.product_id'''
+    select p.product_id, p.slug, p.category_id, p.ratings, p.original_price, p.stock from dim_product p'''
     connection = psycopg2.connect(
         dbname=config['database'],
         user=config['user'],
@@ -27,15 +24,13 @@ def get_data(config):
     cursor = connection.cursor()
     cursor.execute(query_string)
     result = cursor.fetchall()
-    meta_database = pd.DataFrame(result, columns=['product_id', 'slug', 'category_id', 'ratings', 'original_price', 'stock', 'discount_percent', 'in_use'])
-    meta_database['in_use'] = meta_database['in_use'].fillna(False)
-    meta_database.loc[~meta_database['in_use'], 'discount_percent'] = 0
+    meta_database = pd.DataFrame(result, columns=['product_id', 'slug', 'category_id', 'ratings', 'original_price', 'stock'])
+   
     # drop in_use column
-    meta_database = meta_database.drop(columns=['in_use'])
-    label_encoder = LabelEncoder()
-    for column in ['category_id']:
-        meta_database[column] = label_encoder.fit_transform(meta_database[column])
-    print(meta_database.columns)
+    # label_encoder = LabelEncoder()
+    # for column in ['category_id']:
+    #     meta_database[column] = label_encoder.fit_transform(meta_database[column])
+    # print(meta_database.columns)
     return meta_database
 
 class RS:
