@@ -88,7 +88,14 @@ class RS:
 
 if __name__ == "__main__":
     load_dotenv()
-    config = {
+    olap_config = {
+        'host': os.environ.get('DWHOST'),
+        'port': os.environ.get('PORT'),
+        'user': os.environ.get('DWUSER'),
+        'password':  os.environ.get('PASSWORD'),
+        'database': os.environ.get('NAME')
+    }
+    oltp_config = {
         'host': os.environ.get('HOST'),
         'port': os.environ.get('PORT'),
         'user': os.environ.get('USER'),
@@ -111,7 +118,7 @@ if __name__ == "__main__":
                 json_data = json.loads(json_string)
                 user_id = json_data['user_id']
                 product_id = json_data['product_id']
-                rs = RS(get_data(config))
+                rs = RS(get_data(olap_config))
                 product_ids = rs.recommend(product_id)
                 product_ids.append(user_id)
                 query_string = '''UPDATE customer
@@ -119,11 +126,11 @@ if __name__ == "__main__":
                     WHERE WHERE user_id = %s;
                 ''', 
                 connection = psycopg2.connect(
-                    dbname=config['NAME'],
-                    user=config['USER'],
-                    password=config['PASSWORD'],
-                    host=config['HOST'],
-                    port=config['PORT']
+                    dbname=oltp_config['NAME'],
+                    user=oltp_config['USER'],
+                    password=oltp_config['PASSWORD'],
+                    host=oltp_config['HOST'],
+                    port=oltp_config['PORT']
                 )
                 cursor = connection.cursor()
                 try:
