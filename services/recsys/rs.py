@@ -115,11 +115,14 @@ if __name__ == "__main__":
         for message in pubsub.listen():
             if message['type'] == 'message':
                 json_string = message['data'].decode('utf-8')
+                write_log(json_string)
                 json_data = json.loads(json_string)
+                
                 user_id = json_data['user_id']
                 product_id = json_data['product_id']
                 rs = RS(get_data(olap_config))
                 product_ids = rs.recommend(product_id)
+                del rs
                 product_ids.append(user_id)
                 query_string = '''UPDATE customer
                     SET recommend_product_ids  = '{%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s}'
