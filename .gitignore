@@ -167,3 +167,7 @@ a.html
 # qdrant
 search/__pycache__/
 search/qdrant_db/
+
+# warehouse
+warehouse/__pycache__/
+warehouse/logs/

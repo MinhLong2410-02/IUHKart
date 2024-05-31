@@ -1,11 +1,11 @@
-import pandas as pd
-import psycopg2
 from dotenv import load_dotenv
 from postgres_tool import PostgresTool
+from datetime import datetime
+import pytz
 import os
 import warnings
 warnings.filterwarnings("ignore")
-
+os.chdir(os.path.dirname(__file__))
 load_dotenv()
 configs = {
     'DB': {
@@ -24,23 +24,18 @@ configs = {
     }
     
 }
-
-select_columns_query = '''
-SELECT column_name 
-FROM information_schema.columns 
-WHERE table_schema = 'public' AND table_name = '{table_name}'
-'''
+print(configs)
 
 extract_query_product = '''
 SELECT *
 FROM public.product
-WHERE date_created > current_date - interval '1 days';
+WHERE date_add >= current_date - interval '1 days';
 '''
 
 extract_query_vendor = '''
 SELECT *
 FROM public.vendor
-WHERE date_join > current_date - interval '1 days';
+WHERE date_join >= current_date - interval '1 days';
 '''
 
 extract_query_category = '''
@@ -51,19 +46,19 @@ FROM public.category
 extract_query_customer = '''
 SELECT *
 FROM public.customer
-WHERE date_join > current_date - interval '1 days';
+WHERE date_join >= current_date - interval '1 days';
 '''
 
 extract_query_order = '''
 SELECT *
 FROM public.order
-WHERE order_date > current_date - interval '1 days';
+WHERE order_date >= current_date - interval '1 days';
 '''
 
 extract_query_review = '''
 SELECT *
 FROM public.review
-WHERE review_date > current_date - interval '1 days';
+WHERE review_date >= current_date - interval '1 days';
 '''
 
 extract_query_order_product ='''
@@ -72,82 +67,184 @@ FROM public.order_product
 WHERE order_id in ({oids});
 '''
 
-def main():
+def write_log(text):
+    with open('logs/scheduler.log', 'a', encoding='utf-8') as f:
+        f.write(f'{text}' + '\n')
+
+def dim_vendor():
     pg1 = PostgresTool(**configs['DB'])
     pg1.test_connection()
     pg2 = PostgresTool(**configs['WH'])
     pg2.test_connection()
 
+    table_name = 'dim_vendor'
     try:
-        table_name = 'dim_vendor'
         df = pg1.query(extract_query_vendor)
-        df = df.rename(columns={'id': 'vendor_id'})
-        pg2.truncate(table_name)
-        pg2.push_data(df, table_name)
-        print('✅ dim_vendor')
+        if len(df) != 0:
+            df = df.rename(columns={'id': 'vendor_id'})
+            pg2.push_data(df, table_name)
+            # pg2.to_sql(df, table_name)
+            write_log(f'✅ {table_name} - {df.shape[0]} rows')
+        else:
+            write_log(f'✅ {table_name} - 0 rows')
     except Exception as e:
-        print('❌ dim_vendor:', e)
-
-    try:
-        table_name = 'dim_category'
-        df = pg1.query(extract_query_category)
-        pg2.truncate(table_name)
-        pg2.push_data(df, table_name)
-        print('✅ dim_category')
-    except Exception as e:
-        print('❌ dim_category:', e)
-
-    try:
-        table_name = 'dim_product'
-        df = pg1.query(extract_query_product)
-        pg2.truncate(table_name)
-        pg2.push_data(df, table_name)
-        print('✅ dim_product')
-    except Exception as e:
-        print('❌ dim_product:', e)
-
-    try:
-        table_name = 'dim_customer'
-        df = pg1.query(extract_query_customer)
-        df = df.rename(columns={'id': 'customer_id'})
-        pg2.truncate(table_name)
-        pg2.push_data(df, table_name)
-        print('✅ dim_customer')
-    except Exception as e:
-        print('❌ dim_customer:', e)
-
-    try:
-        table_name = 'fact_review'
-        df = pg1.query(extract_query_review)
-        pg2.truncate(table_name)
-        pg2.push_data(df, table_name)
-        print('✅ fact_review')
-    except Exception as e:
-        print('❌ fact_review:', e)
-
-    ids = []
-    try:
-        table_name = 'dim_order'
-        df = pg1.query(extract_query_order)
-        ids = df['order_id'].tolist()
-        pg2.truncate(table_name)
-        pg2.push_data(df, table_name)
-        print('✅ dim_order')
-    except Exception as e:
-        print('❌ dim_order:', e)
-    
-    try:
-        table_name = 'fact_order_product'
-        oids = ','.join([str(i) for i in ids])
-        query = extract_query_order_product.format(oids=oids)
-        df = pg1.query(query)
-        pg2.truncate(table_name)
-        pg2.push_data(df, table_name)
-        print('✅ fact_order_product')
-    except Exception as e:
-        print('❌ fact_order_product:', e)
+        print(f'❌ {table_name} - {e}')
 
     pg1.close()
     pg2.close()
 
-main()
+def dim_category():
+    pg1 = PostgresTool(**configs['DB'])
+    pg1.connect()
+    pg2 = PostgresTool(**configs['WH'])
+    pg2.connect()
+
+    table_name = 'dim_category'
+    try:
+        df = pg1.query(extract_query_category)
+        # pg2.truncate(table_name)
+        pg2.push_data(df, table_name)
+        # pg2.to_sql(df, table_name)
+        write_log(f'✅ {table_name} - {df.shape[0]} rows')
+    except Exception as e:
+        print(f'❌ {table_name} - {e}')
+
+    pg1.close()
+    pg2.close()
+
+def dim_product():
+    pg1 = PostgresTool(**configs['DB'])
+    pg1.connect()
+    pg2 = PostgresTool(**configs['WH'])
+    pg2.connect()
+
+    table_name = 'dim_product'
+    try:
+        df = pg1.query(extract_query_product)
+        if len(df) != 0:
+            del df['date_created']
+            df.rename(columns={'date_add': 'date_created'}, inplace=True)
+            pg2.push_data(df, table_name)
+            # pg2.to_sql(df, table_name)
+            write_log(f'✅ {table_name} - {df.shape[0]} rows')
+        else:
+            write_log(f'✅ {table_name} - 0 rows')
+    except Exception as e:
+        print(f'❌ {table_name} - {e}')
+
+    pg1.close()
+    pg2.close()
+
+def dim_customer():
+    pg1 = PostgresTool(**configs['DB'])
+    pg1.connect()
+    pg2 = PostgresTool(**configs['WH'])
+    pg2.connect()
+
+    table_name = 'dim_customer'
+    try:
+        df = pg1.query(extract_query_customer)
+        if len(df) != 0:
+            df = df.rename(columns={'id': 'customer_id'})
+            pg2.push_data(df, table_name)
+            # pg2.to_sql(df, table_name)
+            write_log(f'✅ {table_name} - {df.shape[0]} rows')
+        else:
+            write_log(f'✅ {table_name} - 0 rows')
+    except Exception as e:
+        print(f'❌ {table_name} - {e}')
+
+    pg1.close()
+    pg2.close()
+
+def fact_review():
+    pg1 = PostgresTool(**configs['DB'])
+    pg1.connect()
+    pg2 = PostgresTool(**configs['WH'])
+    pg2.connect()
+
+    table_name = 'fact_review'
+    try:
+        df = pg1.query(extract_query_review)
+        if len(df) != 0:
+            pg2.push_data(df, table_name)
+            # pg2.to_sql(df, table_name)
+            write_log(f'✅ {table_name} - {df.shape[0]} rows')
+        else:
+            write_log(f'✅ {table_name} - 0 rows')
+    except Exception as e:
+        print(f'❌ {table_name} - {e}')
+
+    pg1.close()
+    pg2.close()
+
+def dim_order() -> list:
+    pg1 = PostgresTool(**configs['DB'])
+    pg1.connect()
+    pg2 = PostgresTool(**configs['WH'])
+    pg2.connect()
+
+    table_name = 'dim_order'
+    ids = []
+    try:
+        df = pg1.query(extract_query_order)
+        if len(df) != 0:
+            ids = df['order_id'].tolist()
+            pg2.push_data(df, table_name)
+            # pg2.to_sql(df, table_name)
+            write_log(f'✅ {table_name} - {df.shape[0]} rows')
+        else:
+            write_log(f'✅ {table_name} - 0 rows')
+    except Exception as e:
+        print(f'❌ {table_name} - {e}')
+
+    pg1.close()
+    pg2.close()
+
+    return ids
+
+def fact_order_product(ids:list=[]):
+    pg1 = PostgresTool(**configs['DB'])
+    pg1.connect()
+    pg2 = PostgresTool(**configs['WH'])
+    pg2.connect()
+
+    table_name = 'fact_order_product'
+    try:
+        if len(ids) == 0:
+            write_log(f'✅ {table_name} - 0 rows')
+        else:
+            oids = ','.join([str(i) for i in ids])
+            query = extract_query_order_product.format(oids=oids)
+            df = pg1.query(query)
+            if len(df) != 0:
+                pg2.push_data(df, table_name)
+                # pg2.to_sql(df, table_name)
+                write_log(f'✅ {table_name} - {df.shape[0]} rows')
+            else:
+                write_log(f'✅ {table_name} - 0 rows')
+    except Exception as e:
+        print(f'❌ {table_name} - {e}')
+
+    pg1.close()
+    pg2.close()
+
+    return ids
+
+def main():
+    dim_vendor()
+    dim_category()
+    dim_product()
+    dim_customer()
+    fact_review()
+    ids = dim_order()
+    fact_order_product(ids)
+
+if __name__ == '__main__':
+    write_log(f"Start {datetime.now(pytz.timezone('Asia/Ho_Chi_Minh'))}")
+    main()
+    write_log('-'*30)
+
+    # print(configs)
+    # write_log(configs)
+    

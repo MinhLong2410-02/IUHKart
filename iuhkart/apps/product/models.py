@@ -26,7 +26,7 @@ class Product(models.Model):
     brand = models.CharField(max_length=255)
     slug = AutoSlugField(max_length=255, populate_from='product_name')
     product_description = models.TextField()
-    date_created = models.DateField(auto_now_add=True)
+    date_created = models.DateField(null=True) # auto_now_add=True
     ratings = models.DecimalField(max_digits=10, decimal_places=2)
     created_by = models.ForeignKey('account.Vendor', on_delete=models.CASCADE, null=False, db_column='vendor_id')
     date_add = models.DateField(default=timezone.now)

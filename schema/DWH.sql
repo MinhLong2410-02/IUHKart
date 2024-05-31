@@ -41,7 +41,8 @@ CREATE TABLE "fact_order_product" (
   "order_product_id" int PRIMARY KEY NOT NULL,
   "product_id" int NOT NULL,
   "order_id" int NOT NULL,
-  "quantity" int
+  "quantity" int,
+  "price" float
 );
 
 CREATE TABLE "fact_review" (

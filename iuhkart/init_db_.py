@@ -21,13 +21,15 @@ from tqdm import tqdm
 
 ssl._create_default_https_context = ssl._create_stdlib_context
 
-load_dotenv('.env')
+load_dotenv()
+
 PROJECT_STATUS = environ.get('STATUS')
 DB_NAME = os.getenv('NAME')
 DB_USER = os.getenv('USER')
 DB_PASS = os.getenv('PASSWORD')
 DB_HOST = 'localhost' if PROJECT_STATUS == 'DEV' else os.getenv('HOST')
 DB_PORT = os.getenv('PORT')
+
 print(F'✅ STATUS: {PROJECT_STATUS}')
 connection = psycopg2.connect(
         dbname=DB_NAME,
@@ -334,7 +336,7 @@ def create_discount():
         # convert to dict
         df = df.to_dict('records')
         model_objs = [Discount(
-            discount_id=rc['discount_id'],
+            # discount_id=rc['discount_id'],
             product=product_cache[rc['product_id']],
             name=rc['name'],
             discount_percent=rc['discount_percent'],
@@ -377,7 +379,7 @@ def create_order():
         # address_cache = {x.address_id: x for x in Address.objects.all()}
         df = df.to_dict('records')
         model_objs = [Order(
-            order_id = rc['order_id'],
+            # order_id = rc['order_id'],
             order_number = rc['order_number'],
             shipping_date = rc['shipping_date'],
             order_date = rc['order_date'],
@@ -464,5 +466,5 @@ def init_qdrant():
     df = pd.DataFrame(broken_products, columns=['product_id', 'product_name'])
     df.to_csv('../schema/Database/broken_products.csv', index=False)
 
-# if PROJECT_STATUS == 'PROD':
-#     init_qdrant()
+if PROJECT_STATUS == 'PROD':
+    init_qdrant()

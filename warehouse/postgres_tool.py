@@ -1,5 +1,4 @@
 import psycopg2
-from tabulate import tabulate
 import pandas as pd
 import numpy as np
 
@@ -34,13 +33,12 @@ class PostgresTool():
     def close(self):
         self.cursor.close()
         self.conn.close()
-        print("🖐 Closed connection")
+        # print("🖐 Closed connection")
 
     def query(self, sql_query):
-        self.cursor.execute("ROLLBACK")
+        # self.cursor.execute("ROLLBACK")
         self.cursor.execute(sql_query)
         rows = self.cursor.fetchall()
-        # print(tabulate(rows, headers=[desc[0] for desc in self.cursor.description], tablefmt='psql'))
         df = pd.DataFrame(rows, columns=[desc[0] for desc in self.cursor.description])
         return df
 
@@ -60,19 +58,19 @@ class PostgresTool():
             print(f'❌ {e}')
         
     def get_columns(self, table_name):
-        self.cursor.execute("ROLLBACK")
+        # self.cursor.execute("ROLLBACK")
         self.cursor.execute("SELECT column_name FROM information_schema.columns WHERE table_schema = 'public' AND table_name = '{table_name}'".format(table_name=table_name))
         cols = [i[0] for i in self.cursor.fetchall()]
         return cols
 
     def get_all_table(self,):
-        self.cursor.execute("ROLLBACK")
+        # self.cursor.execute("ROLLBACK")
         self.cursor.execute("SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' AND table_type = 'BASE TABLE'")
         tables = [i[0] for i in self.cursor.fetchall()]
         return tables
     
     def delete_table(self, table_names = []):
-        self.cursor.execute("ROLLBACK")
+        # self.cursor.execute("ROLLBACK")
         for table in table_names:
             try:
                 self.cursor.execute(f"DROP TABLE {table}")
@@ -82,15 +80,31 @@ class PostgresTool():
         self.conn.commit()
 
     def push_data(self, df, table_name):
-        self.cursor.execute("ROLLBACK")
+        # self.cursor.execute("ROLLBACK")
         cols = self.get_columns(table_name)
         df = df[cols]
         datas = [tuple(i) for i in np.where(pd.isna(df), None, df).tolist()]
-        sql_insert = f"insert into {table_name} ({','.join(cols)}) values ({','.join(['%s']*len(cols))})"
+        conflict_target = '_'.join(table_name.split('_')[1:]) + '_id'
+        cols_ = [c for c in cols if c != conflict_target]
+        updates = ','.join([f"{c}={'EXCLUDED.'+c}" for c in cols_])
+        sql_insert = f"""
+            INSERT INTO {table_name} ({','.join(cols)})
+            VALUES ({','.join(['%s']*len(cols))})
+            ON CONFLICT ({conflict_target})
+            DO UPDATE SET {updates};
+        """
+        
+        # sql_insert = f"insert into {table_name} ({','.join(cols)}) values ({','.join(['%s']*len(cols))})"
+        # print(sql_insert)
         self.cursor.executemany(sql_insert, datas)
         self.conn.commit()
 
+    def to_sql(self, df, table_name):
+        cols = self.get_columns(table_name)
+        df = df[cols]
+        df.to_sql(name=table_name, con=self.conn, if_exists='replace', index=False)
+
     def truncate(self, table_name):
-        self.cursor.execute("ROLLBACK")
+        # self.cursor.execute("ROLLBACK")
         self.cursor.execute(f"TRUNCATE {table_name} CASCADE")
         self.conn.commit()
