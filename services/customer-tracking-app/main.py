@@ -35,7 +35,7 @@ async def root(current_user: TokenData = Depends(get_current_user)):
 async def keepTrack(
                   product: Product = None, 
                   current_user: TokenData = Depends(get_current_user)):
-    user_id = current_user['user_id']
+    user_id = str(current_user['user_id'])
     
     if user_id not in track_db.list_collection_names() or product == None:
         cursor.execute(f"SELECT product_id FROM product ORDER BY ratings DESC LIMIT 20;")
@@ -46,7 +46,7 @@ async def keepTrack(
             SET recommend_product_ids  = '{%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s}'
             WHERE WHERE user_id = %s;
         ''', product_ids)
-        track_db.create_collection(str(user_id))
+        track_db.create_collection(user_id)
         return current_user
     user_collection = track_db[user_id]
     user_collection.insert_one(product.model_dump())
