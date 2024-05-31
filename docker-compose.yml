@@ -38,12 +38,12 @@ services:
     restart: unless-stopped
     
   embedding_api:
-    build: ./services/embedding-app
+    build: 
+      context: ./services/embedding-app
+      dockerfile: ./services/embedding-app/Dockerfile
     # ports:
     #   - "8007:8000"
     env_file:
-      - ./services/.env
-    dockerfile: ./services/embedding-app/Dockerfile
     working_dir: /app
     networks:
       - iuhkart-network
