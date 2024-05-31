@@ -41,6 +41,19 @@ class CustomerProductSerializer(serializers.ModelSerializer):
         if main_image:
             return ProductImageSerializer(main_image).data
         return None
+class CustomerSpecificProductSerializer(serializers.ModelSerializer):
+    images = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Product
+        fields = ['product_id', 'product_name', 'product_description', 'original_price', 'stock', 'brand', 'slug', 'created_by', 'category', 'images']
+        
+    @extend_schema_field(ProductImageSerializer(allow_null=True))
+    def get_images(self, obj):
+        images = ProductImages.objects.filter(product_id = obj.product_id)
+        if images:
+            return ProductImageSerializer(images, many=True).data
+        return None
 
 class ProductCreateSerializer(serializers.ModelSerializer):
     images = ProductImageSerializer(many=True, required=False)

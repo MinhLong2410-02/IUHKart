@@ -105,6 +105,14 @@ class CustomerProductListView(generics.ListAPIView):
             return Product.objects.filter(category=category_id).select_related('created_by', 'category').prefetch_related('images')
         return queryset
 
+class CustomerOneProductView(generics.RetrieveAPIView):
+    serializer_class = CustomerSpecificProductSerializer
+    queryset = Product.objects.all()
+    permission_classes = [permissions.IsAuthenticated]
+    def get_queryset(self):
+        return Product.objects.select_related('created_by', 'category').prefetch_related('images')
+
+
 class VendorProductCreateView(generics.CreateAPIView):
     serializer_class = ProductCreateSerializer
     permission_classes = [permissions.IsAuthenticated]
