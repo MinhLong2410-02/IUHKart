@@ -124,11 +124,9 @@ if __name__ == "__main__":
                 rs = RS(get_data(olap_config))
                 product_ids = rs.recommend(product_id)
                 del rs
-                product_ids_str = ', '.join(map(str, product_ids))
-                product_ids.append(user_id)
                 query_string = '''UPDATE customer
-                  SET recommend_product_ids = ARRAY[%s]
-                  WHERE user_id = %s;'''
+                SET recommend_product_ids = %s    
+                WHERE user_id = %s;'''
                 connection = psycopg2.connect(
                     dbname=oltp_config['database'],
                     user=oltp_config['user'],
@@ -138,7 +136,7 @@ if __name__ == "__main__":
                 )
                 cursor = connection.cursor()
                 try:
-                    cursor.execute(query_string, (product_ids_str, user_id))
+                    cursor.execute(query_string, (product_ids, user_id))
                     connection.commit()
                 except Exception as e:
                     connection.rollback()
