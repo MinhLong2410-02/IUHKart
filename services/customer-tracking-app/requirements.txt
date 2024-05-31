@@ -1,0 +1,9 @@
+fastapi==0.109.0
+uvicorn==0.27.0
+psycopg2-binary
+python-dotenv
+python-multipart
+python-jose
+passlib
+sqlalchemy
+pymongo

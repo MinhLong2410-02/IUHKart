@@ -9,6 +9,7 @@ services:
     volumes:
       - ./services/qdrant-db-volume:/qdrant/storage
     restart: unless-stopped
+
   mongo_db:
     image: mongo:latest
     command: mongod --auth
@@ -41,8 +42,6 @@ services:
     build: 
       context: ./services/embedding-app
       dockerfile: Dockerfile
-    # ports:
-    #   - "8007:8000"
     working_dir: /app
     networks:
       - iuhkart-network
@@ -51,6 +50,24 @@ services:
       - mongo_db
     volumes:
       - ./services/embedding-app:/app
+    restart: unless-stopped
+
+  tracking_api:
+    build: 
+      context: ./services/customer-tracking-app
+      dockerfile: Dockerfile
+    ports:
+      - "8007:8000"
+    environment:
+      - MONGO_HOST=mongo_db
+    working_dir: /app
+    networks:
+      - iuhkart-network
+    depends_on:
+      - qdrant_db
+      - mongo_db
+    volumes:
+      - ./services/customer-tracking-app:/app
     restart: unless-stopped
 
   qdrant_fastapi:
@@ -79,6 +96,7 @@ services:
       - iuhkart-network
     depends_on:
       - django_main
+
   metabase:
     image: metabase/metabase:latest
     container_name: metabase
