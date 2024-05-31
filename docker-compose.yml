@@ -1,12 +1,20 @@
 version: '3.0'
 services:
-  etl_data_warehouse:
-    build: ./warehouse
-    env_file:
-      - ./warehouse/.env
-    volumes:
-      - ./warehouse:/app
-    restart: unless-stopped
+    recsys:
+        build: ./services/recsys
+        env_file:
+            - ./services/recsys/.env
+        volumes:
+            - ./services/recsys:/app
+        restart: unless-stopped
+
+#   etl_data_warehouse:
+#     build: ./warehouse
+#     env_file:
+#       - ./warehouse/.env
+#     volumes:
+#       - ./warehouse:/app
+#     restart: unless-stopped
 
 #   qdrant_db:
 #     image: qdrant/qdrant:v1.4.1

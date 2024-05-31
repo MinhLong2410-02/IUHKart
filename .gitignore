@@ -171,3 +171,6 @@ search/qdrant_db/
 # warehouse
 warehouse/__pycache__/
 warehouse/logs/
+
+# rs
+services/recsys/logs/
