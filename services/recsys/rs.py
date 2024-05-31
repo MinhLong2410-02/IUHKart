@@ -14,12 +14,13 @@ def write_log(text):
 def get_data(config):
     query_string = '''
     select p.product_id, p.slug, p.category_id, p.ratings, p.original_price, p.stock from dim_product p'''
+
     connection = psycopg2.connect(
-        dbname=config['NAME'],
-        user=config['DWUSER'],
-        password=config['PASSWORD'],
-        host=config['DWHOST'],
-        port=config['PORT']
+        dbname=config['database'],
+        user=config['user'],
+        password=config['password'],
+        host=config['host'],
+        port=config['port']
     )
     cursor = connection.cursor()
     cursor.execute(query_string)
