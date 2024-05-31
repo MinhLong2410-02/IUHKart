@@ -103,7 +103,7 @@ if __name__ == "__main__":
         'database': os.environ.get('NAME')
     }
     # write_log(config)
-    print('Recommendation service is running')
+    write_log('Recommendation service is running')
     # pubsub
     redis_host = os.getenv('REDIS_HOST', 'localhost')
     redis_port = int(os.getenv('REDIS_PORT', 6379))
