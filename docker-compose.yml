@@ -26,6 +26,7 @@ services:
     volumes:
       - ./services/mongo-db-volume:/data/db
     restart: unless-stopped
+
   iuhkart-redis:
     image: redis:latest
     ports:
@@ -34,12 +35,31 @@ services:
       - ./services/redis_data:/data
     networks:
       - iuhkart-network
+    restart: unless-stopped
+    
+  embedding_api:
+    build: ./services/embedding-app
+    # ports:
+    #   - "8007:8000"
+    env_file:
+      - ./services/.env
+    dockerfile: ./services/embedding-app/Dockerfile
+    working_dir: /app
+    networks:
+      - iuhkart-network
+    depends_on:
+      - qdrant_db
+      - mongo_db
+    volumes:
+      - ./services/embedding-app:/appxs
+    restart: unless-stopped
+
   qdrant_fastapi:
     build: ./services/app
     ports:
       - "8008:8000"
-    env_file:
-      - ./services/.env
+    environment:
+      - TEXT_EMBEDDING_URL=http://embedding_api:8000/embedding
     working_dir: /app
     networks:
       - iuhkart-network
