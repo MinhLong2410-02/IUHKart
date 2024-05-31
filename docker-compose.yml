@@ -43,7 +43,6 @@ services:
       dockerfile: ./services/embedding-app/Dockerfile
     # ports:
     #   - "8007:8000"
-    env_file:
     working_dir: /app
     networks:
       - iuhkart-network
