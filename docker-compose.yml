@@ -40,7 +40,7 @@ services:
   embedding_api:
     build: 
       context: ./services/embedding-app
-      dockerfile: ./services/embedding-app/Dockerfile
+      dockerfile: Dockerfile
     # ports:
     #   - "8007:8000"
     working_dir: /app
@@ -50,7 +50,7 @@ services:
       - qdrant_db
       - mongo_db
     volumes:
-      - ./services/embedding-app:/appxs
+      - ./services/embedding-app:/app
     restart: unless-stopped
 
   qdrant_fastapi:
