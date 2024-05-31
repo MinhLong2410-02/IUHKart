@@ -1,10 +1,21 @@
 from fastapi import FastAPI, HTTPException
 from schemas import InsertPointRequestBody, UpdatePointRequestBody
 from uuid import uuid4
+from fastapi.middleware.cors import CORSMiddleware
 from qdrant_base import client, _check_exist, _get_points, PointStruct, models, getTextEmbedding, VectorParams, Distance
 
 app = FastAPI()
+allowed_origins = [
+    "*"
+]
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=allowed_origins,
+    allow_credentials=True,
+    allow_methods=["GET", "PUT", "POST"],
+    allow_headers=["*"],
+)
 
 ## ----- Base -----
 @app.get("/")
