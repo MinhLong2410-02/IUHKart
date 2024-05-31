@@ -51,15 +51,15 @@ services:
       - ./services/qdrant-db-volume:/qdrant/storage
     restart: unless-stopped
 
-  # cloudflare:
-  #   image: cloudflare/cloudflared:latest
-  #   container_name: iuhkart-cloudflare
-  #   restart: unless-stopped
-  #   command: tunnel --no-autoupdate run --token eyJhIjoiODZlYTNjZjEwNmRlMTU3Yjc2NTg0YzgyODgyNDdmMTciLCJ0IjoiMjkwNDAwODQtZmM4NS00YmFhLTk1OTUtODA0NDc3ZTY1OTA3IiwicyI6IlpqZzFaV0UwWm1JdFpESTBNaTAwTUdSaExUZ3habVV0WVdaa05UazNOV0kyTVdVMSJ9
-  #   networks:
-  #     - iuhkart-network
-  #   depends_on:
-  #     - django_main
+  cloudflare:
+    image: cloudflare/cloudflared:latest
+    container_name: iuhkart-cloudflare
+    restart: unless-stopped
+    command: tunnel --no-autoupdate run --token eyJhIjoiODZlYTNjZjEwNmRlMTU3Yjc2NTg0YzgyODgyNDdmMTciLCJ0IjoiMjkwNDAwODQtZmM4NS00YmFhLTk1OTUtODA0NDc3ZTY1OTA3IiwicyI6IlpqZzFaV0UwWm1JdFpESTBNaTAwTUdSaExUZ3habVV0WVdaa05UazNOV0kyTVdVMSJ9
+    networks:
+      - iuhkart-network
+    depends_on:
+      - django_main
   metabase:
     image: metabase/metabase:latest
     container_name: metabase
