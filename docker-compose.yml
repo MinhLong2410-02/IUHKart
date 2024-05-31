@@ -127,6 +127,22 @@ services:
       - mongo_db
       - iuhkart-redis
   
+  iuhkart-recsys:
+    build:
+      context: ./services/recsys
+      dockerfile: Dockerfile
+    env_file:
+      - ./services/recsys/.env
+    networks:
+      - iuhkart-network
+    depends_on:
+      - qdrant_db
+      - mongo_db
+      - iuhkart-redis
+    volumes:
+      - ./services/recsys:/app
+    restart: unless-stopped
+
   etl_data_warehouse:
     build: ./warehouse
     env_file:
@@ -141,7 +157,7 @@ services:
       - django_main
     networks:
       - iuhkart-network
-    
+  
 networks:
   iuhkart-network:
     name: iuhkart

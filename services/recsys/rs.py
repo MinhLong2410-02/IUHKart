@@ -15,11 +15,11 @@ def get_data(config):
     query_string = '''
     select p.product_id, p.slug, p.category_id, p.ratings, p.original_price, p.stock from dim_product p'''
     connection = psycopg2.connect(
-        dbname=config['database'],
-        user=config['user'],
-        password=config['password'],
-        host=config['host'],
-        port=config['port']
+        dbname=config['NAME'],
+        user=config['DWUSER'],
+        password=config['PASSWORD'],
+        host=config['DWHOST'],
+        port=config['PORT']
     )
     cursor = connection.cursor()
     cursor.execute(query_string)
@@ -55,7 +55,8 @@ class RS:
 
 
     def normalization_data(self):
-        SVD = TruncatedSVD(n_components=5)
+        print(self.data.shape)
+        SVD = TruncatedSVD(n_components=4)
         decomposed_matrix = SVD.fit_transform(self.data.drop(columns=['slug']))
         self.compute_corr(decomposed_matrix)
 
@@ -82,6 +83,7 @@ class RS:
 
         # get id 
         recommend = list(self.data.index[top_two_indices])
+        
         return recommend
 
 if __name__ == "__main__":
@@ -93,9 +95,8 @@ if __name__ == "__main__":
         'password':  os.environ.get('PASSWORD'),
         'database': os.environ.get('NAME')
     }
-    rs = RS(get_data(config))
-    write_log(config)
-    write_log('Recommendation service is running')
+    # write_log(config)
+    print('Recommendation service is running')
     # pubsub
     redis_host = os.getenv('REDIS_HOST', 'localhost')
     redis_port = int(os.getenv('REDIS_PORT', 6379))
@@ -108,8 +109,27 @@ if __name__ == "__main__":
             if message['type'] == 'message':
                 json_string = message['data'].decode('utf-8')
                 json_data = json.loads(json_string)
-                customer_id = json_data['customer_id']
+                user_id = json_data['user_id']
+                product_id = json_data['product_id']
                 rs = RS(get_data(config))
-                print(json_data)
+                product_ids = rs.recommend(product_id)
+                product_ids.append(user_id)
+                query_string = '''UPDATE customer
+                    SET recommend_product_ids  = '{%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s}'
+                    WHERE WHERE user_id = %s;
+                ''', 
+                connection = psycopg2.connect(
+                    dbname=config['NAME'],
+                    user=config['USER'],
+                    password=config['PASSWORD'],
+                    host=config['HOST'],
+                    port=config['PORT']
+                )
+                cursor = connection.cursor()
+                try:
+                    cursor.execute(query_string, product_ids)
+                    connection.commit()
+                except Exception as e:
+                    connection.rollback()
     except KeyboardInterrupt:
         redis_client.close()
