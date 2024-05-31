@@ -58,6 +58,8 @@ services:
       dockerfile: Dockerfile
     ports:
       - "8007:8000"
+    env_file:
+      - ./services/customer-tracking-app/.env
     environment:
       - MONGO_HOST=mongo_db
     working_dir: /app
