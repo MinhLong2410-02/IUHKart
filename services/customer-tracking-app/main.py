@@ -32,6 +32,6 @@ async def root(current_user: TokenData = Depends(get_current_user)):
 async def keepTrack(
                   product: Product, 
                   current_user: TokenData = Depends(get_current_user)):
-    user_id = current_user['user_id']  
+    user_id = current_user['user_id']
     return current_user
 
