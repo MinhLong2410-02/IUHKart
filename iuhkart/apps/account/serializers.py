@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from apps.account.models import Customer, Vendor, BankAccount
+from apps.product.models import Product
 from apps.cart.models import Cart
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from datetime import date
@@ -72,7 +73,9 @@ class CustomerSerializer(serializers.ModelSerializer):
         user.is_customer = True
         if not self.isUserIsVendor(user):
             user.save()
-            
+        product_ids = Product.objects.order_by('-ratings').values_list('id', flat=True)[:20]
+        customer.recommend_product_ids = list(product_ids)
+        customer.save()
         return customer
 
     def calculate_age(self, birthdate):

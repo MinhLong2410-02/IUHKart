@@ -6,7 +6,6 @@ from apps.account.models import User
 from apps.account.serializers import *
 from drf_spectacular.utils import extend_schema
 from rest_framework_simplejwt.tokens import RefreshToken
-import requests
 class RegisterCustomerView(generics.CreateAPIView):
     queryset = User.objects.all()
     serializer_class = CustomerSerializer
@@ -14,10 +13,6 @@ class RegisterCustomerView(generics.CreateAPIView):
         response = super().create(request, *args, **kwargs)
         user = User.objects.get(email=response.data['user']['email'])
         refresh = RefreshToken.for_user(user)
-        # requests.post(
-        #     'https://tracking_api-iuhkart.aiclubiuh.com/api/v1/keep-track', 
-        #     headers={'Authorization': f'Bearer {str(refresh.access_token)}'},
-        # )
         return Response({
             'refresh': str(refresh),
             'access': str(refresh.access_token),
