@@ -56,17 +56,17 @@ class CustomerSpecificProductSerializer(serializers.ModelSerializer):
         return None
 
 class ProductCreateSerializer(serializers.ModelSerializer):
-    images = ProductImageSerializer(many=True, required=False)
+    # images = ProductImageSerializer(many=True, required=False)
 
     class Meta:
         model = Product
-        fields = ['product_name', 'product_description', 'original_price', 'stock', 'brand', 'category', 'images']
+        fields = ['product_name', 'product_description', 'original_price', 'stock', 'brand', 'category']
 
     def create(self, validated_data):
-        images_data = validated_data.pop('images', [])
+        # images_data = validated_data.pop('images', [])
         product = Product.objects.create(**validated_data)
-        for image_data in images_data:
-            ProductImages.objects.create(product=product, **image_data)
+        # for image_data in images_data:
+        #     ProductImages.objects.create(product=product, **image_data)
         return product
 
 class ProductSerializer(serializers.ModelSerializer):
