@@ -154,7 +154,6 @@ services:
     restart: unless-stopped
     depends_on:
       - mongo_db
-      - qdrant_db
       - iuhkart-redis
       - django_main
     networks:
