@@ -167,3 +167,7 @@ a.html
 # qdrant
 search/__pycache__/
 search/qdrant_db/
+services/metabase-data/
+services/mongo-db-volume/
+services/qdrant-db-volume/
+services/redis_data/
