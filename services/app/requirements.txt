@@ -3,3 +3,4 @@ uuid
 requests
 qdrant_client
 pydantic
+uvicorn
