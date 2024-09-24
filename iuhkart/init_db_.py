@@ -2,7 +2,7 @@ from iuhkart.wsgi import *
 from iuhkart.settings import *
 from django.contrib.auth import get_user_model
 from apps.product.models import Category, Product, ProductImages
-from apps.account.models import Vendor, Customer, User
+from apps.account.models import Vendor, Customer, User, Role, UserRole
 from apps.address.models import Province, District, Ward, Address
 from apps.cart.models import Cart
 from apps.discount.models import Discount
@@ -226,52 +226,71 @@ def create_address(province_id, district_id, ward_id, address_detail):
     )
     return address
 
+vendor_role, _ = Role.objects.get_or_create(name="vendor")
+customer_role, _ = Role.objects.get_or_create(name="customer")
+
 def create_vendor_with_jwt(email, password, name, phone, description):
+    # Create the user
     user = User.objects.create_user(
         email=email,
-        password=password,  # No need to hash the password here
-        is_vendor=True,
+        password=password,  # Django will hash the password automatically
     )
+
+    # Assign the vendor role
+    user.roles.add(vendor_role)
+    
+    # Create vendor-specific details
     vendor = Vendor.objects.create(
-        user=user,
         name=name,
         phone=phone,
         description=description
     )
+
+    # Generate JWT tokens
     refresh = RefreshToken.for_user(user)
     access_token = str(refresh.access_token)
     refresh_token = str(refresh)
+
     return user, vendor, access_token, refresh_token
 
 def create_customer_with_jwt(email, password, fullname, phone, date_of_birth, address):
+    # Create the user
     user = User.objects.create_user(
         email=email,
-        password=password,  # No need to hash the password here
-        is_customer=True,
+        password=password,  # Django will hash the password automatically
     )
+
+    # Assign the customer role
+    user.roles.add(customer_role)
+    
+    # Create the cart
     cart = Cart.objects.create()
+
+    # Create customer-specific details
     customer = Customer.objects.create(
-        user=user,
         fullname=fullname,
         phone=phone,
         date_of_birth=date_of_birth,
-        cart = cart,
-        age = 2024 - int(date_of_birth.split('-')[0])
+        cart=cart,
+        age=2024 - int(date_of_birth.split('-')[0])
     )
     
+    # Assign address to the user
     user.address = address
     user.save()
+
+    # Generate JWT tokens
     refresh = RefreshToken.for_user(user)
     access_token = str(refresh.access_token)
     refresh_token = str(refresh)
-    
-    # Cart.objects.create(customer=customer)
-    
+
     return user, customer, access_token, refresh_token
+
+# Example usage of the updated functions
 
 user1, vendor1, token1, refresh1 = create_vendor_with_jwt(
     email='minhlong2002@gmail.com',
-    password='123',  # Pass the plain password
+    password='123',
     name='Minh Long',
     phone='1234567890',
     description='This is a description for Vendor One.'
@@ -281,7 +300,7 @@ print(f'✅ Vendor: {user1.email}, Access Token: {token1}, Refresh Token: {refre
 address = create_address(79, 764, 26899, '13/1 Phường 11, đường Nguyễn Văn Hậu, quận Gò Vấp, TP.HCM')
 user2, customer2, token2, refresh2 = create_customer_with_jwt(
     email='vanhau20022018@gmail.com',
-    password='123',  # Pass the plain password
+    password='123',
     fullname='Văn Hậu',
     phone='0987654321',
     date_of_birth='2002-02-20',
@@ -291,7 +310,7 @@ print(f'✅ Customer: {user2.email}, Access Token: {token2}, Refresh Token: {ref
 
 user3, vendor3, token3, refresh3 = create_vendor_with_jwt(
     email='quachnam311@gmail.com',
-    password='123',  # Pass the plain password
+    password='123',
     name='Qx Nam',
     phone='0398089311',
     description='This is a description for Vendor Three.'
@@ -301,25 +320,22 @@ print(f'✅ Vendor: {user3.email}, Access Token: {token3}, Refresh Token: {refre
 address = create_address(79, 764, 26881, '69/96 Phường 12, đường Lê Thành Nghĩa, quận Gò Vấp, TP.HCM')
 user4, customer4, token4, refresh4 = create_customer_with_jwt(
     email='nguyenvannam14056969@gmail.com',
-    password='123',  # Pass the plain password
+    password='123',
     fullname='Nguyễn VNam',
     phone='0987654322',
     date_of_birth='2003-07-31',
     address=address
-    
 )
 print(f'✅ Customer: {user4.email}, Access Token: {token4}, Refresh Token: {refresh4}')
-
 
 address = create_address(79, 764, 26898, '69/96 Phường 79, đường Nhân Vi, quận Gò Vấp, TP.HCM')
 user5, customer5, token5, refresh5 = create_customer_with_jwt(
     email='nhanvi212@gmail.com',
-    password='123',  # Pass the plain password
+    password='123',
     fullname='Lưu Lương Vi Nhân',
     phone='0987654324',
     date_of_birth='2002-03-20',
     address=address
-    
 )
 print(f'✅ Customer: {user5.email}, Access Token: {token5}, Refresh Token: {refresh5}')
 
@@ -464,5 +480,5 @@ def init_qdrant():
     df = pd.DataFrame(broken_products, columns=['product_id', 'product_name'])
     df.to_csv('../schema/Database/broken_products.csv', index=False)
 
-if PROJECT_STATUS == 'PROD':
-    init_qdrant()
+# if PROJECT_STATUS == 'PROD':
+    # init_qdrant()
