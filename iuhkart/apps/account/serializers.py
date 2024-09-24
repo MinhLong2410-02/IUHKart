@@ -20,8 +20,6 @@ class UserSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         user = User(
             email=validated_data['email'],
-            is_customer=validated_data.get('is_customer', False),
-            is_vendor=validated_data.get('is_vendor', False),
             address=validated_data.get('address')
         )
         user.set_password(validated_data['password'])
@@ -42,13 +40,10 @@ class CustomerDOBUpdateSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         instance.date_of_birth = validated_data.get('date_of_birth', instance.date_of_birth)
-        
         today = date.today()
         instance.age = today.year - instance.date_of_birth.year - ((today.month, today.day) < (instance.date_of_birth.month, instance.date_of_birth.day))
-        
         instance.save()
         return instance
-
 
 class CustomerSerializer(serializers.ModelSerializer):
     user = UserSerializer()
@@ -57,31 +52,17 @@ class CustomerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Customer
         fields = ('id', 'user', 'fullname', 'phone', 'date_of_birth')
-    def isUserIsVendor(self, user):
-        vendor = Vendor.objects.filter(user=user)
-        return vendor.exists()
+
     def create(self, validated_data):
         user_data = validated_data.pop('user')
         user = UserSerializer.create(UserSerializer(), validated_data=user_data)
         date_of_birth = validated_data.pop('date_of_birth', None)
-        if date_of_birth:
-            age = self.calculate_age(date_of_birth)
-        else:
-            age = None
         cart = Cart.objects.create()
-        customer = Customer.objects.create(user=user, cart = cart, date_of_birth=date_of_birth, age=age, **validated_data)
-        user.is_customer = True
-        if not self.isUserIsVendor(user):
-            user.save()
+        customer = Customer.objects.create(user=user, cart=cart, date_of_birth=date_of_birth, **validated_data)
         product_ids = Product.objects.order_by('-ratings').values_list('id', flat=True)[:20]
         customer.recommend_product_ids = list(product_ids)
         customer.save()
         return customer
-
-    def calculate_age(self, birthdate):
-        today = date.today()
-        age = today.year - birthdate.year - ((today.month, today.day) < (birthdate.month, birthdate.day))
-        return age
 
 class VendorSerializer(serializers.ModelSerializer):
     user = UserSerializer()
@@ -90,42 +71,23 @@ class VendorSerializer(serializers.ModelSerializer):
         model = Vendor
         fields = ('id', 'user', 'name', 'phone', 'description')
 
-    def isUserIsCustomer(self, user):
-        customer = Customer.objects.filter(user=user)
-        return customer.exists()
     def create(self, validated_data):
         user_data = validated_data.pop('user')
         user = UserSerializer.create(UserSerializer(), validated_data=user_data)
         vendor = Vendor.objects.create(user=user, **validated_data)
-        user.is_vendor = True
-        if not self.isUserIsCustomer(user):
-            user.save()
         return vendor
 
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
     def validate(self, attrs):
         data = super().validate(attrs)
-        roles = []
-        customer_id = None
-        vendor_id = None
-        
-        # Check if the user has a customer profile
-        if hasattr(self.user, 'customer'):
-            roles.append('customer')
-            customer_id = self.user.customer.id
-        
-        # Check if the user has a vendor profile
-        if hasattr(self.user, 'vendor'):
-            roles.append('vendor')
-            vendor_id = self.user.vendor.id
-
-        # Add roles and IDs to the token data
+        roles = list(self.user.roles.values_list('name', flat=True))
+        customer_id = getattr(self.user.customer, 'id', None)
+        vendor_id = getattr(self.user.vendor, 'id', None)
         data.update({
-            'role': roles,
+            'roles': roles,
             'customer_id': customer_id,
             'vendor_id': vendor_id
         })
-
         return data
 
 class CustomerAvatarUploadSerializer(serializers.ModelSerializer):
@@ -162,9 +124,8 @@ class BankAccountSerializer(serializers.ModelSerializer):
         model = BankAccount
         fields = ['bank_name', 'account_number', 'account_holder_name', 'branch_name']
         extra_kwargs = {
-            'account_number': {'write_only': True}  # For security reasons, you might want to make the account number write-only
+            'account_number': {'write_only': True}
         }
 
     def validate_account_number(self, value):
-        # Add validation for the account number if necessary, e.g., check format or encrypt
         return value
