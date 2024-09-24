@@ -5,7 +5,7 @@ class Cart(models.Model):
     grand_total = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     items_total = models.PositiveIntegerField(default=0)
     class Meta:
-        db_table = 'cart'
+        db_table = 'carts'
         verbose_name_plural = 'Carts'
         ordering = ['-cart_id']
 
@@ -15,5 +15,5 @@ class CartProduct(models.Model):
     product = models.ForeignKey('product.Product', on_delete=models.CASCADE, db_column='product_id')
     quantity = models.PositiveIntegerField()
     class Meta:
-        db_table = 'cart_product'
+        db_table = 'cart_products'
         ordering = ['-cart_id']

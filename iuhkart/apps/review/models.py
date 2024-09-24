@@ -14,7 +14,7 @@ class Review(models.Model):
     review_content = models.TextField()
     
     class Meta:
-        db_table = 'review'
+        db_table = 'reviews'
         unique_together = ['product', 'customer']
         verbose_name_plural = 'Reviews'
         ordering = ['review_date']

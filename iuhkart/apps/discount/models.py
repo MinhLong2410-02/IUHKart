@@ -12,7 +12,7 @@ class Discount(models.Model):
     end_date = models.DateField()
     in_use = models.BooleanField(default=True)
     class Meta:
-        db_table = 'discount'
+        db_table = 'discounts'
         indexes = [
             models.Index(fields=['start_date']),
             models.Index(fields=['end_date']),
@@ -25,7 +25,7 @@ class OrderProductDiscount(models.Model):
     discount = models.ForeignKey(Discount, on_delete=models.CASCADE)
     
     class Meta:
-        db_table = 'order_product_discount'
+        db_table = 'order_product_discounts'
         unique_together = (('order_product', 'discount'),)
         
     def __str__(self):

@@ -6,12 +6,24 @@ from apps.custom_storage import AzureCustomerStorage, AzureVendorStorage
 from django.contrib.postgres.fields import ArrayField
 from django.utils import timezone
 # Create your models here.
+
+class Role(models.Model):
+    name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name_plural = "Roles"
+        db_table = 'roles'
+
 class User(AbstractBaseUser):
     username = None
     email = models.EmailField(_('email address'), unique=True, max_length=255)
     address = models.OneToOneField('address.Address', models.DO_NOTHING, blank=True, null=True)
-    is_customer = models.BooleanField(default=False)
-    is_vendor = models.BooleanField(default=False)
+    
+    # Define many-to-many relationship with Role using UserRole as the through table
+    roles = models.ManyToManyField(Role, through='UserRole', related_name='users')
     
     objects = UserManager()
     USERNAME_FIELD = 'email'
@@ -20,12 +32,20 @@ class User(AbstractBaseUser):
     class Meta:
         verbose_name = _('user')
         verbose_name_plural = _('users')
-        db_table = 'user'
+        db_table = 'users'
+
+class UserRole(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    role = models.ForeignKey(Role, on_delete=models.CASCADE)
+
+    class Meta:
+        db_table = 'user_roles'
+        unique_together = ('user', 'role')
 
 class Customer(models.Model):
     phone = models.CharField(max_length=17, blank=True, null=True)
     cart = models.OneToOneField('cart.Cart', on_delete=models.CASCADE, blank=True, null=True, db_column='cart_id')
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='customer', blank=True, null=True)
+    # user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='customer', blank=True, null=True)
     fullname = models.CharField(max_length=255)
     date_of_birth = models.DateField(blank=True, null=True)
     age = models.SmallIntegerField()
@@ -34,11 +54,11 @@ class Customer(models.Model):
     recommend_products = ArrayField(models.IntegerField(), blank=True, default=list, size=20, db_column='recommend_product_ids')
     class Meta:
         verbose_name_plural = "Customers"
-        db_table = 'customer'
+        db_table = 'customers'
         
 
 class Vendor(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='vendor')
+    # user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='vendor')
     name = models.CharField(max_length=255, blank=True, null=True)
     phone = models.CharField(max_length=20, blank=True, null=True)
     description = models.TextField(blank=True, null=True)
@@ -47,7 +67,7 @@ class Vendor(models.Model):
 
     class Meta:
         verbose_name_plural = "Vendors"
-        db_table = 'vendor'
+        db_table = 'vendors'
 
 class BankAccount(models.Model):
     bank_account_id = models.AutoField(primary_key=True, db_column='bank_account_id')
@@ -58,4 +78,4 @@ class BankAccount(models.Model):
     branch_name = models.CharField(max_length=255, blank=True, null=True)
     
     class Meta:
-        db_table = 'bank_account'
+        db_table = 'bank_accounts'

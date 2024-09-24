@@ -17,7 +17,7 @@ class Province(models.Model):
     province_name_en = models.CharField(max_length=50)
     type = models.CharField(max_length=30)
     class Meta:
-        db_table = 'province'
+        db_table = 'provinces'
         verbose_name_plural = 'Provinces'
         ordering = ['province_name']
 
@@ -28,7 +28,7 @@ class District(models.Model):
     district_name_en = models.CharField(max_length=50)
     type = models.CharField(max_length=30)
     class Meta:
-        db_table = 'district'
+        db_table = 'districts'
         verbose_name_plural = 'Districts'
         ordering = ['district_name']
 
@@ -40,6 +40,6 @@ class Ward(models.Model):
     ward_name_en = models.CharField(max_length=50)
     type = models.CharField(max_length=30)
     class Meta:
-        db_table = 'ward'
+        db_table = 'wards'
         verbose_name_plural = 'Wards'
         ordering = ['ward_name']

@@ -13,7 +13,7 @@ class Category(models.Model):
     def __str__(self):
         return f"{self.category_id} - {self.category_name} - {self.category_img_url}"
     class Meta:
-        db_table = 'category'
+        db_table = 'categories'
         verbose_name_plural = 'Categories'
         ordering = ['-category_id']
 
@@ -37,7 +37,7 @@ class Product(models.Model):
         return f"{self.product_id} - {self.product_name} - {self.original_price} - {self.stock} - {self.brand} - {self.created_by}"
     
     class Meta:
-        db_table = 'product'
+        db_table = 'products'
         verbose_name_plural = 'Products'
         ordering = ['-product_id']
 
