@@ -99,9 +99,11 @@ class CustomerProductListView(generics.ListAPIView):
     queryset = Product.objects.all().select_related('created_by', 'category').prefetch_related('images')
     def get_queryset(self):
         queryset = Product.objects.all().select_related('created_by', 'category').prefetch_related('images')
-        customer = self.request.user.customer
 
-        if customer.recommend_products:
+        # Get the customer based on the user's email or ID
+        customer = Customer.objects.filter(email=self.request.user.email).first()
+
+        if customer and customer.recommend_products:
             preserved_order = Case(*[When(pk=pk, then=pos) for pos, pk in enumerate(customer.recommend_products)])
             queryset = queryset.annotate(sort_order=preserved_order).order_by('sort_order')
 
@@ -110,6 +112,7 @@ class CustomerProductListView(generics.ListAPIView):
             queryset = queryset.filter(category=category_id)
 
         return queryset
+
 class CustomerOneProductView(generics.RetrieveAPIView):
     serializer_class = CustomerSpecificProductSerializer
     queryset = Product.objects.all()
