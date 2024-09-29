@@ -7,8 +7,8 @@ from apps.account.serializers import *
 from drf_spectacular.utils import extend_schema
 from rest_framework_simplejwt.tokens import RefreshToken
 
-vendor_role, _ = Role.objects.get_or_create(name="vendor")
-customer_role, _ = Role.objects.get_or_create(name="customer")
+# vendor_role, _ = Role.objects.get_or_create(name="vendor")
+# customer_role, _ = Role.objects.get_or_create(name="customer")
 
 class RegisterCustomerView(generics.CreateAPIView):
     queryset = User.objects.all()
