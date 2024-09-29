@@ -1,0 +1,11 @@
+input {
+    border-radius: none !important;
+    background-color: white !important;
+    border-bottom: 2px solid #000000 !important;
+}
+
+select {
+    border-radius: none !important;
+    background-color: white !important;
+    border-bottom: 2px solid #000000 !important;
+}

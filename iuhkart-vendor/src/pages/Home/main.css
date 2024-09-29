@@ -1,0 +1,9 @@
+.home {
+    background: linear-gradient(231.62deg, rgba(255, 123, 172, 0.81) 9.93%, rgba(67, 165, 220, 0.62) 80.83%);
+}
+
+.boxPrimary {
+    background-color: white;
+    border-radius: 20px;
+    padding: 5px;
+}
