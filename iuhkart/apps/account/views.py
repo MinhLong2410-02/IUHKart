@@ -14,7 +14,10 @@ class RegisterCustomerView(generics.CreateAPIView):
     def create(self, request, *args, **kwargs):
         response = super().create(request, *args, **kwargs)
         customer_role, _ = Role.objects.get_or_create(name="customer")
-        user = User.objects.get(email=response.data['user']['email'])
+        customer_id = response.data['id']
+        customer = Customer.objects.select_related('user').get(id=customer_id)
+        
+        user = customer.user
         user.roles.add(customer_role)
         refresh = RefreshToken.for_user(user)
         return Response({
@@ -30,7 +33,9 @@ class RegisterVendorView(generics.CreateAPIView):
     def create(self, request, *args, **kwargs):
         response = super().create(request, *args, **kwargs)
         vendor_role, _ = Role.objects.get_or_create(name="vendor")
-        user = User.objects.get(email=response.data['user']['email'])
+        vendor_id = response.data['id']
+        vendor = Vendor.objects.select_related('user').get(id=vendor_id)
+        user = vendor.user
         user.roles.add(vendor_role)
         refresh = RefreshToken.for_user(user)
         BankAccount.objects.create(vendor=user.vendor)

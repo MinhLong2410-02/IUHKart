@@ -33,7 +33,21 @@ class User(AbstractBaseUser):
         verbose_name = _('user')
         verbose_name_plural = _('users')
         db_table = 'users'
+    
+    def add_role(self, role_name):
+        """Utility function to add a role to the user."""
+        role, created = Role.objects.get_or_create(name=role_name)
+        self.roles.add(role)
 
+    def remove_role(self, role_name):
+        """Utility function to remove a role from the user."""
+        role = Role.objects.get(name=role_name)
+        self.roles.remove(role)
+
+    def has_role(self, role_name):
+        """Check if the user has a specific role."""
+        return self.roles.filter(name=role_name).exists()
+    
 class UserRole(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     roles = models.ForeignKey(Role, on_delete=models.CASCADE)
@@ -57,7 +71,7 @@ class Customer(models.Model):
         
 
 class Vendor(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='vendor')
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='vendor', null=True)
     name = models.CharField(max_length=255, blank=True, null=True)
     phone = models.CharField(max_length=20, blank=True, null=True)
     description = models.TextField(blank=True, null=True)
