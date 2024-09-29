@@ -1,14 +1,5 @@
 version: '3.0'
 services:
-  qdrant_db:
-    image: qdrant/qdrant:v1.4.1
-    ports:
-      - "6336:6333"
-    networks:
-      - iuhkart-network
-    volumes:
-      - ./services/qdrant-db-volume:/qdrant/storage
-    restart: unless-stopped
 
   mongo_db:
     image: mongo:latest
@@ -37,20 +28,6 @@ services:
     networks:
       - iuhkart-network
     restart: unless-stopped
-    
-  embedding_api:
-    build: 
-      context: ./services/embedding-app
-      dockerfile: Dockerfile
-    working_dir: /app
-    networks:
-      - iuhkart-network
-    depends_on:
-      - qdrant_db
-      - mongo_db
-    volumes:
-      - ./services/embedding-app:/app
-    restart: unless-stopped
 
   tracking_api:
     build: 
@@ -66,7 +43,6 @@ services:
     networks:
       - iuhkart-network
     depends_on:
-      - qdrant_db
       - mongo_db
     volumes:
       - ./services/customer-tracking-app:/app
@@ -82,11 +58,9 @@ services:
     networks:
       - iuhkart-network
     depends_on:
-      - qdrant_db
       - mongo_db
     volumes:
       - ./services/app:/app
-      - ./services/qdrant-db-volume:/qdrant/storage
     restart: unless-stopped
 
   cloudflare:
@@ -99,18 +73,18 @@ services:
     depends_on:
       - django_main
 
-  metabase:
-    image: metabase/metabase:latest
-    container_name: metabase
-    ports:
-      - "3000:3000"
-    networks:
-      - iuhkart-network
-    volumes:
-      - ./services/metabase-data:/metabase-data
-    environment:
-      - MB_DB_FILE=/metabase-data/metabase.db
-    restart: unless-stopped
+  # metabase:
+  #   image: metabase/metabase:latest
+  #   container_name: metabase
+  #   ports:
+  #     - "3000:3000"
+  #   networks:
+  #     - iuhkart-network
+  #   volumes:
+  #     - ./services/metabase-data:/metabase-data
+  #   environment:
+  #     - MB_DB_FILE=/metabase-data/metabase.db
+  #   restart: unless-stopped
 
   django_main:
     build: ./iuhkart
@@ -129,6 +103,30 @@ services:
       - mongo_db
       - iuhkart-redis
   
+  vendor_fe:
+    build: ./iuhkart-vendor
+    ports:
+      - "8006:8000"
+    env_file:
+      - ./iuhkart-vendor/.env
+    working_dir: /app
+    networks:
+      - iuhkart-network
+    depends_on:
+      - django_main
+  customer_fe:
+    build: ./iuhkart-customer
+    ports:
+      - "8005:8000"
+    env_file:
+      - ./iuhkart-customer/.env
+    working_dir: /app
+    networks:
+      - iuhkart-network
+    depends_on:
+      - django_main
+
+
   iuhkart-recsys:
     build:
       context: ./services/recsys
@@ -138,7 +136,6 @@ services:
     networks:
       - iuhkart-network
     depends_on:
-      - qdrant_db
       - mongo_db
       - iuhkart-redis
     volumes:
@@ -165,6 +162,5 @@ networks:
     driver: bridge
 
 volumes:
-  qdrant-db-volume:
   metabase-data:
   mongo-db-volume:
