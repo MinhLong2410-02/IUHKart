@@ -453,11 +453,26 @@ def create_review():
 create_review()
 
 ## vector database
+from qdrant_client import QdrantClient, models
+from qdrant_client.http.models import Distance, VectorParams, PointStruct
+import os, requests
+from dotenv import load_dotenv
+from uuid import uuid4
+TEXT_EMBEDDING_URL = os.getenv('TEXT_EMBEDDING_URL')
+HOST = os.getenv('HOST')
+
+def getTextEmbedding(text: str):
+    response = requests.get(TEXT_EMBEDDING_URL + text)
+    vector = response.json()['embedding'] if response.status_code == 200 else None
+    return vector
+
 def init_qdrant():
-    broken_products = []
     collection_name='product'
-    requests.delete(f'https://qdrant-iuhkart.aiclubiuh.com/collections/delete?collection_name={collection_name}')
-    requests.post(f'https://qdrant-iuhkart.aiclubiuh.com/collections/create?collection_name={collection_name}')
+    client = QdrantClient(host=HOST, port=6321)
+    if collection_name in [c.name for c in client.get_collections().collections]:
+        client.delete_collection(collection_name=collection_name)
+    client.create_collection(collection_name=collection_name, vectors_config=VectorParams(size=384, distance=Distance.COSINE))
+    
     df = pd.read_csv('../schema/Database/products.csv')
     product_image_df = pd.read_csv('../schema/Database/product_images_main.csv')
     df = df[['product_id', 'product_name', 'slug']]
@@ -465,22 +480,52 @@ def init_qdrant():
     for _, iter in loop:
         product_image = product_image_df[(product_image_df['product_id']==iter['product_id']) & (product_image_df['is_main']==True)]
         if product_image.shape[0] == 0:
-            broken_products.append((iter['product_id'], iter['product_name']))
             continue
         image_url = product_image['image_url'].values[0]
-        request_body = {
-            'slug': iter['slug'],
+        vector = getTextEmbedding(iter['slug'])
+        payload = {
             'product_id': iter['product_id'],
             'product_name': f"{iter['product_name']}",
             'product_image_url': image_url
         }
-        res = requests.post(f'https://qdrant-iuhkart.aiclubiuh.com/collections/{collection_name}/insert',
-                            json=request_body,
-                            headers={"Content-Type": "application/json"}
-                )
-        loop.set_postfix(status_code='success' if res.status_code == 201 else 'fail')
-    df = pd.DataFrame(broken_products, columns=['product_id', 'product_name'])
-    df.to_csv('../schema/Database/broken_products.csv', index=False)
+
+        if vector is None:
+            continue
+        point = PointStruct(id=str(uuid4()),
+                    vector=vector,
+                    payload=payload
+        )
+        client.upsert(collection_name=collection_name, points=[point])
+
+init_qdrant()
+# def init_qdrant():
+#     broken_products = []
+#     collection_name='product'
+#     requests.delete(f'https://qdrant-iuhkart.aiclubiuh.com/collections/delete?collection_name={collection_name}')
+#     requests.post(f'https://qdrant-iuhkart.aiclubiuh.com/collections/create?collection_name={collection_name}')
+#     df = pd.read_csv('../schema/Database/products.csv')
+#     product_image_df = pd.read_csv('../schema/Database/product_images_main.csv')
+#     df = df[['product_id', 'product_name', 'slug']]
+#     loop = tqdm(df.iterrows(), total=df.shape[0], desc='Insert to qdrantDB', colour='green')
+#     for _, iter in loop:
+#         product_image = product_image_df[(product_image_df['product_id']==iter['product_id']) & (product_image_df['is_main']==True)]
+#         if product_image.shape[0] == 0:
+#             broken_products.append((iter['product_id'], iter['product_name']))
+#             continue
+#         image_url = product_image['image_url'].values[0]
+#         request_body = {
+#             'slug': iter['slug'],
+#             'product_id': iter['product_id'],
+#             'product_name': f"{iter['product_name']}",
+#             'product_image_url': image_url
+#         }
+#         res = requests.post(f'https://qdrant-iuhkart.aiclubiuh.com/collections/{collection_name}/insert',
+#                             json=request_body,
+#                             headers={"Content-Type": "application/json"}
+#                 )
+#         loop.set_postfix(status_code='success' if res.status_code == 201 else 'fail')
+#     df = pd.DataFrame(broken_products, columns=['product_id', 'product_name'])
+#     df.to_csv('../schema/Database/broken_products.csv', index=False)
 
 # if PROJECT_STATUS == 'PROD':
     # init_qdrant()
