@@ -24,7 +24,7 @@ ssl._create_default_https_context = ssl._create_stdlib_context
 load_dotenv('.env')
 PROJECT_STATUS = environ.get('STATUS')
 DB_NAME = os.getenv('NAME')
-DB_USER = os.getenv('USER')
+DB_USER = os.getenv('DBUSER')
 DB_PASS = os.getenv('PASSWORD')
 DB_HOST = 'localhost' if PROJECT_STATUS == 'DEV' else os.getenv('HOST')
 DB_PORT = os.getenv('PORT')
