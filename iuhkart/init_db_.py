@@ -241,6 +241,7 @@ def create_vendor_with_jwt(email, password, name, phone, description):
     
     # Create vendor-specific details
     vendor = Vendor.objects.create(
+        user=user,
         name=name,
         phone=phone,
         description=description
@@ -268,6 +269,7 @@ def create_customer_with_jwt(email, password, fullname, phone, date_of_birth, ad
 
     # Create customer-specific details
     customer = Customer.objects.create(
+        user=user,
         fullname=fullname,
         phone=phone,
         date_of_birth=date_of_birth,
