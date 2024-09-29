@@ -113,7 +113,7 @@ if PROJECT_STATUS == 'DEV':
             'default': {
                 'ENGINE': 'django.db.backends.postgresql',
                 'NAME': environ['NAME'],
-                'USER': environ['USER'],
+                'USER': environ['DBUSER'],
                 'PASSWORD': environ['PASSWORD'],
                 'HOST': 'localhost',
                 'PORT': environ['PORT'],
@@ -124,7 +124,7 @@ else:
             'default': {
                 'ENGINE': 'django.db.backends.postgresql',
                 'NAME': environ['NAME'],
-                'USER': environ['USER'],
+                'USER': environ['DBUSER'],
                 'PASSWORD': environ['PASSWORD'],
                 'HOST': environ['HOST'],
                 'PORT': environ['PORT'],
