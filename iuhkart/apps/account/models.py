@@ -36,11 +36,11 @@ class User(AbstractBaseUser):
 
 class UserRole(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    role = models.ForeignKey(Role, on_delete=models.CASCADE)
+    roles = models.ForeignKey(Role, on_delete=models.CASCADE)
 
     class Meta:
         db_table = 'user_roles'
-        unique_together = ('user', 'role')
+        unique_together = ('user', 'roles')
 
 class Customer(models.Model):
     phone = models.CharField(max_length=17, blank=True, null=True)

@@ -9,7 +9,7 @@ class Address(models.Model):
     address_detail = models.CharField(max_length=200, blank=True, null=True)
 
     class Meta:
-        db_table = 'address'
+        db_table = 'addresses'
 
 class Province(models.Model):
     province_id = models.AutoField(primary_key=True)
