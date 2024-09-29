@@ -7,15 +7,13 @@ from apps.account.serializers import *
 from drf_spectacular.utils import extend_schema
 from rest_framework_simplejwt.tokens import RefreshToken
 
-# vendor_role, _ = Role.objects.get_or_create(name="vendor")
-# customer_role, _ = Role.objects.get_or_create(name="customer")
-
 class RegisterCustomerView(generics.CreateAPIView):
     queryset = User.objects.all()
     serializer_class = CustomerSerializer
     
     def create(self, request, *args, **kwargs):
         response = super().create(request, *args, **kwargs)
+        customer_role, _ = Role.objects.get_or_create(name="customer")
         user = User.objects.get(email=response.data['user']['email'])
         user.roles.add(customer_role)
         refresh = RefreshToken.for_user(user)
@@ -31,6 +29,7 @@ class RegisterVendorView(generics.CreateAPIView):
     
     def create(self, request, *args, **kwargs):
         response = super().create(request, *args, **kwargs)
+        vendor_role, _ = Role.objects.get_or_create(name="vendor")
         user = User.objects.get(email=response.data['user']['email'])
         user.roles.add(vendor_role)
         refresh = RefreshToken.for_user(user)
@@ -40,8 +39,30 @@ class RegisterVendorView(generics.CreateAPIView):
             'access': str(refresh.access_token),
             'vendor': response.data
         }, status=status.HTTP_201_CREATED)
-class MyTokenObtainPairView(TokenObtainPairView):
-    serializer_class = MyTokenObtainPairSerializer
+class CustomerTokenObtainPairView(TokenObtainPairView):
+    serializer_class = CustomerTokenObtainPairSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        try:
+            serializer.is_valid(raise_exception=True)
+        except serializers.ValidationError:
+            return Response({'detail': 'Invalid credentials or no customer account associated.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response(serializer.validated_data, status=status.HTTP_200_OK)
+
+
+class VendorTokenObtainPairView(TokenObtainPairView):
+    serializer_class = VendorTokenObtainPairSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        try:
+            serializer.is_valid(raise_exception=True)
+        except serializers.ValidationError:
+            return Response({'detail': 'Invalid credentials or no vendor account associated.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response(serializer.validated_data, status=status.HTTP_200_OK)
 
 class UpdateCustomerAvatarView(generics.UpdateAPIView):
     serializer_class = CustomerAvatarUploadSerializer
