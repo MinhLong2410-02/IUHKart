@@ -111,6 +111,20 @@ CREATE TABLE "user" (
   "phone" varchar(20)
 );
 
+CREATE TABLE "role" (
+  "role_id" SERIAL PRIMARY KEY,
+  "name" VARCHAR(100) NOT NULL
+);
+
+CREATE TABLE "user_roles" (
+  "id" SERIAL PRIMARY KEY,
+  "user_id" INT NOT NULL,
+  "role_id" INT NOT NULL,
+  FOREIGN KEY (user_id) REFERENCES "user" (user_id),
+  FOREIGN KEY (role_id) REFERENCES role (role_id),
+  UNIQUE (user_id, role_id) -- Ensures no duplicate entries
+);
+
 CREATE TABLE "category" (
   "category_id" int PRIMARY KEY,
   "category_name" varchar(255),
