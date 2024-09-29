@@ -48,7 +48,6 @@ class Customer(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='customer', blank=True, null=True)
     fullname = models.CharField(max_length=255)
     date_of_birth = models.DateField(blank=True, null=True)
-    age = models.SmallIntegerField()
     avatar_url = models.ImageField(storage=AzureCustomerStorage(), max_length=255, blank=True, null=True)
     date_join = models.DateField(default=timezone.now)
     recommend_products = ArrayField(models.IntegerField(), blank=True, default=list, size=20, db_column='recommend_product_ids')

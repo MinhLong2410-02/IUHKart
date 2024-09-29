@@ -274,7 +274,7 @@ def create_customer_with_jwt(email, password, fullname, phone, date_of_birth, ad
         phone=phone,
         date_of_birth=date_of_birth,
         cart=cart,
-        age=2024 - int(date_of_birth.split('-')[0])
+        # age=2024 - int(date_of_birth.split('-')[0])
     )
     
     # Assign address to the user
