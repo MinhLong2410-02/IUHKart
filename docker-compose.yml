@@ -63,15 +63,15 @@ services:
   #     - ./services/app:/app
   #   restart: unless-stopped
 
-  cloudflare:
-    image: cloudflare/cloudflared:latest
-    container_name: iuhkart-cloudflare
-    restart: unless-stopped
-    command: tunnel --no-autoupdate run --token eyJhIjoiODZlYTNjZjEwNmRlMTU3Yjc2NTg0YzgyODgyNDdmMTciLCJ0IjoiMjkwNDAwODQtZmM4NS00YmFhLTk1OTUtODA0NDc3ZTY1OTA3IiwicyI6IlpqZzFaV0UwWm1JdFpESTBNaTAwTUdSaExUZ3habVV0WVdaa05UazNOV0kyTVdVMSJ9
-    networks:
-      - iuhkart-network
-    depends_on:
-      - django_main
+  # cloudflare:
+  #   image: cloudflare/cloudflared:latest
+  #   container_name: iuhkart-cloudflare
+  #   restart: unless-stopped
+  #   command: tunnel --no-autoupdate run --token eyJhIjoiODZlYTNjZjEwNmRlMTU3Yjc2NTg0YzgyODgyNDdmMTciLCJ0IjoiMjkwNDAwODQtZmM4NS00YmFhLTk1OTUtODA0NDc3ZTY1OTA3IiwicyI6IlpqZzFaV0UwWm1JdFpESTBNaTAwTUdSaExUZ3habVV0WVdaa05UazNOV0kyTVdVMSJ9
+  #   networks:
+  #     - iuhkart-network
+  #   depends_on:
+  #     - django_main
 
   # metabase:
   #   image: metabase/metabase:latest
@@ -99,32 +99,31 @@ services:
       - ./iuhkart:/app
     restart: unless-stopped
     depends_on:
-      - qdrant_fastapi
       - mongo_db
       - iuhkart-redis
   
-  vendor_fe:
-    build: ./iuhkart-vendor
-    ports:
-      - "8006:8000"
-    env_file:
-      - ./iuhkart-vendor/.env
-    working_dir: /app
-    networks:
-      - iuhkart-network
-    depends_on:
-      - django_main
-  customer_fe:
-    build: ./iuhkart-customer
-    ports:
-      - "8005:8000"
-    env_file:
-      - ./iuhkart-customer/.env
-    working_dir: /app
-    networks:
-      - iuhkart-network
-    depends_on:
-      - django_main
+  # vendor_fe:
+  #   build: ./iuhkart-vendor
+  #   ports:
+  #     - "8006:8000"
+  #   env_file:
+  #     - ./iuhkart-vendor/.env
+  #   working_dir: /app
+  #   networks:
+  #     - iuhkart-network
+  #   depends_on:
+  #     - django_main
+  # customer_fe:
+  #   build: ./iuhkart-customer
+  #   ports:
+  #     - "8005:8000"
+  #   env_file:
+  #     - ./iuhkart-customer/.env
+  #   working_dir: /app
+  #   networks:
+  #     - iuhkart-network
+  #   depends_on:
+  #     - django_main
 
 
   iuhkart-recsys:
