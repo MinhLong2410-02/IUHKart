@@ -48,20 +48,20 @@ services:
       - ./services/customer-tracking-app:/app
     restart: unless-stopped
 
-  qdrant_fastapi:
-    build: ./services/app
-    ports:
-      - "8008:8000"
-    environment:
-      - TEXT_EMBEDDING_URL=http://embedding_api:8000/embedding
-    working_dir: /app
-    networks:
-      - iuhkart-network
-    depends_on:
-      - mongo_db
-    volumes:
-      - ./services/app:/app
-    restart: unless-stopped
+  # qdrant_fastapi:
+  #   build: ./services/app
+  #   ports:
+  #     - "8008:8000"
+  #   environment:
+  #     - TEXT_EMBEDDING_URL=http://embedding_api:8000/embedding
+  #   working_dir: /app
+  #   networks:
+  #     - iuhkart-network
+  #   depends_on:
+  #     - mongo_db
+  #   volumes:
+  #     - ./services/app:/app
+  #   restart: unless-stopped
 
   cloudflare:
     image: cloudflare/cloudflared:latest
@@ -142,19 +142,19 @@ services:
       - ./services/recsys:/app
     restart: unless-stopped
 
-  etl_data_warehouse:
-    build: ./warehouse
-    env_file:
-      - ./warehouse/.env
-    volumes:
-      - ./warehouse:/app
-    restart: unless-stopped
-    depends_on:
-      - mongo_db
-      - iuhkart-redis
-      - django_main
-    networks:
-      - iuhkart-network
+  # etl_data_warehouse:
+  #   build: ./warehouse
+  #   env_file:
+  #     - ./warehouse/.env
+  #   volumes:
+  #     - ./warehouse:/app
+  #   restart: unless-stopped
+  #   depends_on:
+  #     - mongo_db
+  #     - iuhkart-redis
+  #     - django_main
+  #   networks:
+  #     - iuhkart-network
   
 networks:
   iuhkart-network:
