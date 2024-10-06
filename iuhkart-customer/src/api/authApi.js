@@ -6,7 +6,7 @@ const authApi = {
     return axiosClient.post(url, data);
   },
   login: (data) => {
-    const url = "/user/api/get-token/";
+    const url = "/user/api/token/customer/";
     return axiosClient.post(url, data);
   },
 };
