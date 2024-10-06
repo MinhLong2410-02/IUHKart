@@ -101,7 +101,7 @@ class CustomerProductListView(generics.ListAPIView):
         queryset = Product.objects.all().select_related('created_by', 'category').prefetch_related('images')
 
         # Get the customer based on the user's email or ID
-        customer = Customer.objects.filter(email=self.request.user.email).first()
+        customer = Customer.objects.filter(id=self.request.user.id).first()
 
         if customer and customer.recommend_products:
             preserved_order = Case(*[When(pk=pk, then=pos) for pos, pk in enumerate(customer.recommend_products)])

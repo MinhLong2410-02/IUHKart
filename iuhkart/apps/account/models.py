@@ -6,24 +6,12 @@ from apps.custom_storage import AzureCustomerStorage, AzureVendorStorage
 from django.contrib.postgres.fields import ArrayField
 from django.utils import timezone
 # Create your models here.
-
-class Role(models.Model):
-    name = models.CharField(max_length=100)
-
-    def __str__(self):
-        return self.name
-
-    class Meta:
-        verbose_name_plural = "Roles"
-        db_table = 'roles'
-
 class User(AbstractBaseUser):
     username = None
     email = models.EmailField(_('email address'), unique=True, max_length=255)
     address = models.OneToOneField('address.Address', models.DO_NOTHING, blank=True, null=True)
-    
-    # Define many-to-many relationship with Role using UserRole as the through table
-    roles = models.ManyToManyField(Role, through='UserRole', related_name='users')
+    is_customer = models.BooleanField(default=False)
+    is_vendor = models.BooleanField(default=False)
     
     objects = UserManager()
     USERNAME_FIELD = 'email'
@@ -33,28 +21,6 @@ class User(AbstractBaseUser):
         verbose_name = _('user')
         verbose_name_plural = _('users')
         db_table = 'users'
-    
-    def add_role(self, role_name):
-        """Utility function to add a role to the user."""
-        role, created = Role.objects.get_or_create(name=role_name)
-        self.roles.add(role)
-
-    def remove_role(self, role_name):
-        """Utility function to remove a role from the user."""
-        role = Role.objects.get(name=role_name)
-        self.roles.remove(role)
-
-    def has_role(self, role_name):
-        """Check if the user has a specific role."""
-        return self.roles.filter(name=role_name).exists()
-    
-class UserRole(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    roles = models.ForeignKey(Role, on_delete=models.CASCADE)
-
-    class Meta:
-        db_table = 'user_roles'
-        unique_together = ('user', 'roles')
 
 class Customer(models.Model):
     phone = models.CharField(max_length=17, blank=True, null=True)
@@ -62,6 +28,7 @@ class Customer(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='customer', blank=True, null=True)
     fullname = models.CharField(max_length=255)
     date_of_birth = models.DateField(blank=True, null=True)
+    age = models.SmallIntegerField()
     avatar_url = models.ImageField(storage=AzureCustomerStorage(), max_length=255, blank=True, null=True)
     date_join = models.DateField(default=timezone.now)
     recommend_products = ArrayField(models.IntegerField(), blank=True, default=list, size=20, db_column='recommend_product_ids')
@@ -71,7 +38,7 @@ class Customer(models.Model):
         
 
 class Vendor(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='vendor', null=True)
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='vendor')
     name = models.CharField(max_length=255, blank=True, null=True)
     phone = models.CharField(max_length=20, blank=True, null=True)
     description = models.TextField(blank=True, null=True)

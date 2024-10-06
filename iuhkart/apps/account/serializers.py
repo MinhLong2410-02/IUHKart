@@ -21,6 +21,8 @@ class UserSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         user = User(
             email=validated_data['email'],
+            is_customer=validated_data.get('is_customer', False),
+            is_vendor=validated_data.get('is_vendor', False),
             address=validated_data.get('address')
         )
         user.set_password(validated_data['password'])
@@ -73,43 +75,57 @@ class CustomerSerializer(serializers.ModelSerializer):
         return customer
 
 
+class CustomerSerializer(serializers.ModelSerializer):
+    user = UserSerializer()
+    date_of_birth = serializers.DateField(required=False, allow_null=True)
+
+    class Meta:
+        model = Customer
+        fields = ('id', 'user', 'fullname', 'phone', 'date_of_birth')
+    def isUserIsVendor(self, user):
+        vendor = Vendor.objects.filter(user=user)
+        return vendor.exists()
+    def create(self, validated_data):
+        user_data = validated_data.pop('user')
+        user = UserSerializer.create(UserSerializer(), validated_data=user_data)
+        date_of_birth = validated_data.pop('date_of_birth', None)
+        if date_of_birth:
+            age = self.calculate_age(date_of_birth)
+        else:
+            age = None
+        cart = Cart.objects.create()
+        customer = Customer.objects.create(user=user, cart = cart, date_of_birth=date_of_birth, age=age, **validated_data)
+        user.is_customer = True
+        if not self.isUserIsVendor(user):
+            user.save()
+        product_ids = Product.objects.order_by('-ratings').values_list('product_id', flat=True)[:20]
+        customer.recommend_product_ids = list(product_ids)
+        customer.save()
+        return customer
+
+    def calculate_age(self, birthdate):
+        today = date.today()
+        age = today.year - birthdate.year - ((today.month, today.day) < (birthdate.month, birthdate.day))
+        return age
+
 class VendorSerializer(serializers.ModelSerializer):
-    email = serializers.EmailField(write_only=True)  # Capture email separately
+    user = UserSerializer()
 
     class Meta:
         model = Vendor
-        fields = ('id', 'email', 'name', 'phone', 'description')
+        fields = ('id', 'user', 'name', 'phone', 'description')
 
+    def isUserIsCustomer(self, user):
+        customer = Customer.objects.filter(user=user)
+        return customer.exists()
     def create(self, validated_data):
-        email = validated_data.pop('email')
-        user, is_exist = User.objects.get_or_create(email=email)
-        
-        user.set_password(validated_data.get('password', 'defaultpassword'))
-        user.save()
-        vendor = Vendor.objects.create(**validated_data)
-        vendor.user = user
-        vendor.save()
+        user_data = validated_data.pop('user')
+        user = UserSerializer.create(UserSerializer(), validated_data=user_data)
+        vendor = Vendor.objects.create(user=user, **validated_data)
+        user.is_vendor = True
+        if not self.isUserIsCustomer(user):
+            user.save()
         return vendor
-
-
-class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
-    def validate(self, attrs):
-        data = super().validate(attrs)
-        roles = list(self.user.roles.values_list('name', flat=True))
-
-        # Handling the fact that User does not directly relate to Customer and Vendor
-        customer = Customer.objects.filter(fullname=self.user.get_full_name()).first()
-        vendor = Vendor.objects.filter(name=self.user.get_full_name()).first()
-
-        customer_id = customer.id if customer else None
-        vendor_id = vendor.id if vendor else None
-
-        data.update({
-            'roles': roles,
-            'customer_id': customer_id,
-            'vendor_id': vendor_id
-        })
-        return data
 
 class CustomerTokenObtainPairSerializer(TokenObtainPairSerializer):
     def validate(self, attrs):

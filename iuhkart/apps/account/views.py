@@ -2,7 +2,7 @@ from rest_framework import generics, permissions
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from rest_framework.response import Response
 from rest_framework import status
-from apps.account.models import User, Role
+from apps.account.models import User
 from apps.account.serializers import *
 from drf_spectacular.utils import extend_schema
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -13,12 +13,10 @@ class RegisterCustomerView(generics.CreateAPIView):
     
     def create(self, request, *args, **kwargs):
         response = super().create(request, *args, **kwargs)
-        customer_role, _ = Role.objects.get_or_create(name="customer")
         customer_id = response.data['id']
         customer = Customer.objects.select_related('user').get(id=customer_id)
         
         user = customer.user
-        user.roles.add(customer_role)
         refresh = RefreshToken.for_user(user)
         return Response({
             'refresh': str(refresh),
@@ -32,11 +30,9 @@ class RegisterVendorView(generics.CreateAPIView):
     
     def create(self, request, *args, **kwargs):
         response = super().create(request, *args, **kwargs)
-        vendor_role, _ = Role.objects.get_or_create(name="vendor")
         vendor_id = response.data['id']
         vendor = Vendor.objects.select_related('user').get(id=vendor_id)
         user = vendor.user
-        user.roles.add(vendor_role)
         refresh = RefreshToken.for_user(user)
         BankAccount.objects.create(vendor=user.vendor)
         return Response({
@@ -55,7 +51,6 @@ class CustomerTokenObtainPairView(TokenObtainPairView):
             return Response({'detail': 'Invalid credentials or no customer account associated.'}, status=status.HTTP_400_BAD_REQUEST)
 
         return Response(serializer.validated_data, status=status.HTTP_200_OK)
-
 
 class VendorTokenObtainPairView(TokenObtainPairView):
     serializer_class = VendorTokenObtainPairSerializer
