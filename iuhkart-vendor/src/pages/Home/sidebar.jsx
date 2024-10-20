@@ -1,57 +1,29 @@
 import React from 'react';
-
-import { Link, NavLink, useLocation } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import {
-    IconButton,
     Box,
     CloseButton,
     Flex,
-    Icon,
-    useColorModeValue,
+    Text,
+    Button,
+    useDisclosure,
     Drawer,
     DrawerContent,
-    Text,
-    useDisclosure,
-    Button,
+    useColorModeValue,
 } from '@chakra-ui/react';
-// import {
-//     FiHome,
-//     FiTrendingUp,
-//     FiCompass,
-//     FiStar,
-//     FiSettings,
-//     FiMenu,
-// } from "react-icon";
+import Cookies from 'js-cookie'; // Import Cookies if using it for authentication
 
 const LinkItems = [
     { path: "summary", name: 'Summary' },
     { path: "info", name: 'Info' },
     { path: "products", name: 'Products' },
-    // { path: "orders", name: 'Pr' },
 ];
 
 export default function SimpleSidebar({ children }) {
     const { isOpen, onOpen, onClose } = useDisclosure();
     return (
-        <Box
-            minH="100vh"
-        // bg={useColorModeValue('gray.100', 'gray.900')}
-        >
-            <SidebarContent
-                onClose={() => onClose()}
-                display={{ base: 'none', md: 'block' }}
-                className='relative'
-            />
-            {/* <Box
-                w={{ base: 'full', md: 60 }}
-                className='absolute top-[82%] bg-white h-[150px] rounded-[20px] p-4 flex justify-center items-center'>
-                <Button
-                    colorScheme="blue"
-                    w="full"
-                >
-                    LogOut
-                </Button>
-            </Box> */}
+        <Box minH="100vh">
+            <SidebarContent onClose={() => onClose()} display={{ base: 'none', md: 'block' }} className='relative' />
             <Drawer
                 autoFocus={false}
                 isOpen={isOpen}
@@ -64,14 +36,21 @@ export default function SimpleSidebar({ children }) {
                     <SidebarContent onClose={onClose} />
                 </DrawerContent>
             </Drawer>
-            {/* <Box ml={{ base: 0, md: 60 }} p="4">
-                {children}
-            </Box> */}
         </Box>
     );
 }
 
 const SidebarContent = ({ onClose, ...rest }) => {
+    const navigate = useNavigate();
+
+    const handleLogout = () => {
+        // Clear authentication tokens
+        Cookies.remove('authorization'); // If using cookies
+        localStorage.removeItem('authorization'); // If using local storage
+        // Redirect to login page
+        navigate('/login');
+    };
+
     return (
         <Box
             bg={"white"}
@@ -93,6 +72,12 @@ const SidebarContent = ({ onClose, ...rest }) => {
                     {link.name}
                 </NavItem>
             ))}
+            {/* Add Logout Button */}
+            <Flex p="4" mt="auto" justifyContent="center">
+                <Button colorScheme="red" onClick={handleLogout}>
+                    Log Out
+                </Button>
+            </Flex>
         </Box>
     );
 };
@@ -128,27 +113,3 @@ const NavItem = ({ icon, children, path, ...rest }) => {
         </Link>
     );
 };
-
-// const MobileNav = ({ onOpen, ...rest }) => {
-//     return (
-//         <Flex
-//             height="20"
-//             alignItems="center"
-//             // bg={useColorModeValue('white', 'gray.900')}
-//             borderBottomWidth="1px"
-//             borderBottomColor={useColorModeValue('gray.200', 'gray.700')}
-//             justifyContent="flex-start"
-//             {...rest}>
-//             <IconButton
-//                 variant="outline"
-//                 onClick={onOpen}
-//                 aria-label="open menu"
-//             // icon={<FiMenu />}
-//             />
-
-//             <Text fontSize="2xl" ml="8" fontFamily="monospace" fontWeight="bold">
-//                 Logo
-//             </Text>
-//         </Flex>
-//     );
-// };

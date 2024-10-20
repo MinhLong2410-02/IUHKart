@@ -30,6 +30,7 @@ import { ArrowUpDownIcon, ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
 import SignUpImg from "../../assets/images/signup1vendor.png";
 import { Form, useNavigate } from 'react-router-dom';
 import { registerAPI } from '../../api/authApi';
+import Cookies from 'js-cookie'; 
 
 const steps = [
     {
@@ -98,12 +99,12 @@ function SignUp() {
         formData.append('phoneNumber', phoneNumber);
 
         const data = Object.fromEntries(formData.entries());
-
+        console.log(email)
         const param = {
             "user": {
               "email": email,
               "password": password,
-              "address": 1
+              "address": null
             },
             "name": shopName,
             "phone": phoneNumber,
@@ -113,6 +114,7 @@ function SignUp() {
         if (validateFormData(data)) {
 
             const data = await registerAPI(param);
+            Cookies.set('authorization', data.access);
             if (data) {
                 navigate('/sign-up-next'); 
             }
