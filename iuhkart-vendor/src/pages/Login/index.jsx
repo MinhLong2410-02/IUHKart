@@ -16,6 +16,7 @@ import { NavLink } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import Cookies from 'js-cookie';
 
+
 function Login() {
     const [show, setShow] = React.useState(false);
     const handleClick = () => setShow(!show);
@@ -23,6 +24,7 @@ function Login() {
     const [password, setPassword] = React.useState('');
     const [emailError, setEmailError] = React.useState('');
     const [passwordError, setPasswordError] = React.useState('')
+    const [loginError, setLoginError] = React.useState('');
 
     const validateEmail = (email) => {
         const re = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
@@ -30,6 +32,8 @@ function Login() {
     }
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setLoginError('');
+
         if (!email) {
             setEmailError('Email is required');
             return null;
@@ -55,7 +59,8 @@ function Login() {
             window.location.href = '/summary'
 
         } catch (error) {
-            console.log(error)
+            console.error(error);
+            setLoginError('Sai email hoặc mật khẩu. Vui lòng thử lại');
         }
     }
 
@@ -81,19 +86,26 @@ function Login() {
                     <Stack spacing={15}>
                         <Heading fontWeight={600}>Login</Heading>
                         <Box mb={15}>
-                            Welcome  back! Please login to your account.
+                            Welcome back! Please login to your account.
                         </Box>
                         <Box>
                             <form>
                                 <Stack spacing={6}>
+                                    {/* Show error message if login fails */}
+                                    {loginError && (
+                                        <Box color="red" textAlign="center">
+                                            {loginError}
+                                        </Box>
+                                    )}
                                     <FormControl variant="floating" isInvalid={emailError?.length > 0}>
                                         <InputGroup flexDirection="column">
                                             <Input
                                                 className='outline'
                                                 type="email" borderRadius={4}
                                                 onChange={(e) => {
-                                                    setEmail(e.target.value)
-                                                    setEmailError('')
+                                                    setEmail(e.target.value);
+                                                    setEmailError('');
+                                                    setLoginError('');
                                                 }} />
                                             <FormLabel fontWeight={400}>Email</FormLabel>
                                             <FormErrorMessage>{emailError}</FormErrorMessage>
@@ -103,8 +115,9 @@ function Login() {
                                         <InputGroup flexDirection="column">
                                             <Input type={show ? 'text' : 'password'} borderRadius={4}
                                                 onChange={(e) => {
-                                                    setPassword(e.target.value)
-                                                    setPasswordError('')
+                                                    setPassword(e.target.value);
+                                                    setPasswordError('');
+                                                    setLoginError('');
                                                 }} />
                                             <FormLabel fontWeight={400}>Password</FormLabel>
                                             <InputRightElement>
@@ -118,27 +131,21 @@ function Login() {
                                     </FormControl>
                                     <FormControl>
                                         <Flex flexDirection="row" justifyContent="space-between" mb={5}>
-                                            <Checkbox
-                                                className='bg-white'
-                                            >Remember me</Checkbox>
+                                            <Checkbox className='bg-white'>Remember me</Checkbox>
                                             <Box>
-                                                <Button variant="link" colorScheme="black"
-                                                    _hover={{ textDecoration: "none" }}>Forgot
-                                                    password?</Button>
+                                                <Button variant="link" colorScheme="black" _hover={{ textDecoration: "none" }}>
+                                                    Forgot password?
+                                                </Button>
                                             </Box>
                                         </Flex>
                                     </FormControl>
-                                    <FormControl
-                                        className='flex justify-start items-center'
-                                    >
+                                    <FormControl className='flex justify-start items-center'>
                                         <button className='w-[200px] h-[50px] flex justify-center items-center p-4 mr-10 bg-[#3751FE] text-[#fff]'
-                                            onClick={(e) => handleSubmit(e)}>Login</button>
-                                        <Link
-                                            to="/sign-up"
-                                        >
-                                            <div
-                                                className='w-[200px] h-[50px] flex justify-center items-center p-4 mr-5 border border-[#3751FE] bg-white'
-                                            >
+                                            onClick={(e) => handleSubmit(e)}>
+                                            Login
+                                        </button>
+                                        <Link to="/sign-up">
+                                            <div className='w-[200px] h-[50px] flex justify-center items-center p-4 mr-5 border border-[#3751FE] bg-white'>
                                                 SignUp
                                             </div>
                                         </Link>
@@ -157,22 +164,6 @@ function Login() {
                                                 bg="white"
                                                 className='!font-bold'
                                             >
-                                                FaceBook
-                                            </Button>
-                                            <Button padding="0 15px" position="relative" zIndex={1} width="fit-content"
-                                                color="#3751FE"
-                                                fontSize={14}
-                                                bg="white"
-                                                className='!font-bold'
-                                            >
-                                                Linked
-                                            </Button>
-                                            <Button padding="0 15px" position="relative" zIndex={1} width="fit-content"
-                                                color="#3751FE"
-                                                fontSize={14}
-                                                bg="white"
-                                                className='!font-bold'
-                                            >
                                                 Google
                                             </Button>
                                         </Flex>
@@ -182,6 +173,7 @@ function Login() {
                         </Box>
                     </Stack>
                 </Box>
+
             </Box>
             <Box
                 backgroundColor={"#E5E5E5"}

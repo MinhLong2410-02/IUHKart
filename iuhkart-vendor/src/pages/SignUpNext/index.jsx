@@ -127,7 +127,9 @@ function SignUp() {
         const data = Object.fromEntries(formData.entries());
         
         const rs = await updateAddress(data);
-        console.log(rs);
+        if (rs) {
+            navigate('/home'); 
+        } 
     };
 
     // console.log(province);
