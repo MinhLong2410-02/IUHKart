@@ -1,17 +1,15 @@
-# Description
-Final Project for K16DS's Data Platform subject
-# Member
+# BUILDING DATA INFRASTRUCTURE FOR MULTI-SHOPER E-COMMERCE SYSTEM
+This is our **graduation project**.
+
+## Member
 - Trần Minh Long: 20078291
 - Quách Xuân Nam: 20020541
-- Nguyễn Văn Hậu: 20001665
-- Lưu Lương Vi Nhân: 20104821
-- Nguyễn Văn Nam: 21017711
 
-# Backend (Overview architecture system)
-![BE](schema/Overview.png)
+## Overview architecture system
+![overview_pipeline](assets/overview_pipeline.png)
 
-# DP (ERD data product)
-![ERD Design](schema/DPD.png)
+## DP (ERD data product)
+![schema_oltp](assets/schema_oltp.png)
 
-# DWH (ERD data warehouse)
-![ERD WH](schema/DWH.png)
+## DWH (ERD data warehouse)
+![star_schema_dwh](assets/star_schema_dwh.png)
