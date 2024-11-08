@@ -1,0 +1,179 @@
+networks:
+    iuhkart-network:
+        name: iuhkart-network
+        external: true
+
+services:
+    # cloudflare:
+    #     image: cloudflare/cloudflared:latest
+    #     container_name: cloudflare
+    #     restart: always
+    #     command: tunnel --no-autoupdate run --token eyJhIjoiYjEyNTc2NjEwYTQyYzVmM2JmZTZlZThhZjE1MjIwM2EiLCJ0IjoiMTM0NzM3ZDUtY2I5OC00NmExLTg2OTktZjdlZDc1YTI2MGNiIiwicyI6Ik9ESTNOMkU0TTJVdE1tVTVNeTAwTURKa0xUaGlNalV0WVdFMk1qa3paR1F6TjJRMSJ9
+    #     networks:
+    #         - iuhkart-network
+
+    embedding:
+        platform: linux/amd64
+        container_name: embedding
+        image: qxnam/embedding-api:latest
+        environment:
+            - NVIDIA_VISIBLE_DEVICES="0"
+        ports:
+            - 8000:8000
+        networks:
+            - iuhkart-network
+        volumes:
+            - ./configs/embedding-app:/app
+        restart: always
+        # deploy:
+        #     resources:
+        #         reservations:
+        #             devices:
+        #                 - driver: nvidia
+        #                   count: all
+        #                   capabilities: [gpu]
+        healthcheck:
+            test: ["CMD", "curl", "-f", "http://embedding:8000/health"]
+            interval: 10s
+            timeout: 5s
+            retries: 3
+    
+    superset:
+        platform: linux/amd64
+        build: ./configs/superset
+        container_name: superset
+        ports:
+            - 8088:8088
+        environment:
+            - SUPERSET_ENV=development
+            - SUPERSET_LOAD_EXAMPLES=yes
+            - SUPERSET_SECRET_KEY=your_secret_key
+            - DATABASE_URL=postgresql+psycopg2://superset:superset@db:5432/superset
+        volumes:
+            - ./data/superset_home:/var/lib/superset
+        depends_on:
+            - superset-db
+        networks:
+            - iuhkart-network
+        restart: always
+
+    superset-db:
+        image: postgres:13
+        container_name: superset_db
+        environment:
+            POSTGRES_USER: superset
+            POSTGRES_PASSWORD: superset
+            POSTGRES_DB: superset
+        volumes:
+            - ./data/superset_pg_data:/var/lib/postgresql/data
+        networks:
+            - iuhkart-network
+        restart: always
+
+    zookeeper:
+        container_name: zookeeper
+        platform: linux/amd64
+        image: wurstmeister/zookeeper:latest
+        ports:
+            - "2181:2181"
+        networks:
+            - iuhkart-network
+        healthcheck:
+            test: ["CMD", "nc", "-z", "zookeeper", "2181"]
+            interval: 30s
+            timeout: 10s
+            retries: 5
+            start_period: 20s
+        restart: always
+
+    kafka:
+        container_name: kafka
+        image: wurstmeister/kafka:latest
+        depends_on:
+            zookeeper:
+                condition: service_healthy
+        ports:
+            - 9092:9092
+        environment:
+            KAFKA_BROKER_ID: 1
+            KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+            KAFKA_LISTENERS: INTERNAL://:29092,EXTERNAL://:9092
+            KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka:29092,EXTERNAL://localhost:9092
+            KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
+            KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+        volumes:
+            - ./data/kafka-data:/kafka
+        networks:
+            - iuhkart-network
+        healthcheck:
+            test: ["CMD", "nc", "-z", "kafka", "9092"]
+            interval: 30s
+            timeout: 10s
+            retries: 5
+            start_period: 30s
+        restart: always
+
+    kafka-ui:
+        platform: linux/amd64
+        container_name: kafka-ui
+        image: provectuslabs/kafka-ui:latest
+        depends_on:
+            - kafka
+        ports:
+            - 8084:8084
+        environment:
+            KAFKA_CLUSTERS_0_NAME: "local"
+            KAFKA_CLUSTERS_0_BOOTSTRAP_SERVERS: "kafka:29092"
+            KAFKA_CLUSTERS_0_ZOOKEEPER: "zookeeper:2181"
+            SERVER_PORT: 8084
+        networks:
+            - iuhkart-network
+
+    debezium:
+        platform: linux/amd64
+        container_name: debezium
+        image: debezium/connect:3.0.0.Final
+        ports:
+            - '8083:8083'
+        environment:
+            - BOOTSTRAP_SERVERS=kafka:29092
+            - GROUP_ID=1
+            - CONFIG_STORAGE_TOPIC=my_connect_configs
+            - OFFSET_STORAGE_TOPIC=my_connect_offsets
+            - STATUS_STORAGE_TOPIC=my_connect_statuses
+        networks:
+            - iuhkart-network
+        healthcheck:
+            test: ["CMD", "curl", "-f", "http://debezium:8083/connectors"]
+            interval: 30s
+            timeout: 10s
+            retries: 5
+            start_period: 30s
+        restart: always
+
+    debezium-ui:
+        platform: linux/amd64
+        container_name: debezium-ui
+        image: debezium/debezium-ui:latest
+        depends_on:
+            - debezium
+        ports:
+            - '8080:8080'
+        environment:
+            KAFKA_CONNECT_URIS: http://debezium:8083
+        networks:
+            - iuhkart-network
+
+    init-connect:
+        container_name: init-connect
+        build: ./configs/connector
+        depends_on:
+            debezium:
+                condition: service_healthy
+            kafka:
+                condition: service_healthy
+        networks:
+            - iuhkart-network
+        volumes:
+            - ./configs/connector:/app
+        restart: "no"
