@@ -63,15 +63,15 @@ services:
   #     - ./services/app:/app
   #   restart: unless-stopped
 
-  # cloudflare:
-  #   image: cloudflare/cloudflared:latest
-  #   container_name: iuhkart-cloudflare
-  #   restart: unless-stopped
-  #   command: tunnel --no-autoupdate run --token eyJhIjoiODZlYTNjZjEwNmRlMTU3Yjc2NTg0YzgyODgyNDdmMTciLCJ0IjoiMjkwNDAwODQtZmM4NS00YmFhLTk1OTUtODA0NDc3ZTY1OTA3IiwicyI6IlpqZzFaV0UwWm1JdFpESTBNaTAwTUdSaExUZ3habVV0WVdaa05UazNOV0kyTVdVMSJ9
-  #   networks:
-  #     - iuhkart-network
-  #   depends_on:
-  #     - django_main
+  cloudflare:
+    image: cloudflare/cloudflared:latest
+    container_name: iuhkart-cloudflare
+    restart: unless-stopped
+    command: tunnel --no-autoupdate run --token eyJhIjoiYjEyNTc2NjEwYTQyYzVmM2JmZTZlZThhZjE1MjIwM2EiLCJ0IjoiNDQ3Yzk4ZTQtOWZjNi00OWUxLTlhMjktM2MyZTI3ZjJkMjZkIiwicyI6IlpUVTFPREpsWVdFdE5EWTBaaTAwTldZMExUaGlNMkl0TlRJMllXSmhZakV5Tm1KayJ9
+    networks:
+      - iuhkart-network
+    depends_on:
+      - django_main
 
   # metabase:
   #   image: metabase/metabase:latest
