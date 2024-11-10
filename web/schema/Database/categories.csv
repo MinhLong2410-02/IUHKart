@@ -1,16 +1,26 @@
-name,category_id,slug,category_img_url
-Watches,136719,watches,https://iuhkart.blob.core.windows.net/category/watches
-Hair Extensions & Wigs,219886,hair-extensions-and-wigs,https://iuhkart.blob.core.windows.net/category/hair-extensions-and-wigs
-Weddings & Events,211754,weddings-and-events,https://iuhkart.blob.core.windows.net/category/weddings-and-events
-Mother & Kids,3785,mother-and-kids,https://iuhkart.blob.core.windows.net/category/mother-and-kids
-Lingerie & Loungewear,42074,lingerie-and-loungewear,https://iuhkart.blob.core.windows.net/category/lingerie-and-loungewear
-Jewelry & Accessories,120662,jewelry-and-accessories,https://iuhkart.blob.core.windows.net/category/jewelry-and-accessories
-Shoes,134473,shoes,https://iuhkart.blob.core.windows.net/category/shoes
-Special Occasion Costume,134497,special-occasion-costume,https://iuhkart.blob.core.windows.net/category/special-occasion-costume
-Phones & Telecommunications,136314,phones-and-telecommunications,https://iuhkart.blob.core.windows.net/category/phones-and-telecommunications
-Men's Clothing,42084,mens-clothing,https://iuhkart.blob.core.windows.net/category/mens-clothing
-Luggages & Bags,15,luggages-and-bags,https://iuhkart.blob.core.windows.net/category/luggages-and-bags
-Toys & Games,125610,toys-and-games,https://iuhkart.blob.core.windows.net/category/toys-and-games
-Women's Clothing,42090,womens-clothing,https://iuhkart.blob.core.windows.net/category/womens-clothing
-Accessories,137646,accessories,https://iuhkart.blob.core.windows.net/category/accessories
-Beauty & Health,128915,beauty-and-health,https://iuhkart.blob.core.windows.net/category/beauty-and-health
+,category_id,name,slug,category_img_url
+0,249,Home & Garden,home-garden,https://image.iuhkart.systems/images/home-garden.png?preview=true
+1,229,Home Appliances,home-appliances,https://image.iuhkart.systems/images/home-appliances.png?preview=true
+2,239,Women's Clothing,womens-clothing,https://image.iuhkart.systems/images/womens-clothing.png?preview=true
+3,232,Beauty & Health,beauty-health,https://image.iuhkart.systems/images/beauty-health.png?preview=true
+4,228,Mother & Kids,mother-kids,https://image.iuhkart.systems/images/mother-kids.png?preview=true
+5,233,Furniture,furniture,https://image.iuhkart.systems/images/furniture.png?preview=true
+6,241,Shoes,shoes,https://image.iuhkart.systems/images/shoes.png?preview=true
+7,245,Watches,watches,https://image.iuhkart.systems/images/watches.png?preview=true
+8,234,Luggages & Bags,luggages-bags,https://image.iuhkart.systems/images/luggages-bags.png?preview=true
+9,231,"Jewelry, Watches & Accessories",jewelry-watches-accessories,https://image.iuhkart.systems/images/jewelry-watches-accessories.png?preview=true
+10,248,Special Occasion Costume,special-occasion-costume,https://image.iuhkart.systems/images/special-occasion-costume.png?preview=true
+11,230,Weddings & Events,weddings-events,https://image.iuhkart.systems/images/weddings-events.png?preview=true
+12,235,Automotive & Motorcycle,automotive-motorcycle,https://image.iuhkart.systems/images/automotive-motorcycle.png?preview=true
+13,240,Men's Clothing,mens-clothing,https://image.iuhkart.systems/images/mens-clothing.png?preview=true
+14,243,Toys & Games,toys-games,https://image.iuhkart.systems/images/toys-games.png?preview=true
+15,244,Tools & Industrial,tools-industrial,https://image.iuhkart.systems/images/tools-industrial.png?preview=true
+16,237,Pet Supplies,pet-supplies,https://image.iuhkart.systems/images/pet-supplies.png?preview=true
+17,246,Security & Protection,security-protection,https://image.iuhkart.systems/images/security-protection.png?preview=true
+18,242,Sports & Entertainment,sports-entertainment,https://image.iuhkart.systems/images/sports-entertainment.png?preview=true
+19,238,"Computer, Office & Education",computer-office-education,https://image.iuhkart.systems/images/computer-office-education.png?preview=true
+20,247,Lingerie & Loungewear,lingerie-loungewear,https://image.iuhkart.systems/images/lingerie-loungewear.png?preview=true
+21,250,Consumer Electronics,consumer-electronics,https://image.iuhkart.systems/images/consumer-electronics.png?preview=true
+22,227,Home Improvement & Lighting,home-improvement-lighting,https://image.iuhkart.systems/images/home-improvement-lighting.png?preview=true
+23,236,Hair Extensions & Wigs,hair-extensions-wigs,https://image.iuhkart.systems/images/hair-extensions-wigs.png?preview=true
+24,226,Phones & Telecommunications,phones-telecommunications,https://image.iuhkart.systems/images/phones-telecommunications.png?preview=true
