@@ -6,69 +6,69 @@ networks:
 services:
     # cloudflare:
     #     image: cloudflare/cloudflared:latest
-    #     container_name: cloudflare
+    #     container_name: service-cloudflare
     #     restart: always
-    #     command: tunnel --no-autoupdate run --token eyJhIjoiYjEyNTc2NjEwYTQyYzVmM2JmZTZlZThhZjE1MjIwM2EiLCJ0IjoiMTM0NzM3ZDUtY2I5OC00NmExLTg2OTktZjdlZDc1YTI2MGNiIiwicyI6Ik9ESTNOMkU0TTJVdE1tVTVNeTAwTURKa0xUaGlNalV0WVdFMk1qa3paR1F6TjJRMSJ9
+    #     command: tunnel --no-autoupdate run --token ${CLOUDFLARE_TUNNEL_TOKEN}
     #     networks:
     #         - iuhkart-network
 
-    embedding:
-        platform: linux/amd64
-        container_name: embedding
-        image: qxnam/embedding-api:latest
-        environment:
-            - NVIDIA_VISIBLE_DEVICES="0"
-        ports:
-            - 8000:8000
-        networks:
-            - iuhkart-network
-        volumes:
-            - ./configs/embedding-app:/app
-        restart: always
-        # deploy:
-        #     resources:
-        #         reservations:
-        #             devices:
-        #                 - driver: nvidia
-        #                   count: all
-        #                   capabilities: [gpu]
-        healthcheck:
-            test: ["CMD", "curl", "-f", "http://embedding:8000/health"]
-            interval: 10s
-            timeout: 5s
-            retries: 3
+    # embedding:
+    #     platform: linux/amd64
+    #     container_name: embedding
+    #     image: qxnam/embedding-api:latest
+    #     environment:
+    #         - NVIDIA_VISIBLE_DEVICES="0"
+    #     ports:
+    #         - 8000:8000
+    #     networks:
+    #         - iuhkart-network
+    #     volumes:
+    #         - ./configs/embedding-app:/app
+    #     restart: always
+    #     # deploy:
+    #     #     resources:
+    #     #         reservations:
+    #     #             devices:
+    #     #                 - driver: nvidia
+    #     #                   count: all
+    #     #                   capabilities: [gpu]
+    #     healthcheck:
+    #         test: ["CMD", "curl", "-f", "http://embedding:8000/health"]
+    #         interval: 10s
+    #         timeout: 5s
+    #         retries: 3
     
-    superset:
-        platform: linux/amd64
-        build: ./configs/superset
-        container_name: superset
-        ports:
-            - 8088:8088
-        environment:
-            - SUPERSET_ENV=development
-            - SUPERSET_LOAD_EXAMPLES=yes
-            - SUPERSET_SECRET_KEY=your_secret_key
-            - DATABASE_URL=postgresql+psycopg2://superset:superset@db:5432/superset
-        volumes:
-            - ./data/superset_home:/var/lib/superset
-        depends_on:
-            - superset-db
-        networks:
-            - iuhkart-network
-        restart: always
+    # superset:
+    #     platform: linux/amd64
+    #     build: ./configs/superset
+    #     container_name: superset
+    #     ports:
+    #         - 8088:8088
+    #     environment:
+    #         - SUPERSET_ENV=development
+    #         - SUPERSET_LOAD_EXAMPLES=yes
+    #         - SUPERSET_SECRET_KEY=your_secret_key
+    #         - DATABASE_URL=postgresql+psycopg2://superset:superset@db:5432/superset
+    #     volumes:
+    #         - ./data/superset_home:/var/lib/superset
+    #     depends_on:
+    #         - superset-db
+    #     networks:
+    #         - iuhkart-network
+    #     restart: always
 
-    superset-db:
-        image: postgres:13
-        container_name: superset_db
-        environment:
-            POSTGRES_USER: superset
-            POSTGRES_PASSWORD: superset
-            POSTGRES_DB: superset
-        volumes:
-            - ./data/superset_pg_data:/var/lib/postgresql/data
-        networks:
-            - iuhkart-network
-        restart: always
+    # superset-db:
+    #     image: postgres:13
+    #     container_name: superset_db
+    #     environment:
+    #         POSTGRES_USER: superset
+    #         POSTGRES_PASSWORD: superset
+    #         POSTGRES_DB: superset
+    #     volumes:
+    #         - ./data/superset_pg_data:/var/lib/postgresql/data
+    #     networks:
+    #         - iuhkart-network
+    #     restart: always
 
     zookeeper:
         container_name: zookeeper
@@ -177,3 +177,41 @@ services:
         volumes:
             - ./configs/connector:/app
         restart: "no"
+    
+    flink-jobmanager:
+        container_name: flink-jobmanager
+        # build: flink-1.18.1
+        image: qxnam/flink-etl:latest
+        ports:
+            - "28081:8081"
+        environment:
+            - |
+                FLINK_PROPERTIES=
+                jobmanager.rpc.address: flink-jobmanager
+        command: jobmanager
+        depends_on:
+            kafka:
+                condition: service_healthy
+        networks:
+            - iuhkart-network
+        volumes:
+            - ./configs/flink-1.18.1/jobs:/opt/flink/jobs
+
+    flink-taskmanager:
+        container_name: flink-taskmanager
+        # build: flink-1.18.1
+        image: qxnam/flink-etl:latest
+        depends_on:
+            - flink-jobmanager
+        command: taskmanager
+        scale: 1
+        environment:
+            - |
+                FLINK_PROPERTIES=
+                jobmanager.rpc.address: flink-jobmanager
+                taskmanager.numberOfTaskSlots: 2
+        networks:
+            - iuhkart-network
+        volumes:
+            - ./configs/flink-1.18.1/jobs:/opt/flink/jobs
+

@@ -1,0 +1,6 @@
+id,password,last_login,email,is_customer,is_vendor,address_id
+1,pbkdf2_sha256$720000$Prk8ZTsPz9obEA9ubF3Io5$6Swh9AhSWwlS292u0ckyjXj3OphwvL1v3KC/sP2Dv98=,,minhlong2002@gmail.com,False,True,
+2,pbkdf2_sha256$720000$PvFkkV8iIdXLhqJUdn4tBh$/Xq6Si8bEi6YHO9u8s5LKTIfyZUfHH1QNsy4dpLNvqo=,,vanhau20022018@gmail.com,True,False,1.0
+3,pbkdf2_sha256$720000$rmGTqG0MnSHmovv2N5RcdY$8Pq2mtZcI5qtByaESU/6DIDmljChnnU6ShC202fZdgk=,,quachnam311@gmail.com,False,True,
+4,pbkdf2_sha256$720000$dfSaP4CSOqEsNYfBQJm7rV$l2yujryk/JttJSpx+2yUE8H/5omltOU4lThcQ+yOjTc=,,nguyenvannam14056969@gmail.com,True,False,2.0
+5,pbkdf2_sha256$720000$cRJcpO2U8Kc0zEj52GwXF6$M/HCkvj7phoqFA7b3kI7PFdVfydOdIf2mCI5bdkSlvU=,,nhanvi212@gmail.com,True,False,3.0

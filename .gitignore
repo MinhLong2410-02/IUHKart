@@ -199,3 +199,5 @@ yarn-error.log*
 
 # Log files
 *.log
+
+databases/data

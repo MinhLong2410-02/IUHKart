@@ -1,0 +1,4 @@
+id,phone,fullname,date_of_birth,age,avatar_url,date_join,recommend_product_ids,cart_id,user_id
+1,0987654321,Văn Hậu,2002-02-20,22,,2024-11-08,[],1,2
+2,0987654322,Nguyễn VNam,2003-07-31,21,,2024-11-08,[],2,4
+3,0987654324,Lưu Lương Vi Nhân,2002-03-20,22,,2024-11-08,[],3,5

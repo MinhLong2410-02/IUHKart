@@ -72,19 +72,6 @@ services:
     depends_on:
       - django_main
 
-  # metabase:
-  #   image: metabase/metabase:latest
-  #   container_name: metabase
-  #   ports:
-  #     - "3000:3000"
-  #   networks:
-  #     - iuhkart-network
-  #   volumes:
-  #     - ./services/metabase-data:/metabase-data
-  #   environment:
-  #     - MB_DB_FILE=/metabase-data/metabase.db
-  #   restart: unless-stopped
-
   django_main:
     build: ./iuhkart
     ports:
@@ -139,25 +126,10 @@ services:
     volumes:
       - ./services/recsys:/app
     restart: unless-stopped
-
-  # etl_data_warehouse:
-  #   build: ./warehouse
-  #   env_file:
-  #     - ./warehouse/.env
-  #   volumes:
-  #     - ./warehouse:/app
-  #   restart: unless-stopped
-  #   depends_on:
-  #     - mongo_db
-  #     - iuhkart-redis
-  #     - django_main
-  #   networks:
-  #     - iuhkart-network
   
 networks:
   iuhkart-network:
-    # name: iuhkart
-    driver: bridge
+    name: iuhkart-network
     external: true
 
 volumes:

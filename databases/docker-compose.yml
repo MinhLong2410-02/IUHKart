@@ -4,6 +4,16 @@ networks:
         external: true
 
 services:
+    cloudflare:
+        image: cloudflare/cloudflared:latest
+        container_name: database-cloudflare
+        restart: always
+        command: tunnel --no-autoupdate run --token ${CLOUDFLARE_TUNNEL_TOKEN}
+        networks:
+            - iuhkart-network
+        depends_on:
+            - minio
+
     postgres-database:
         image: postgres:17.0
         container_name: postgres-database
@@ -92,3 +102,33 @@ services:
             timeout: 5s
             retries: 5
 
+    minio:
+        image: minio/minio:latest
+        container_name: minio
+        restart: unless-stopped
+        ports:
+            - "29000:9000"
+            - "9001:9001"
+        environment:
+        MINIO_ROOT_USER: "${MINIO_ROOT_USER}"
+        MINIO_ROOT_PASSWORD: "${MINIO_ROOT_PASSWORD}"
+        volumes:
+            - ./data/.minio.sys:/data/.minio.sys
+        command: server /data --console-address ":9001"
+
+    mc:
+        image: minio/mc:latest
+        container_name: minio-mc
+        depends_on:
+            - minio
+        environment:
+            MINIO_ROOT_USER: "${MINIO_ROOT_USER}"
+            MINIO_ROOT_PASSWORD: "${MINIO_ROOT_PASSWORD}"
+        entrypoint: >
+            /bin/sh -c "
+            while ! nc -z minio 9000; do sleep 1; done;
+            mc alias set myminio http://minio:9000 $MINIO_ROOT_USER $MINIO_ROOT_PASSWORD;
+            mc mb myminio/my-bucket;
+            mc policy set public myminio/my-bucket;
+            "
+    
