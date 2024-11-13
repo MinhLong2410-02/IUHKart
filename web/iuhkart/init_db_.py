@@ -188,17 +188,12 @@ def assign_is_main(group):
 def insert_product_image():
     try:
         df = pd.read_csv(path['product_image_main'])
-        # process
-        # df.drop_duplicates(subset=['product_img_id', 'product_id'], inplace=True)
-        # df = df.groupby('product_id', group_keys=False).apply(assign_is_main)
         df.columns = ['product_image_id', 'product_id', 'image_url', 'is_main']
-        # df.to_csv('../schema/Database/product_images_main.csv', index=False)
-        # convert to dict
         df = df.to_dict('records')
         product_cache = {x.product_id: x for x in Product.objects.all()}
 
         model_objs = [ProductImages(
-            product_image_id=rc['product_image_id'],
+            # product_image_id=rc['product_image_id'],
             product_id=product_cache[rc['product_id']],
             image_url=rc['image_url'].split('product/')[-1],
             is_main=rc['is_main']
