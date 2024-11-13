@@ -70,7 +70,7 @@ path = {
     'product_discount': '../schema/Database/product_discount.csv',
     'order_products': '../schema/Database/order_products.csv',
     'orders': '../schema/Database/orders.csv',
-    'review': '../schema/Database/review.csv'
+    'review': '../schema/Database/reviews.csv'
 }
 
 ########################

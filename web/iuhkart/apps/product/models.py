@@ -22,7 +22,7 @@ class Product(models.Model):
 
     product_name = models.CharField(max_length=255)
     product_description = models.TextField()
-    original_price = models.DecimalField(max_digits=10, decimal_places=2)
+    original_price = models.DecimalField(max_digits=12, decimal_places=2)
     stock = models.PositiveIntegerField()
     brand = models.CharField(max_length=255)
     slug = AutoSlugField(max_length=255, populate_from='product_name')

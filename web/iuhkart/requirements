@@ -13,3 +13,4 @@ django-cors-headers
 drf-spectacular
 django-storages
 qdrant_client
+tqdm

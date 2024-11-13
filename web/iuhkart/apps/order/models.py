@@ -19,11 +19,11 @@ class Order(models.Model):
     shipping_date = models.DateField(default=default_shipping_date)
     order_date = models.DateField(default=now)
     order_status = models.CharField(max_length=50, choices=ORDER_STATUS_CHOICES, default='pending', db_index=True)
-    order_total = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    order_total = models.DecimalField(max_digits=12, decimal_places=2, default=0.00)
     customer = models.ForeignKey('account.Customer', on_delete=models.CASCADE, db_column='customer_id')
     # products = models.ManyToManyField('product.Product', through='OrderProduct')
     address = models.OneToOneField('address.Address', on_delete=models.CASCADE, db_column='address_id', null=True, blank=True)
-    total_price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    total_price = models.DecimalField(max_digits=12, decimal_places=2, default=0.00)
 
     class Meta:
         ordering = ['-order_date']
@@ -37,7 +37,7 @@ class OrderProduct(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, db_column='order_id')
     product = models.ForeignKey('product.Product', on_delete=models.CASCADE, db_column='product_id')
     quantity = models.IntegerField()
-    price = models.DecimalField(max_digits=10, decimal_places=2)
+    price = models.DecimalField(max_digits=12, decimal_places=2)
 
     class Meta:
         db_table = 'order_products'
@@ -55,7 +55,7 @@ class Transaction(models.Model):
     transaction_id = models.AutoField(primary_key=True)
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='payments')
     transation_date = models.DateTimeField(default=now)
-    total_money = models.DecimalField(max_digits=10, decimal_places=2)
+    total_money = models.DecimalField(max_digits=12, decimal_places=2)
     status = models.CharField(max_length=50, choices=TRANSACTION_STATUS_CHOICES, default='pending')
     customer = models.ForeignKey('account.Customer', on_delete=models.CASCADE, db_column='customer_id')
     
