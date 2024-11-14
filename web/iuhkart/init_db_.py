@@ -5,8 +5,8 @@ from apps.product.models import Category, Product, ProductImages
 from apps.account.models import Vendor, Customer, User
 from apps.address.models import Province, District, Ward, Address
 from apps.cart.models import Cart
-from apps.discount.models import Discount
-from apps.order.models import OrderProduct, Order
+from apps.discount.models import Discount, OrderProductDiscount
+from apps.order.models import OrderProduct, Order, Transaction
 from apps.review.models import Review
 
 import pandas as pd
@@ -70,7 +70,8 @@ path = {
     'product_discount': '../schema/Database/product_discount.csv',
     'order_products': '../schema/Database/order_products.csv',
     'orders': '../schema/Database/orders.csv',
-    'review': '../schema/Database/reviews.csv'
+    'review': '../schema/Database/reviews.csv',
+    'transaction': '../schema/Database/transactions.csv',
 }
 
 ########################
@@ -207,7 +208,7 @@ insert_address()
 insert_category()
 
 ########################
-# user - vendor - customer - address
+# user - Shop - customer - address
 ########################
 def create_address(province_id, district_id, ward_id, address_detail):
     province = Province.objects.get(province_id=province_id)
@@ -264,6 +265,7 @@ def create_customer_with_jwt(email, password, fullname, phone, date_of_birth, ad
     
     return user, customer, access_token, refresh_token
 
+##--------------------- Shop 
 user1, vendor1, token1, refresh1 = create_vendor_with_jwt(
     email='minhlong2002@gmail.com',
     password='123',  # Pass the plain password
@@ -273,8 +275,18 @@ user1, vendor1, token1, refresh1 = create_vendor_with_jwt(
 )
 print(f'✅ Vendor: {user1.email}, Access Token: {token1}, Refresh Token: {refresh1}')
 
-address = create_address(79, 764, 26899, '13/1 Phường 11, đường Nguyễn Văn Hậu, quận Gò Vấp, TP.HCM')
-user2, customer2, token2, refresh2 = create_customer_with_jwt(
+user2, vendor2, token2, refresh2 = create_vendor_with_jwt(
+    email='quachnam311@gmail.com',
+    password='123',  # Pass the plain password
+    name='Qx Nam',
+    phone='0398089311',
+    description='This is a description for Vendor Three.'
+)
+print(f'✅ Vendor: {user2.email}, Access Token: {token2}, Refresh Token: {refresh2}')
+
+##--------------------- Customer
+address = create_address(79, 764, 26899, '12 Nguyễn Văn Bảo, Phường 4, quận Gò Vấp, TP.HCM')
+user3, customer3, token3, refresh3 = create_customer_with_jwt(
     email='vanhau20022018@gmail.com',
     password='123',  # Pass the plain password
     fullname='Văn Hậu',
@@ -282,22 +294,13 @@ user2, customer2, token2, refresh2 = create_customer_with_jwt(
     date_of_birth='2002-02-20',
     address=address
 )
-print(f'✅ Customer: {user2.email}, Access Token: {token2}, Refresh Token: {refresh2}')
+print(f'✅ Customer: {user3.email}, Access Token: {token3}, Refresh Token: {refresh3}')
 
-user3, vendor3, token3, refresh3 = create_vendor_with_jwt(
-    email='quachnam311@gmail.com',
-    password='123',  # Pass the plain password
-    name='Qx Nam',
-    phone='0398089311',
-    description='This is a description for Vendor Three.'
-)
-print(f'✅ Vendor: {user3.email}, Access Token: {token3}, Refresh Token: {refresh3}')
-
-address = create_address(79, 764, 26881, '69/96 Phường 12, đường Lê Thành Nghĩa, quận Gò Vấp, TP.HCM')
+address = create_address(79, 764, 26881, '273/34/1 Nguyễn Văn Đậu, Phường 11, Bình Thạnh, TP.HCM')
 user4, customer4, token4, refresh4 = create_customer_with_jwt(
-    email='nguyenvannam14056969@gmail.com',
+    email='lamthanhthanh@gmail.com',
     password='123',  # Pass the plain password
-    fullname='Nguyễn VNam',
+    fullname='Lê Thành Nghĩa',
     phone='0987654322',
     date_of_birth='2003-07-31',
     address=address
@@ -305,8 +308,7 @@ user4, customer4, token4, refresh4 = create_customer_with_jwt(
 )
 print(f'✅ Customer: {user4.email}, Access Token: {token4}, Refresh Token: {refresh4}')
 
-
-address = create_address(79, 764, 26898, '69/96 Phường 79, đường Nhân Vi, quận Gò Vấp, TP.HCM')
+address = create_address(79, 764, 26898, '185b Nguyễn Oanh, Phường 10, Gò Vấp, Hồ Chí Minh')
 user5, customer5, token5, refresh5 = create_customer_with_jwt(
     email='nhanvi212@gmail.com',
     password='123',  # Pass the plain password
@@ -318,10 +320,22 @@ user5, customer5, token5, refresh5 = create_customer_with_jwt(
 )
 print(f'✅ Customer: {user5.email}, Access Token: {token5}, Refresh Token: {refresh5}')
 
-address = create_address(79, 764, 26898, '69/96 Phường 79, đường Nhân Vi, quận Gò Vấp, TP.HCM')
+address = create_address(79, 764, 26898, '190 Đ. Quang Trung, Phường 10, Gò Vấp, Hồ Chí Minh')
+user6, customer6, token6, refresh6 = create_customer_with_jwt(
+    email='hungcao@gmail.com',
+    password='123',  # Pass the plain password
+    fullname='Cao Nguyễn Gia Hưng',
+    phone='0987654324',
+    date_of_birth='2002-03-20',
+    address=address
+    
+)
+print(f'✅ Customer: {user6.email}, Access Token: {token6}, Refresh Token: {refresh6}')
+
 print(f'✅ Create a fake address acount with address_id: {address.address_id}')
 insert_product()
 insert_product_image()
+#---------------------
 
 # order
 def create_discount():
@@ -332,55 +346,78 @@ def create_discount():
         df = df.to_dict('records')
         model_objs = [Discount(
             discount_id=rc['discount_id'],
-            product=product_cache[rc['product_id']],
+            # product=product_cache[rc['product_id']],
             name=rc['name'],
             discount_percent=rc['discount_percent'],
-            start_date=rc['start_date'],
-            end_date=rc['end_date'],
-            vendor = Product.objects.get(product_id=rc['product_id']).created_by
+            # start_date=rc['start_date'],
+            # end_date=rc['end_date'],
+            # vendor = Product.objects.get(product_id=rc['product_id']).created_by
         ) for rc in df]
         Discount.objects.bulk_create(model_objs)
         print(f'✅ {Discount.__name__}')
     except Exception as e:
         print(f'❌ {Discount.__name__} - {e}')
 
-# def create_product_discount():
-#     try:
-#         df = pd.read_csv(path['product_discount'])
-#         # convert to dict
-#         discount_cache = {x.discount_id: x for x in Discount.objects.all()}
-#         product_cache = {x.product_id: x for x in Product.objects.all()}
-#         df = df.to_dict('records')
-#         model_objs = [ProductDiscount(
-#             product_discount_id=rc['product_discount_id'],
-#             product=product_cache[rc['product_id']],
-#             discount=discount_cache[rc['discount_id']],
-#             start_date=rc['start_date'],
-#             end_date=rc['end_date']
-#         ) for rc in df]
-#         ProductDiscount.objects.bulk_create(model_objs)
-#         print(f'✅ {ProductDiscount.__name__}')
-#     except Exception as e:
-#         print(f'❌ {ProductDiscount.__name__} - {e}')
+def create_product_discount():
+    try:
+        df = pd.read_csv(path['product_discount'])
+        # convert to dict
+        discount_cache = {x.discount_id: x for x in Discount.objects.all()}
+        product_cache = {x.product_id: x for x in Product.objects.all()}
+        df = df.to_dict('records')
+        model_objs = [OrderProductDiscount(
+            product_discount_id=rc['product_discount_id'],
+            product=product_cache[rc['product_id']],
+            discount=discount_cache[rc['discount_id']],
+            start_date=rc['start_date'],
+            end_date=rc['end_date']
+        ) for rc in df]
+        OrderProductDiscount.objects.bulk_create(model_objs)
+        print(f'✅ {OrderProductDiscount.__name__}')
+    except Exception as e:
+        print(f'❌ {OrderProductDiscount.__name__} - {e}')
 
 create_discount()
-# create_product_discount()
+create_product_discount()
+
+def create_review():
+    try:
+        df = pd.read_csv(path['review'])
+        # convert to dict
+        customer_cache = {x.id: x for x in Customer.objects.all()}
+        product_cache = {x.product_id: x for x in Product.objects.all()}
+        df = df.to_dict('records')
+        model_objs = [Review(
+            review_id = rc['review_id'],
+            product_id = product_cache[rc['product_id']],
+            customer_id = customer_cache[rc['customer_id']],
+            review_rating = rc['review_rating'],
+            review_date = rc['review_date'],
+            review_content = rc['review_content']
+        ) for rc in df]
+        Review.objects.bulk_create(model_objs)
+        print(f'✅ {Review.__name__}')
+    except Exception as e:
+        print(f'❌ {Review.__name__} - {e}')
+
+create_review()
 
 def create_order():
     try:
         df = pd.read_csv(path['orders'])
         # convert to dict
         customer_cache = {x.id: x for x in Customer.objects.all()}
-        # address_cache = {x.address_id: x for x in Address.objects.all()}
+        address_cache = {x.address_id: x for x in Address.objects.all()}
         df = df.to_dict('records')
         model_objs = [Order(
-            # order_id = rc['order_id'],
+            order_id = rc['order_id'],
             order_number = rc['order_number'],
             shipping_date = rc['shipping_date'],
             order_date = rc['order_date'],
             order_status = rc['order_status'],
             order_total = rc['total_price'],
             customer = customer_cache[rc['customer_id']],
+            address = address_cache[rc['address_id']]
         ) for rc in df]
         Order.objects.bulk_create(model_objs)
         print(f'✅ {Order.__name__}')
@@ -409,71 +446,72 @@ def create_order_product():
 create_order()
 create_order_product()
 
-def create_review():
+
+def create_transaction():
     try:
-        df = pd.read_csv(path['review'])
+        df = pd.read_csv(path['orders'])
         # convert to dict
         customer_cache = {x.id: x for x in Customer.objects.all()}
-        product_cache = {x.product_id: x for x in Product.objects.all()}
         df = df.to_dict('records')
-        model_objs = [Review(
-            # review_id = rc['review_id'],
-            product=product_cache[rc['product_id']],
-            customer = customer_cache[rc['customer_id']],
-            review_rating = rc['review_rating'],
-            review_date = rc['review_date'],
-            review_content = rc['review_content']
+        model_objs = [Transaction(
+            transaction_id = rc['order_id'],
+            order = Order.objects.get(order_id=rc['order_id']),
+            transation_date = rc['order_date'],
+            total_money = rc['total_price'],
+            status = 'completed',
+            customer = customer_cache[rc['customer_id']]
         ) for rc in df]
-        Review.objects.bulk_create(model_objs)
-        print(f'✅ {Review.__name__}')
+        Transaction.objects.bulk_create(model_objs)
+        print(f'✅ {Transaction.__name__}')
     except Exception as e:
-        print(f'❌ {Review.__name__} - {e}')
+        print(f'❌ {Transaction.__name__} - {e}')
 
-create_review()
+create_transaction()
+
 
 ## vector database
-from qdrant_client import QdrantClient, models
-from qdrant_client.http.models import Distance, VectorParams, PointStruct
-import os, requests
-from dotenv import load_dotenv
-from uuid import uuid4
-TEXT_EMBEDDING_URL = os.getenv('TEXT_EMBEDDING_URL')
-HOST = os.getenv('HOST')
+# from qdrant_client import QdrantClient, models
+# from qdrant_client.http.models import Distance, VectorParams, PointStruct
+# import os, requests
+# from dotenv import load_dotenv
+# from uuid import uuid4
+# TEXT_EMBEDDING_URL = os.getenv('TEXT_EMBEDDING_URL')
+# HOST = os.getenv('HOST')
 
-def getTextEmbedding(text: str):
-    response = requests.get(TEXT_EMBEDDING_URL + text)
-    vector = response.json()['embedding'] if response.status_code == 200 else None
-    return vector
+# def getTextEmbedding(text: str):
+#     response = requests.get(TEXT_EMBEDDING_URL + text)
+#     vector = response.json()['embedding'] if response.status_code == 200 else None
+#     return vector
 
-def init_qdrant():
-    collection_name='product'
-    client = QdrantClient(host=HOST, port=6333)
-    if collection_name in [c.name for c in client.get_collections().collections]:
-        client.delete_collection(collection_name=collection_name)
-    client.create_collection(collection_name=collection_name, vectors_config=VectorParams(size=384, distance=Distance.COSINE))
+# def init_qdrant():
+#     collection_name='product'
+#     client = QdrantClient(host=HOST, port=6333)
+#     if collection_name in [c.name for c in client.get_collections().collections]:
+#         client.delete_collection(collection_name=collection_name)
+#     client.create_collection(collection_name=collection_name, vectors_config=VectorParams(size=384, distance=Distance.COSINE))
     
-    df = pd.read_csv('../schema/Database/products.csv')
-    product_image_df = pd.read_csv('../schema/Database/product_images_main.csv')
-    df = df[['product_id', 'product_name', 'slug']]
-    loop = tqdm(df.iterrows(), total=df.shape[0], desc='Insert to qdrantDB', colour='green')
-    for _, iter in loop:
-        product_image = product_image_df[(product_image_df['product_id']==iter['product_id']) & (product_image_df['is_main']==True)]
-        if product_image.shape[0] == 0:
-            continue
-        image_url = product_image['image_url'].values[0]
-        vector = getTextEmbedding(iter['slug'])
-        payload = {
-            'product_id': iter['product_id'],
-            'product_name': f"{iter['product_name']}",
-            'product_image_url': image_url
-        }
+#     df = pd.read_csv('../schema/Database/products.csv')
+#     product_image_df = pd.read_csv('../schema/Database/product_images_main.csv')
+#     df = df[['product_id', 'product_name', 'slug']]
+#     loop = tqdm(df.iterrows(), total=df.shape[0], desc='Insert to qdrantDB', colour='green')
+#     for _, iter in loop:
+#         product_image = product_image_df[(product_image_df['product_id']==iter['product_id']) & (product_image_df['is_main']==True)]
+#         if product_image.shape[0] == 0:
+#             continue
+#         image_url = product_image['image_url'].values[0]
+#         vector = getTextEmbedding(iter['slug'])
+#         payload = {
+#             'product_id': iter['product_id'],
+#             'product_name': f"{iter['product_name']}",
+#             'product_image_url': image_url
+#         }
 
-        if vector is None:
-            continue
-        point = PointStruct(id=str(uuid4()),
-                    vector=vector,
-                    payload=payload
-        )
-        client.upsert(collection_name=collection_name, points=[point])
+#         if vector is None:
+#             continue
+#         point = PointStruct(id=str(uuid4()),
+#                     vector=vector,
+#                     payload=payload
+#         )
+#         client.upsert(collection_name=collection_name, points=[point])
 
 # init_qdrant()
