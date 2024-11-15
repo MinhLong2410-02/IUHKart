@@ -18,7 +18,7 @@ ENV JAVA_HOME=/usr/lib/jvm/java-21-openjdk-arm64
 
 WORKDIR /opt/flink
 COPY requirements.txt .
-RUN pip install -r requirements.txt
+RUN pip install --upgrade pip && pip install -r requirements.txt
 
 COPY download_libs.sh .
 RUN chmod +x ./download_libs.sh && ./download_libs.sh

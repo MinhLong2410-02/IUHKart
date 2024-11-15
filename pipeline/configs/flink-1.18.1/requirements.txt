@@ -3,3 +3,5 @@ apache-flink-libraries==1.18.1
 clickhouse-connect
 python-dotenv
 psycopg2-binary
+wheel
+googletrans
