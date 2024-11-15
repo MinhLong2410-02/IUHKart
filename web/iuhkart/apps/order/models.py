@@ -22,8 +22,8 @@ class Order(models.Model):
     order_total = models.DecimalField(max_digits=12, decimal_places=2, default=0.00)
     customer = models.ForeignKey('account.Customer', on_delete=models.CASCADE, db_column='customer_id')
     # products = models.ManyToManyField('product.Product', through='OrderProduct')
-    address = models.OneToOneField('address.Address', on_delete=models.CASCADE, db_column='address_id', null=True, blank=True)
-    total_price = models.DecimalField(max_digits=12, decimal_places=2, default=0.00)
+    address = models.ForeignKey('address.Address', on_delete=models.CASCADE, db_column='address_id', null=True, blank=True)
+    # total_price = models.DecimalField(max_digits=12, decimal_places=2, default=0.00)
 
     class Meta:
         ordering = ['-order_date']
@@ -42,7 +42,7 @@ class OrderProduct(models.Model):
     class Meta:
         db_table = 'order_products'
         ordering = ['-order_id']
-        unique_together = (('order', 'product'),)
+        # unique_together = (('order', 'product'),)
 
 class Transaction(models.Model):
     TRANSACTION_STATUS_CHOICES = [
