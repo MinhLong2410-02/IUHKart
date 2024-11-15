@@ -105,7 +105,6 @@ const ProductGrid = () => {
 
   const renderGridProduct = useMemo(() => {
     const listProduct = productDataSet?.results || [];
-
     return (
       <>
         {isLoading ? (
