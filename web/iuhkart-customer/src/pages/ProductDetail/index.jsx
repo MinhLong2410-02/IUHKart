@@ -113,7 +113,7 @@ const ProductDetail = () => {
               <Text
                 as="b"
                 fontSize="xl"
-              >{`${product?.original_price} USD`}</Text>
+              >{`${product?.original_price} VND`}</Text>
 
               <Box>
                 <Button

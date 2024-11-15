@@ -81,7 +81,7 @@ const Cart = () => {
                   <Heading as="h4" size="md" noOfLines={2}>
                     {productName}
                   </Heading>
-                  <Text fontSize="lg">{`${productPrice} USD`}</Text>
+                  <Text fontSize="lg">{`${productPrice} VND`}</Text>
                 </Stack>
                 <Stack justifyContent="center" paddingX={2}>
                   <NumberInput defaultValue={product?.quantity} min={1}>
@@ -134,7 +134,7 @@ const Cart = () => {
                     <Box>
                       <Flex gap={10} justifyContent="space-between">
                         <Text whiteSpace="nowrap">{`Subtotal (${cart["items_total"]} items)`}</Text>
-                        <Text whiteSpace="nowrap">{`${cart["grand_total"]} USD`}</Text>
+                        <Text whiteSpace="nowrap">{`${cart["grand_total"]} VND`}</Text>
                       </Flex>
                     </Box>
                     <Divider marginY="10px" orientation="horizontal" />
@@ -146,7 +146,7 @@ const Cart = () => {
                         <Text
                           whiteSpace="nowrap"
                           fontWeight={600}
-                        >{`${cart["grand_total"]} USD`}</Text>
+                        >{`${cart["grand_total"]} VND`}</Text>
                       </Flex>
                     </Box>
                   </Box>
