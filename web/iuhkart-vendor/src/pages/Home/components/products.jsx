@@ -42,12 +42,12 @@ export const Products = () => {
             <h2
                 className="text-[30px] font-bold text-[#333] mt-[20px] mb-4 pb-[20px] border-b-2 border-black"
             >
-                Manage Products
+                Quản lý sản phẩm
             </h2>
             <div className="!p-4 boxPrimary min-h-[80vh]">
                 <div className="">
                     <div className="flex justify-between items-center">
-                        <h3 className="text-[18px] font-bold text-[#333]">Products: {productsData?.count}</h3>
+                        <h3 className="text-[18px] font-bold text-[#333]">Tổng số lượng sản phẩm: {productsData?.count}</h3>
                     </div>
                     <div className="mt-5">
                         <table className="w-full min-w-max table-auto shadow-md bg-white">

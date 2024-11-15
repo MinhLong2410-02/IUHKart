@@ -44,10 +44,8 @@ const SidebarContent = ({ onClose, ...rest }) => {
     const navigate = useNavigate();
 
     const handleLogout = () => {
-        // Clear authentication tokens
-        Cookies.remove('authorization'); // If using cookies
-        localStorage.removeItem('authorization'); // If using local storage
-        // Redirect to login page
+        Cookies.remove('authorization'); 
+        localStorage.removeItem('authorization'); 
         navigate('/login');
     };
 
@@ -60,6 +58,8 @@ const SidebarContent = ({ onClose, ...rest }) => {
             w={{ base: 'full', md: 60 }}
             pos="fixed"
             h="80%"
+            mt="20px"  
+            pt="20px"
             {...rest}>
             <Flex h="20" alignItems="center" mx="8" justifyContent="space-between">
                 <Text fontSize="2xl" fontFamily="monospace" fontWeight="bold">
