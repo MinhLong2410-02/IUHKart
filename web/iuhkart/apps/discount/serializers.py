@@ -5,7 +5,7 @@ from datetime import date
 class DiscountSerializer(serializers.ModelSerializer):
     class Meta:
         model = Discount
-        fields = ['discount_id', 'vendor', 'product', 'name', 'discount_percent', 'start_date', 'end_date', 'in_use', 'date_created']
+        fields = ['discount_id', 'name', 'discount_percent']
         read_only_fields = ['date_created']
 
     def validate(self, data):
