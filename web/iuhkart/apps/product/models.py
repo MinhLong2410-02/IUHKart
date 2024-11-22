@@ -18,8 +18,7 @@ class Category(models.Model):
         ordering = ['-category_id']
 
 class Product(models.Model):
-    product_id = models.AutoField(primary_key=True)
-
+    product_id = models.AutoField(primary_key=True, db_column='product_id')
     product_name = models.CharField(max_length=255)
     product_description = models.TextField()
     original_price = models.DecimalField(max_digits=12, decimal_places=2)
