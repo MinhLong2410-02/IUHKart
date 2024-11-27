@@ -4,15 +4,13 @@ networks:
         external: true
 
 services:
-    cloudflare:
-        image: cloudflare/cloudflared:latest
-        container_name: database-cloudflare
-        restart: always
-        command: tunnel --no-autoupdate run --token ${CLOUDFLARE_TUNNEL_TOKEN}
-        networks:
-            - iuhkart-network
-        depends_on:
-            - minio
+    # cloudflare:
+    #     image: cloudflare/cloudflared:latest
+    #     container_name: database-cloudflare
+    #     restart: always
+    #     command: tunnel --no-autoupdate run --token ${CLOUDFLARE_TUNNEL_TOKEN}
+    #     networks:
+    #         - iuhkart-network
 
     postgres-database:
         image: postgres:17.0
@@ -26,7 +24,6 @@ services:
             - 5432:5432
         volumes:
             - ./data/postgres-data:/data/postgres
-            - ./configs/postgres/create_tables.sql:/docker-entrypoint-initdb.d/create_tables.sql:ro
         networks:
             - iuhkart-network
         restart: always
@@ -36,30 +33,21 @@ services:
             timeout: 5s
             retries: 5
 
-    # chưa tạo được replSet để connect debezium
-    # mongodb:
-    #     container_name: mongodb
-    #     image: mongo:7.0.2
-    #     restart: always
-    #     ports:
-    #         - 27017:27017
-    #     environment:
-    #         MONGO_INITDB_ROOT_USERNAME: iuhkart
-    #         MONGO_INITDB_ROOT_PASSWORD: iuhkartpassword
-    #         MONGO_INITDB_DATABASE: mydb
-    #     command: ["--replSet", "rs0", "--bind_ip_all", "--port", "27017"]
-    #     networks:
-    #         - iuhkart-network
-    #     volumes:
-    #         - ./configs/mongo/mongo_init.js:/docker-entrypoint-initdb.d/mongo_init.js:ro
-    #         - ./data/mongo-data:/data/db
-    #         # - ./configs/mongo-key:/etc/mongo/mongo-key:ro
-    #         # - ./configs/mongo-config:/data/configdb
-    #     healthcheck:
-    #         test: echo "try { rs.status() } catch (err) { rs.initiate({_id:'rs0',members:[{_id:0,host:'mongodb:27017'}]}) }" | mongosh --port 27017 --quiet
-    #         interval: 10s
-    #         timeout: 5s
-    #         retries: 5
+    mongodb:
+        image: mongo:7.0.2
+        restart: always
+        container_name: mongodb
+        ports:
+            - 27017:27017
+        # environment:
+        #     MONGO_INITDB_ROOT_USERNAME: iuhkart
+        #     MONGO_INITDB_ROOT_PASSWORD: iuhkartpassword
+        #     MONGO_INITDB_DATABASE: e-commerce
+        command: ["--replSet", "rs0", "--bind_ip_all"]
+        networks:
+            - iuhkart-network
+        volumes:
+            - ./data/mongo-data:/data/db
 
     qdrant:
         container_name: qdrant
@@ -108,27 +96,13 @@ services:
         restart: unless-stopped
         ports:
             - "29000:9000"
-            - "9001:9001"
-        environment:
-        MINIO_ROOT_USER: "${MINIO_ROOT_USER}"
-        MINIO_ROOT_PASSWORD: "${MINIO_ROOT_PASSWORD}"
-        volumes:
-            - ./data/.minio.sys:/data/.minio.sys
-        command: server /data --console-address ":9001"
-
-    mc:
-        image: minio/mc:latest
-        container_name: minio-mc
-        depends_on:
-            - minio
+            - "29001:9001"
         environment:
             MINIO_ROOT_USER: "${MINIO_ROOT_USER}"
             MINIO_ROOT_PASSWORD: "${MINIO_ROOT_PASSWORD}"
-        entrypoint: >
-            /bin/sh -c "
-            while ! nc -z minio 9000; do sleep 1; done;
-            mc alias set myminio http://minio:9000 $MINIO_ROOT_USER $MINIO_ROOT_PASSWORD;
-            mc mb myminio/my-bucket;
-            mc policy set public myminio/my-bucket;
-            "
-    
+        networks:
+            - iuhkart-network
+        volumes:
+            - ./data/minio:/data
+        command: server /data --console-address ":9001"
+
