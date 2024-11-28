@@ -20,14 +20,6 @@ x-common:
     - iuhkart-network
 
 services:
-    cloudflare:
-        image: cloudflare/cloudflared:latest
-        container_name: cloudflare
-        restart: always
-        command: tunnel --no-autoupdate run --token ${CLOUDFLARE_TUNNEL_TOKEN}
-        networks:
-            - iuhkart-network
-
     embedding:
         container_name: embedding
         image: qxnam/embedding-api:latest
@@ -233,6 +225,7 @@ services:
             SERVER_PORT: 8081
         networks:
             - iuhkart-network
+        restart: always
 
     debezium-postgres:
         container_name: debezium-postgres
@@ -306,7 +299,7 @@ services:
     flink-jobmanager:
         container_name: flink-jobmanager
         # build: configs/flink-1.18.1
-        image: flink-etl:latest
+        image: qxnam/flink-etl:latest
         ports:
             - "28081:8081"
         environment:
@@ -320,12 +313,13 @@ services:
         networks:
             - iuhkart-network
         volumes:
-            - ./configs/flink-1.18.1/jobs:/opt/flink/jobs
+            - ./jobs:/opt/flink/jobs
+        restart: always
 
     flink-taskmanager:
         container_name: flink-taskmanager
         # build: configs/flink-1.18.1
-        image: flink-etl:latest
+        image: qxnam/flink-etl:latest
         depends_on:
             - flink-jobmanager
         command: taskmanager
@@ -338,5 +332,6 @@ services:
         networks:
             - iuhkart-network
         volumes:
-            - ./configs/flink-1.18.1/jobs:/opt/flink/jobs
+            - ./jobs:/opt/flink/jobs
+        restart: always
 

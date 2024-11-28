@@ -6,16 +6,17 @@ docker network create iuhkart-network
 ```
 
 # Các database bao gồm:
-`docker-compose-databases.yml`
+`docker-compose.yml`
 
 Khởi động các database chính:
 ```bash
-docker compose -f docker-compose-databases.yml up -d
+docker compose -f docker-compose.yml up -d
 ```
 
 Thông tin kết nối:
 **server**
-- host [sub domain]: **crawl.serveftp.com**
+- host server: **crawl.serveftp.com**
+- host clouflare: **iuhkart.systems**
 
 **local**
 - postgres-database:
@@ -25,12 +26,14 @@ Thông tin kết nối:
     - password: `iuhkartpassword`
     - database: `postgres`
 
-- mongo:
+- mongo: 
     - host: `localhost`
     - port: `27017`
-    - user: `iuhkart`
-    - password: `iuhkartpassword`
-    - database: `e-commerce`
+    - database: `demo`
+    - collection: `items`
+```python
+connection_string = "mongodb://crawl.serveftp.com:27017/?replicaSet=rs0"
+```
 
 - clickhouse:
     - host: `localhost`

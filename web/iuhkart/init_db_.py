@@ -469,7 +469,7 @@ def create_transaction():
 create_transaction()
 
 
-## vector database
+# # vector database
 # from qdrant_client import QdrantClient, models
 # from qdrant_client.http.models import Distance, VectorParams, PointStruct
 # import os, requests
@@ -485,7 +485,7 @@ create_transaction()
 
 # def init_qdrant():
 #     collection_name='product'
-#     client = QdrantClient(host=HOST, port=6333)
+#     client = QdrantClient(host=HOST, port=6334)
 #     if collection_name in [c.name for c in client.get_collections().collections]:
 #         client.delete_collection(collection_name=collection_name)
 #     client.create_collection(collection_name=collection_name, vectors_config=VectorParams(size=384, distance=Distance.COSINE))

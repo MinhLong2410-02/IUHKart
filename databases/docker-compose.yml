@@ -4,13 +4,13 @@ networks:
         external: true
 
 services:
-    # cloudflare:
-    #     image: cloudflare/cloudflared:latest
-    #     container_name: database-cloudflare
-    #     restart: always
-    #     command: tunnel --no-autoupdate run --token ${CLOUDFLARE_TUNNEL_TOKEN}
-    #     networks:
-    #         - iuhkart-network
+    cloudflare:
+        image: cloudflare/cloudflared:latest
+        container_name: database-cloudflare
+        restart: always
+        command: tunnel --no-autoupdate run --token ${CLOUDFLARE_TUNNEL_TOKEN}
+        networks:
+            - iuhkart-network
 
     postgres-database:
         image: postgres:17.0
