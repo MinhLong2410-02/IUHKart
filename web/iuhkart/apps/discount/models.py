@@ -7,9 +7,9 @@ class Discount(models.Model):
     discount_percent = models.DecimalField(max_digits=5, decimal_places=2)
     # vendor = models.ForeignKey('account.Vendor', on_delete=models.CASCADE, db_column='vendor_id')
     # product = models.ForeignKey('product.Product', on_delete=models.CASCADE, db_column='product_id')
-    # date_created = models.DateField(default=timezone.now)
-    # start_date = models.DateField()
-    # end_date = models.DateField()
+    # date_created = models.DateTimeField(default=timezone.now)
+    # start_date = models.DateTimeField()
+    # end_date = models.DateTimeField()
     # in_use = models.BooleanField(default=True)
     class Meta:
         db_table = 'discounts'
@@ -26,8 +26,8 @@ class OrderProductDiscount(models.Model):
     product_discount_id = models.AutoField(primary_key=True)
     product = models.ForeignKey('product.Product', on_delete=models.CASCADE, db_column='product_id')
     discount = models.ForeignKey(Discount, on_delete=models.CASCADE, db_column='discount_id')
-    start_date = models.DateField()
-    end_date = models.DateField()
+    start_date = models.DateTimeField()
+    end_date = models.DateTimeField()
     class Meta:
         db_table = 'order_product_discounts'
         indexes = [

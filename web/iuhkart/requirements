@@ -14,3 +14,4 @@ drf-spectacular
 django-storages
 qdrant_client
 tqdm
+pandas

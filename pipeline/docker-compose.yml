@@ -1,112 +1,209 @@
 networks:
-    iuhkart-network:
-        name: iuhkart-network
-        external: true
+  iuhkart-network:
+    name: iuhkart-network
+    external: true
+
+x-common:
+  &airflow-common
+  build:
+    context: ./generate
+    dockerfile: Dockerfile
+  user: "${AIRFLOW_UID:-50000}:0"
+  env_file:
+    - .env
+  volumes:
+    - ./generate/dags:/opt/airflow/dags
+    - ./generate/logs:/opt/airflow/logs
+    - ./generate/config:/opt/airflow/config
+    - ./generate/plugins:/opt/airflow/plugins
+  networks:
+    - iuhkart-network
 
 services:
-    # cloudflare:
-    #     image: cloudflare/cloudflared:latest
-    #     container_name: service-cloudflare
-    #     restart: always
-    #     command: tunnel --no-autoupdate run --token ${CLOUDFLARE_TUNNEL_TOKEN}
-    #     networks:
-    #         - iuhkart-network
+    embedding:
+        container_name: embedding
+        image: qxnam/embedding-api:latest
+        environment:
+            - NVIDIA_VISIBLE_DEVICES="0"
+        ports:
+            - 8000:8000
+        networks:
+            - iuhkart-network
+        volumes:
+            - ./configs/embedding-app:/app
+        restart: always
+        deploy:
+            resources:
+                reservations:
+                    devices:
+                        - driver: nvidia
+                          count: all
+                          capabilities: [gpu]
+        healthcheck:
+            test: ["CMD", "curl", "-f", "http://embedding:8000/health"]
+            interval: 10s
+            timeout: 5s
+            retries: 3
 
-    # embedding:
-    #     platform: linux/amd64
-    #     container_name: embedding
-    #     image: qxnam/embedding-api:latest
-    #     environment:
-    #         - NVIDIA_VISIBLE_DEVICES="0"
-    #     ports:
-    #         - 8000:8000
-    #     networks:
-    #         - iuhkart-network
-    #     volumes:
-    #         - ./configs/embedding-app:/app
-    #     restart: always
-    #     # deploy:
-    #     #     resources:
-    #     #         reservations:
-    #     #             devices:
-    #     #                 - driver: nvidia
-    #     #                   count: all
-    #     #                   capabilities: [gpu]
-    #     healthcheck:
-    #         test: ["CMD", "curl", "-f", "http://embedding:8000/health"]
-    #         interval: 10s
-    #         timeout: 5s
-    #         retries: 3
-    
-    # superset:
-    #     platform: linux/amd64
-    #     build: ./configs/superset
-    #     container_name: superset
-    #     ports:
-    #         - 8088:8088
-    #     environment:
-    #         - SUPERSET_ENV=development
-    #         - SUPERSET_LOAD_EXAMPLES=yes
-    #         - SUPERSET_SECRET_KEY=your_secret_key
-    #         - DATABASE_URL=postgresql+psycopg2://superset:superset@db:5432/superset
-    #     volumes:
-    #         - ./data/superset_home:/var/lib/superset
-    #     depends_on:
-    #         - superset-db
-    #     networks:
-    #         - iuhkart-network
-    #     restart: always
+    portainer:
+        image: portainer/portainer:latest
+        container_name: portainer
+        ports:
+            - 28000:8000
+            - 29011:9000
+        volumes:
+            - ./data/portainer-data:/data
+            - /var/run/docker.sock:/var/run/docker.sock
+        restart: always
+        networks:
+            - iuhkart-network
 
-    # superset-db:
-    #     image: postgres:13
-    #     container_name: superset_db
-    #     environment:
-    #         POSTGRES_USER: superset
-    #         POSTGRES_PASSWORD: superset
-    #         POSTGRES_DB: superset
-    #     volumes:
-    #         - ./data/superset_pg_data:/var/lib/postgresql/data
-    #     networks:
-    #         - iuhkart-network
-    #     restart: always
-
-    zookeeper:
-        container_name: zookeeper
+    airflow-postgres:
         platform: linux/amd64
+        image: postgres:16-alpine
+        container_name: postgres_airflow
+        hostname: postgres_airflow
+        healthcheck:
+            test: ["CMD", "pg_isready", "-U", "airflow"]
+            interval: 5s
+            retries: 5
+        networks:
+            - iuhkart-network
+        environment:
+            - POSTGRES_USER=${POSTGRES_AIRFLOW_USER:-airflow}
+            - POSTGRES_PASSWORD=${POSTGRES_AIRFLOW_PASSWORD:-airflow}
+            - POSTGRES_DB=${POSTGRES_AIRFLOW_DB:-airflow}
+
+    airflow-scheduler:
+        <<: *airflow-common
+        platform: linux/amd64
+        container_name: airflow-scheduler
+        command: scheduler
+        restart: on-failure
+        ports:
+            - "13006:8793"
+        depends_on:
+            airflow-init:
+                condition: service_completed_successfully
+
+    airflow-webserver:
+        <<: *airflow-common
+        platform: linux/amd64
+        container_name: airflow-webserver
+        restart: always
+        command: webserver
+        ports:
+            - "13005:8080"
+        healthcheck:
+            test: ["CMD", "curl", "--fail", "http://localhost:8080/health"]
+            interval: 30s
+            timeout: 30s
+            retries: 5
+        depends_on:
+            airflow-init:
+                condition: service_completed_successfully
+
+    airflow-init:
+        <<: *airflow-common
+        platform: linux/amd64
+        container_name: airflow-init
+        entrypoint: /bin/bash
+        depends_on:
+            airflow-postgres:
+                condition: service_healthy
+        command:
+            - -c
+            - |
+                mkdir -p /sources/logs /sources/dags /sources/plugins
+                chown -R "${AIRFLOW_UID}:0" /sources/{logs,dags,plugins}
+                exec /entrypoint airflow version
+
+    zookeeper-postgres:
+        container_name: zookeeper-postgres
         image: wurstmeister/zookeeper:latest
         ports:
             - "2181:2181"
         networks:
             - iuhkart-network
         healthcheck:
-            test: ["CMD", "nc", "-z", "zookeeper", "2181"]
+            test: ["CMD", "nc", "-z", "zookeeper-postgres", "2181"]
             interval: 30s
             timeout: 10s
             retries: 5
             start_period: 20s
         restart: always
 
-    kafka:
-        container_name: kafka
-        image: wurstmeister/kafka:latest
-        depends_on:
-            zookeeper:
-                condition: service_healthy
+    zookeeper-mongo:
+        container_name: zookeeper-mongo
+        image: wurstmeister/zookeeper:latest
         ports:
-            - 9092:9092
-        environment:
-            KAFKA_BROKER_ID: 1
-            KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-            KAFKA_LISTENERS: INTERNAL://:29092,EXTERNAL://:9092
-            KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka:29092,EXTERNAL://localhost:9092
-            KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
-            KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
-        volumes:
-            - ./data/kafka-data:/kafka
+            - "2182:2181"
         networks:
             - iuhkart-network
         healthcheck:
-            test: ["CMD", "nc", "-z", "kafka", "9092"]
+            test: ["CMD", "nc", "-z", "zookeeper-mongo", "2181"]
+            interval: 30s
+            timeout: 10s
+            retries: 5
+            start_period: 20s
+        restart: always
+
+    kafka-postgres:
+        container_name: kafka-postgres
+        image: wurstmeister/kafka:latest
+        depends_on:
+            zookeeper-postgres:
+                condition: service_healthy
+        ports:
+            - "9092:9092"
+        environment:
+            KAFKA_BROKER_ID: 1
+            KAFKA_ZOOKEEPER_CONNECT: zookeeper-postgres:2181
+            KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka-postgres:9092
+            KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
+            KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+            KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+            KAFKA_LOG_RETENTION_MS: 300000
+            KAFKA_LOG_RETENTION_CHECK_INTERVAL_MS: 60000
+            KAFKA_LOG_RETENTION_BYTES: -1
+            KAFKA_LOG_RETENTION_POLICY: delete
+        volumes:
+            - ./data/kafka-postgres-data:/kafka
+        networks:
+            - iuhkart-network
+        healthcheck:
+            test: ["CMD", "nc", "-z", "kafka-postgres", "9092"]
+            interval: 30s
+            timeout: 10s
+            retries: 5
+            start_period: 30s
+        restart: always
+
+    kafka-mongo:
+        container_name: kafka-mongo
+        image: wurstmeister/kafka:latest
+        depends_on:
+            zookeeper-mongo:
+                condition: service_healthy
+        ports:
+            - "9093:9093"
+        environment:
+            KAFKA_BROKER_ID: 2
+            KAFKA_ZOOKEEPER_CONNECT: zookeeper-mongo:2181
+            KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka-mongo:9093
+            KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9093
+            KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+            KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+            KAFKA_LOG_RETENTION_MS: 300000
+            KAFKA_LOG_RETENTION_CHECK_INTERVAL_MS: 60000
+            KAFKA_LOG_RETENTION_BYTES: -1
+            KAFKA_LOG_RETENTION_POLICY: delete
+        volumes:
+            - ./data/kafka-mongo-data:/kafka
+        networks:
+            - iuhkart-network
+        healthcheck:
+            test: ["CMD", "nc", "-z", "kafka-mongo", "9093"]
             interval: 30s
             timeout: 10s
             retries: 5
@@ -114,73 +211,94 @@ services:
         restart: always
 
     kafka-ui:
-        platform: linux/amd64
         container_name: kafka-ui
         image: provectuslabs/kafka-ui:latest
-        depends_on:
-            - kafka
         ports:
-            - 8084:8084
+            - "8081:8081"
         environment:
-            KAFKA_CLUSTERS_0_NAME: "local"
-            KAFKA_CLUSTERS_0_BOOTSTRAP_SERVERS: "kafka:29092"
-            KAFKA_CLUSTERS_0_ZOOKEEPER: "zookeeper:2181"
-            SERVER_PORT: 8084
+            KAFKA_CLUSTERS_0_NAME: "kafka-postgres-cluster"
+            KAFKA_CLUSTERS_0_BOOTSTRAP_SERVERS: "kafka-postgres:9092"
+            KAFKA_CLUSTERS_0_ZOOKEEPER: "zookeeper-postgres:2181"
+            KAFKA_CLUSTERS_1_NAME: "kafka-mongo-cluster"
+            KAFKA_CLUSTERS_1_BOOTSTRAP_SERVERS: "kafka-mongo:9093"
+            KAFKA_CLUSTERS_1_ZOOKEEPER: "zookeeper-mongo:2181"
+            SERVER_PORT: 8081
         networks:
             - iuhkart-network
+        restart: always
 
-    debezium:
-        platform: linux/amd64
-        container_name: debezium
+    debezium-postgres:
+        container_name: debezium-postgres
         image: debezium/connect:3.0.0.Final
         ports:
             - '8083:8083'
         environment:
-            - BOOTSTRAP_SERVERS=kafka:29092
-            - GROUP_ID=1
-            - CONFIG_STORAGE_TOPIC=my_connect_configs
-            - OFFSET_STORAGE_TOPIC=my_connect_offsets
-            - STATUS_STORAGE_TOPIC=my_connect_statuses
+            - BOOTSTRAP_SERVERS=kafka-postgres:9092
+            - GROUP_ID=postgres-connect-group
+            - CONFIG_STORAGE_TOPIC=postgres_connect_configs
+            - OFFSET_STORAGE_TOPIC=postgres_connect_offsets
+            - STATUS_STORAGE_TOPIC=postgres_connect_statuses
         networks:
             - iuhkart-network
         healthcheck:
-            test: ["CMD", "curl", "-f", "http://debezium:8083/connectors"]
+            test: ["CMD", "curl", "-f", "http://debezium-postgres:8083/connectors"]
             interval: 30s
             timeout: 10s
             retries: 5
-            start_period: 30s
+        restart: always
+
+    debezium-mongo:
+        container_name: debezium-mongo
+        image: debezium/connect:3.0.0.Final
+        ports:
+            - '8084:8083'
+        environment:
+            - BOOTSTRAP_SERVERS=kafka-mongo:9093
+            - GROUP_ID=mongo-connect-group
+            - CONFIG_STORAGE_TOPIC=mongo_connect_configs
+            - OFFSET_STORAGE_TOPIC=mongo_connect_offsets
+            - STATUS_STORAGE_TOPIC=mongo_connect_statuses
+        networks:
+            - iuhkart-network
+        healthcheck:
+            test: ["CMD", "curl", "-f", "http://debezium-mongo:8083/connectors"]
+            interval: 30s
+            timeout: 10s
+            retries: 5
         restart: always
 
     debezium-ui:
-        platform: linux/amd64
         container_name: debezium-ui
         image: debezium/debezium-ui:latest
         depends_on:
-            - debezium
+            - debezium-postgres
+            - debezium-mongo
         ports:
-            - '8080:8080'
+            - '8085:8080'
         environment:
-            KAFKA_CONNECT_URIS: http://debezium:8083
+            KAFKA_CONNECT_URIS: >
+                http://debezium-postgres:8083,http://debezium-mongo:8083
         networks:
             - iuhkart-network
+        restart: always
 
     init-connect:
         container_name: init-connect
-        build: ./configs/connector
+        build: configs/connector
         depends_on:
-            debezium:
+            debezium-mongo:
                 condition: service_healthy
-            kafka:
+            debezium-postgres:
                 condition: service_healthy
         networks:
             - iuhkart-network
         volumes:
             - ./configs/connector:/app
         restart: "no"
-    
+
     flink-jobmanager:
         container_name: flink-jobmanager
-        # build: flink-1.18.1
+        # build: configs/flink-1.18.1
         image: qxnam/flink-etl:latest
         ports:
             - "28081:8081"
@@ -190,16 +308,17 @@ services:
                 jobmanager.rpc.address: flink-jobmanager
         command: jobmanager
         depends_on:
-            kafka:
+            kafka-postgres:
                 condition: service_healthy
         networks:
             - iuhkart-network
         volumes:
-            - ./configs/flink-1.18.1/jobs:/opt/flink/jobs
+            - ./jobs:/opt/flink/jobs
+        restart: always
 
     flink-taskmanager:
         container_name: flink-taskmanager
-        # build: flink-1.18.1
+        # build: configs/flink-1.18.1
         image: qxnam/flink-etl:latest
         depends_on:
             - flink-jobmanager
@@ -213,5 +332,6 @@ services:
         networks:
             - iuhkart-network
         volumes:
-            - ./configs/flink-1.18.1/jobs:/opt/flink/jobs
+            - ./jobs:/opt/flink/jobs
+        restart: always
 

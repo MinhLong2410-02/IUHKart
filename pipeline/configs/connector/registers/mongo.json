@@ -1,0 +1,12 @@
+{
+    "name": "mongodb-connector",
+    "config": {
+        "connector.class": "io.debezium.connector.mongodb.MongoDbConnector",
+        "mongodb.connection.string": "mongodb://crawl.serveftp.com:27017/?replicaSet=rs0",
+        "topic.prefix": "mongoDB",
+        "database.include.list": "demo",
+        "collection.include.list": "demo.items",
+        "capture.mode": "change_streams_update_full",
+        "tombstones.on.delete": "false"
+    }
+}
