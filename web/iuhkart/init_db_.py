@@ -469,49 +469,51 @@ def create_transaction():
 create_transaction()
 
 
-## vector database
-# from qdrant_client import QdrantClient, models
-# from qdrant_client.http.models import Distance, VectorParams, PointStruct
-# import os, requests
-# from dotenv import load_dotenv
-# from uuid import uuid4
-# TEXT_EMBEDDING_URL = os.getenv('TEXT_EMBEDDING_URL')
-# HOST = os.getenv('HOST')
+# vector database
+from qdrant_client import QdrantClient, models
+from qdrant_client.http.models import Distance, VectorParams, PointStruct
+import os, requests
+from dotenv import load_dotenv
+from uuid import uuid4
+TEXT_EMBEDDING_URL = os.getenv('TEXT_EMBEDDING_URL')
+HOST = os.getenv('HOST')
+HOST = 'http://crawl.serveftp.com'
+PORT = 6334
 
-# def getTextEmbedding(text: str):
-#     response = requests.get(TEXT_EMBEDDING_URL + text)
-#     vector = response.json()['embedding'] if response.status_code == 200 else None
-#     return vector
+def getTextEmbedding(text: str):
+    response = requests.get(TEXT_EMBEDDING_URL + text)
+    vector = response.json()['embedding'] if response.status_code == 200 else None
+    return vector
 
-# def init_qdrant():
-#     collection_name='product'
-#     client = QdrantClient(host=HOST, port=6333)
-#     if collection_name in [c.name for c in client.get_collections().collections]:
-#         client.delete_collection(collection_name=collection_name)
-#     client.create_collection(collection_name=collection_name, vectors_config=VectorParams(size=384, distance=Distance.COSINE))
+def init_qdrant():
+    collection_name='product'
+    client = QdrantClient(url=HOST, port=PORT)
+    if collection_name in [c.name for c in client.get_collections().collections]:
+        client.delete_collection(collection_name=collection_name)
+    client.create_collection(collection_name=collection_name, vectors_config=VectorParams(size=384, distance=Distance.COSINE))
     
-#     df = pd.read_csv('../schema/Database/products.csv')
-#     product_image_df = pd.read_csv('../schema/Database/product_images_main.csv')
-#     df = df[['product_id', 'product_name', 'slug']]
-#     loop = tqdm(df.iterrows(), total=df.shape[0], desc='Insert to qdrantDB', colour='green')
-#     for _, iter in loop:
-#         product_image = product_image_df[(product_image_df['product_id']==iter['product_id']) & (product_image_df['is_main']==True)]
-#         if product_image.shape[0] == 0:
-#             continue
-#         image_url = product_image['image_url'].values[0]
-#         vector = getTextEmbedding(iter['slug'])
-#         payload = {
-#             'product_id': iter['product_id'],
-#             'product_name': f"{iter['product_name']}",
-#             'product_image_url': image_url
-#         }
+    # df = pd.read_csv('../schema/Database/products.csv')
+    # product_image_df = pd.read_csv('../schema/Database/product_images_main.csv')
+    # df = df[['product_id', 'product_name', 'slug']]
+    # loop = tqdm(df.iterrows(), total=df.shape[0], desc='Insert to qdrantDB', colour='green')
+    # for _, iter in loop:
+    #     product_image = product_image_df[(product_image_df['product_id']==iter['product_id']) & (product_image_df['is_main']==True)]
+    #     if product_image.shape[0] == 0:
+    #         continue
+    #     image_url = product_image['image_url'].values[0]
+    #     vector = getTextEmbedding(iter['slug'])
+    #     payload = {
+    #         'product_id': iter['product_id'],
+    #         'product_name': f"{iter['product_name']}",
+    #         'product_image_url': image_url
+    #     }
 
-#         if vector is None:
-#             continue
-#         point = PointStruct(id=str(uuid4()),
-#                     vector=vector,
-#                     payload=payload
-#         )
-#         client.upsert(collection_name=collection_name, points=[point])
-
-# init_qdrant()
+    #     if vector is None:
+    #         continue
+    #     point = PointStruct(id=str(uuid4()),
+    #                 vector=vector,
+    #                 payload=payload
+    #     )
+    #     client.upsert(collection_name=collection_name, points=[point])
+# 
+init_qdrant()
