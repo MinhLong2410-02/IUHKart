@@ -18,8 +18,8 @@ class OrderSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Order
-        fields = ['order_number', 'products', 'order_total', 'total_price']
-        read_only_fields = ['order_number', 'order_total', 'total_price']
+        fields = ['order_number', 'products', 'order_total']
+        read_only_fields = ['order_number', 'order_total']
 
     @transaction.atomic
     def create(self, validated_data):

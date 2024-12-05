@@ -110,7 +110,7 @@ class CustomerProductListView(generics.ListAPIView):
         category_id = self.request.query_params.get('category_id', None)
         if category_id is not None:
             queryset = queryset.filter(category=category_id)
-
+        
         return queryset
 
 class CustomerOneProductView(generics.RetrieveAPIView):

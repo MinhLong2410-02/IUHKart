@@ -4,12 +4,12 @@ from apps.review.models import Review
 class ReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Review
-        fields = ['review_id', 'review_rating', 'review_content', 'review_date', 'customer']
+        fields = ['review_id', 'review_rating', 'review_content', 'review_date', 'customer_id']
 
 class CustomerReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Review
-        fields = ['review_id', 'product', 'review_rating', 'review_date', 'review_content']
+        fields = ['review_id', 'product_id', 'review_rating', 'review_date', 'review_content']
         read_only_fields = ['review_date']  # Auto-set fields should not be editable
 
     def create(self, validated_data):

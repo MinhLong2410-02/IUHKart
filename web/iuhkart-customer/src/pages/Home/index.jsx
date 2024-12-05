@@ -16,7 +16,7 @@ const Home = () => {
         <Box>
           <Box marginY="50px" textAlign="center">
             <Heading as="h3" size="2xl">
-              Our featured store
+              Trang chủ
             </Heading>
           </Box>
           <ProductProvider>

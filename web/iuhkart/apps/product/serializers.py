@@ -10,13 +10,11 @@ class CategorySerializer(serializers.ModelSerializer):
         fields = ['category_id', 'category_name', 'category_img_url']
 class ProductImageSerializer(serializers.ModelSerializer):
     image_url = serializers.ImageField()
-
     class Meta:
         model = ProductImages
         fields = ['product_image_id', 'image_url', 'is_main']
 class ProductImageCreateUpdateSerializer(serializers.ModelSerializer):
     image_url = serializers.ImageField()
-
     class Meta:
         model = ProductImages
         fields = ['image_url']
@@ -30,7 +28,6 @@ class VendorProductSerializer(serializers.ModelSerializer):
 
 class CustomerProductSerializer(serializers.ModelSerializer):
     images = serializers.SerializerMethodField()
-
     class Meta:
         model = Product
         fields = ['product_id', 'product_name', 'product_description', 'original_price', 'stock', 'brand', 'slug', 'created_by', 'category', 'images', 'ratings']
@@ -43,7 +40,6 @@ class CustomerProductSerializer(serializers.ModelSerializer):
         return None
 class CustomerSpecificProductSerializer(serializers.ModelSerializer):
     images = serializers.SerializerMethodField()
-
     class Meta:
         model = Product
         fields = ['product_id', 'product_name', 'product_description', 'original_price', 'stock', 'brand', 'slug', 'created_by', 'category', 'images', 'ratings']
