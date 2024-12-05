@@ -1,10 +1,10 @@
 Build image:
 ```bash
-docker build -t pyflink:1.18.1 .
+docker build -t flink-etl .
 ```
 
 ```bash
-docker tag pyflink:1.18.1 qxnam/pyflink:1.18.1
+docker tag flink-etl qxnam/flink-etl
 ```
 
 Vì đã build sẵn nên chỉ cần gọi image tự pull về dùng luôn.

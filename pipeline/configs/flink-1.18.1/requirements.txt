@@ -4,4 +4,10 @@ clickhouse-connect
 python-dotenv
 psycopg2-binary
 wheel
-googletrans
+deep-translator
+transformers
+pandas
+torch
+torchvision
+torchaudio
+holidays
