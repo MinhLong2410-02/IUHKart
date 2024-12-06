@@ -45,7 +45,7 @@ def configure_source(server:str, topic:str,  earliest:bool = False) -> KafkaSour
     """Makes kafka source initialization"""
     properties = {
         "bootstrap.servers": server,
-        "group.id": "warehouse",
+        "group.id": "flink",
     }
 
     offset = KafkaOffsetsInitializer.latest()
@@ -170,6 +170,27 @@ def stream_product(message: str):
     except Exception as e:
         logger.error(f"❌ Error processing message: {e}")
 
+def stream_category(message: str):
+    """Process and sink data into ClickHouse."""
+    try:
+        # Parse the Kafka message
+        mode, data = process_debezium_message(message)
+        category_id = data.get('category_id')
+        category_name = data.get('name')
+        
+        # Prepare data for ClickHouse
+        row = (category_id, category_name)
+
+        # Insert data into ClickHouse
+        client = get_clickhouse_client()
+        if mode == 'c':
+            client.insert('category', [row], column_names=['id', 'name'])
+        client.close()
+        logger.info(f"✅ Inserted into ClickHouse: {row}")
+
+    except Exception as e:
+        logger.error(f"❌ Error processing message: {e}")
+
 ###################################################
 #  Hàm chuyển đổi dữ liệu và ghi vào ClickHouse   #
 ###################################################
@@ -215,7 +236,7 @@ def main() -> None:
     logger.info("✅ Initializing environment")
 
     # Define source and sinks
-    kafka_source = configure_source(f"{KAFKA_HOST}:{KAFKA_PORT}")
+    kafka_source = configure_source(f"{KAFKA_HOST}:{KAFKA_PORT}", 'category')
     logger.info("🐿️ Configuring source and sinks")
 
     data_stream = env.from_source(
@@ -225,7 +246,7 @@ def main() -> None:
 
     # Áp dụng hàm xử lý cho mỗi message
     data_stream.map(
-        transform_and_sink_to_clickhouse,
+        stream_category,
         output_type=Types.STRING()
     )
     data_stream.print()
@@ -234,7 +255,7 @@ def main() -> None:
     # data_stream.map(lambda record: process_message(record))
 
     # Thực thi job Flink
-    env.execute("Test recieve data from Kafka")
+    env.execute("Flink ETL Job")
 
 if __name__ == "__main__":
     main()
