@@ -26,7 +26,7 @@ services:
         environment:
             - NVIDIA_VISIBLE_DEVICES="0"
         ports:
-            - 8000:8000
+            - 8065:8000
         networks:
             - iuhkart-network
         volumes:
@@ -93,7 +93,7 @@ services:
         restart: always
         command: webserver
         ports:
-            - "13005:8080"
+            - "13008:8080"
         healthcheck:
             test: ["CMD", "curl", "--fail", "http://localhost:8080/health"]
             interval: 30s
@@ -122,7 +122,7 @@ services:
         container_name: zookeeper-postgres
         image: wurstmeister/zookeeper:latest
         ports:
-            - "2181:2181"
+            - "2185:2181"
         networks:
             - iuhkart-network
         healthcheck:
@@ -137,7 +137,7 @@ services:
         container_name: zookeeper-mongo
         image: wurstmeister/zookeeper:latest
         ports:
-            - "2182:2181"
+            - "2186:2181"
         networks:
             - iuhkart-network
         healthcheck:
@@ -163,8 +163,8 @@ services:
             KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
             KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
             KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
-            KAFKA_LOG_RETENTION_MS: 300000
-            KAFKA_LOG_RETENTION_CHECK_INTERVAL_MS: 60000
+            KAFKA_LOG_RETENTION_MS: 7200000
+            KAFKA_LOG_RETENTION_CHECK_INTERVAL_MS: 7200000
             KAFKA_LOG_RETENTION_BYTES: -1
             KAFKA_LOG_RETENTION_POLICY: delete
         volumes:
@@ -194,8 +194,8 @@ services:
             KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9093
             KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
             KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
-            KAFKA_LOG_RETENTION_MS: 300000
-            KAFKA_LOG_RETENTION_CHECK_INTERVAL_MS: 60000
+            KAFKA_LOG_RETENTION_MS: 3600000
+            KAFKA_LOG_RETENTION_CHECK_INTERVAL_MS: 3600000
             KAFKA_LOG_RETENTION_BYTES: -1
             KAFKA_LOG_RETENTION_POLICY: delete
         volumes:
@@ -214,7 +214,7 @@ services:
         container_name: kafka-ui
         image: provectuslabs/kafka-ui:latest
         ports:
-            - "8081:8081"
+            - "18081:8081"
         environment:
             KAFKA_CLUSTERS_0_NAME: "kafka-postgres-cluster"
             KAFKA_CLUSTERS_0_BOOTSTRAP_SERVERS: "kafka-postgres:9092"
@@ -231,7 +231,7 @@ services:
         container_name: debezium-postgres
         image: debezium/connect:3.0.0.Final
         ports:
-            - '8083:8083'
+            - '8086:8083'
         environment:
             - BOOTSTRAP_SERVERS=kafka-postgres:9092
             - GROUP_ID=postgres-connect-group
@@ -251,7 +251,7 @@ services:
         container_name: debezium-mongo
         image: debezium/connect:3.0.0.Final
         ports:
-            - '8084:8083'
+            - '8085:8083'
         environment:
             - BOOTSTRAP_SERVERS=kafka-mongo:9093
             - GROUP_ID=mongo-connect-group
@@ -274,7 +274,7 @@ services:
             - debezium-postgres
             - debezium-mongo
         ports:
-            - '8085:8080'
+            - '8089:8080'
         environment:
             KAFKA_CONNECT_URIS: >
                 http://debezium-postgres:8083,http://debezium-mongo:8083
@@ -333,5 +333,17 @@ services:
             - iuhkart-network
         volumes:
             - ./jobs:/opt/flink/jobs
+        restart: always
+
+    search-engine:
+        container_name: search-engine
+        build: configs/search-engine
+        depends_on:
+            kafka-postgres:
+                condition: service_healthy
+        networks:
+            - iuhkart-network
+        volumes:
+            - ./configs/search-engine:/app
         restart: always
 

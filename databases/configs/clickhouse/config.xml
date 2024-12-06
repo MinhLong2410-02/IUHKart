@@ -32,4 +32,8 @@
     <flush_interval_milliseconds>1000</flush_interval_milliseconds>
   </query_log>
 
+  <!-- <setting>
+    <stream_like_engine_allow_direct_select>1</stream_like_engine_allow_direct_select>
+  </setting> -->
+
 </clickhouse>

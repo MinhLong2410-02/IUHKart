@@ -491,4 +491,4 @@ def init_qdrant():
         client.delete_collection(collection_name=collection_name)
     client.create_collection(collection_name=collection_name, vectors_config=VectorParams(size=384, distance=Distance.COSINE))
 
-init_qdrant()
+# init_qdrant()
