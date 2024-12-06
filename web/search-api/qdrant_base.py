@@ -1,11 +1,18 @@
 from qdrant_client import QdrantClient, models
 from qdrant_client.http.models import Distance, VectorParams, PointStruct
 import os, requests
-from dotenv import load_dotenv
+try:
+    from dotenv import load_dotenv
+    load_dotenv('./.env')
+except ModuleNotFoundError:
+    pass
 
 TEXT_EMBEDDING_URL = os.getenv('TEXT_EMBEDDING_URL')
+QDRANT_HOST = os.getenv('QDRANT_HOST')
+QDRANT_PORT = os.getenv('QDRANT_PORT')
 
-client = QdrantClient(host='qdrant_db', port=6333)
+
+client = QdrantClient(host=QDRANT_HOST, port=QDRANT_PORT)
 
 '''Tạo collection product từ ban đầu nếu chưa tồn tại'''
 if 'product' not in [c.name for c in client.get_collections().collections]:
