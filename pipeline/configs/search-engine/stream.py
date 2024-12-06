@@ -89,7 +89,6 @@ def insert_qdrant(message):
     client.close()
 
 def main():
-
     try:
         consumer = KafkaConsumer(
             KAFKA_TOPIC,
