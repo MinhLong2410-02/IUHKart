@@ -80,6 +80,7 @@ def process_batch(messages):
             client.delete(collection_name='product', point_ids=[data['product_id']])
         else:
             vector = requests.get(f"{URL_EMBEDDING}/embedding?q={data['slug']}").json().get('embedding')
+            print(vector)
             if vector:
                 points.append(PointStruct(
                     id=str(uuid4()),
@@ -95,24 +96,24 @@ def process_batch(messages):
 
 
 def process_messages(consumer):
-    """Process messages from Kafka in batches."""
+    """Process messages from Kafka in batches or individually."""
     batch = []
     try:
         for message in consumer:
             batch.append(message.value)
-            if len(batch) >= 100:  # Process in batches of 100
+
+            # Process batch immediately if size is 1 or reaches 100
+            if len(batch) >= 100 or len(batch) == 1:  
                 process_batch(batch)
                 batch.clear()
+
+        # Process remaining messages in the batch (if any)
         if batch:
-            process_batch(batch)  # Process remaining messages
+            process_batch(batch)
+
     except Exception as e:
         print(f"Error while processing messages: {e}")
 
-
-def signal_handler(sig, frame):
-    """Handle shutdown signals."""
-    print("🛑 Shutdown signal received. Exiting gracefully...")
-    sys.exit(0)
 
 
 def main():

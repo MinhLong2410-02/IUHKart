@@ -2,10 +2,12 @@ from qdrant_client import QdrantClient, models
 from qdrant_client.http.models import Distance, VectorParams, PointStruct
 import os, requests
 from dotenv import load_dotenv
+
+load_dotenv('.env')
 TEXT_EMBEDDING_URL = os.getenv('TEXT_EMBEDDING_URL')
-HOST = os.getenv('HOST')
-HOST = 'http://crawl.serveftp.com'
-PORT = 6334
+Q_HOST = os.getenv('QDRANT_HOST')
+Q_PORT = os.getenv('QDRANT_PORT')
+COLLECTION = os.getenv('COLLECTION')
 
 def getTextEmbedding(text: str):
     response = requests.get(TEXT_EMBEDDING_URL + text)
@@ -13,14 +15,14 @@ def getTextEmbedding(text: str):
     return vector
 
 def init_qdrant():
-    collection_name='product'
-    client = QdrantClient(url=HOST, port=PORT)
-    if collection_name in [c.name for c in client.get_collections().collections]:
-        client.delete_collection(collection_name=collection_name)
-    client.create_collection(collection_name=collection_name, vectors_config=VectorParams(size=384, distance=Distance.COSINE))
+    client = QdrantClient(url=Q_HOST, port=Q_PORT)
+    if COLLECTION in [c.name for c in client.get_collections().collections]:
+        client.delete_collection(collection_name=COLLECTION)
+    client.create_collection(collection_name=COLLECTION, vectors_config=VectorParams(size=384, distance=Distance.COSINE))
 
 init_qdrant()
 
+exit()
 ###
 from iuhkart.wsgi import *
 from iuhkart.settings import *
@@ -42,10 +44,9 @@ from rest_framework_simplejwt.tokens import RefreshToken
 import ssl
 import requests
 from tqdm import tqdm
-
 ssl._create_default_https_context = ssl._create_stdlib_context
-
 load_dotenv('.env')
+
 PROJECT_STATUS = environ.get('STATUS')
 DB_NAME = os.getenv('NAME')
 DB_USER = os.getenv('DBUSER')
@@ -54,12 +55,12 @@ DB_HOST = 'localhost' if PROJECT_STATUS == 'DEV' else os.getenv('HOST')
 DB_PORT = os.getenv('PORT')
 print(F'✅ STATUS: {PROJECT_STATUS}')
 connection = psycopg2.connect(
-        dbname=DB_NAME,
-        user=DB_USER,
-        password=DB_PASS,
-        host=DB_HOST,
-        port=DB_PORT
-    )
+    dbname=DB_NAME,
+    user=DB_USER,
+    password=DB_PASS,
+    host=DB_HOST,
+    port=DB_PORT
+)
 
 connection.autocommit = True
 cursor = connection.cursor()

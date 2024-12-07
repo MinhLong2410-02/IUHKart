@@ -1,0 +1,45 @@
+networks:
+  iuhkart-network:
+    name: iuhkart-network
+    external: true
+
+services:
+    flink-jobmanager:
+        container_name: flink-jobmanager
+        # build: configs/flink-1.18.1
+        image: qxnam/flink-etl:latest
+        ports:
+            - "28081:8081"
+        environment:
+            - |
+                FLINK_PROPERTIES=
+                jobmanager.rpc.address: flink-jobmanager
+        command: jobmanager
+        depends_on:
+            kafka-postgres:
+                condition: service_healthy
+        networks:
+            - iuhkart-network
+        volumes:
+            - ./jobs:/opt/flink/jobs
+        restart: always
+
+    flink-taskmanager:
+        container_name: flink-taskmanager
+        # build: configs/flink-1.18.1
+        image: qxnam/flink-etl:latest
+        depends_on:
+            - flink-jobmanager
+        command: taskmanager
+        scale: 1
+        environment:
+            - |
+                FLINK_PROPERTIES=
+                jobmanager.rpc.address: flink-jobmanager
+                taskmanager.numberOfTaskSlots: 2
+        networks:
+            - iuhkart-network
+        volumes:
+            - ./jobs:/opt/flink/jobs
+        restart: always
+
