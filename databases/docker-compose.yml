@@ -71,8 +71,8 @@ services:
         image: 'clickhouse/clickhouse-server' #:24.7-alpine
         container_name: 'clickhouse-server'
         hostname: clickhouse
-        environment:
-            CLICKHOUSE_ALWAYS_RUN_INITDB_SCRIPTS: 1
+        # environment:
+        #     CLICKHOUSE_ALWAYS_RUN_INITDB_SCRIPTS: 1
         ports:
             - '8123:8123'
             - '9000:9000'
@@ -81,8 +81,8 @@ services:
         #         soft: 262144
         #         hard: 262144
         volumes:
-            # - './configs/clickhouse/config.xml:/etc/clickhouse-server/config.xml'
-            # - './configs/clickhouse/users.xml:/etc/clickhouse-server/users.xml'
+            - './configs/clickhouse/config.xml:/etc/clickhouse-server/config.xml'
+            - './configs/clickhouse/users.xml:/etc/clickhouse-server/users.xml'
             - './configs/clickhouse/schema.sql:/docker-entrypoint-initdb.d/schema.sql'
         networks:
             - iuhkart-network
@@ -109,3 +109,15 @@ services:
     #         - ./data/minio:/data
     #     command: server /data --console-address ":9001"
 
+    portainer:
+        image: portainer/portainer:latest
+        container_name: portainer
+        ports:
+            - 28000:8000
+            - 29011:9000
+        volumes:
+            - ./data/portainer-data:/data
+            - /var/run/docker.sock:/var/run/docker.sock
+        restart: always
+        networks:
+            - iuhkart-network

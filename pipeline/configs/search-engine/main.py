@@ -35,10 +35,10 @@ def decode_message(message: str):
     """Decode Kafka message and extract change data."""
     try:
         message_json = json.loads(message)
-        payload = message_json.get('payload', {})
-        operation = payload.get('op')
-        before = payload.get('before')
-        after = payload.get('after')
+        # payload = message_json.get('payload', {})
+        operation = message_json.get('op')
+        before = message_json.get('before')
+        after = message_json.get('after')
 
         if operation == 'c':
             return 'create', after

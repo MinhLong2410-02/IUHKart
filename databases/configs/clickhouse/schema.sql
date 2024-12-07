@@ -1,5 +1,12 @@
 use default;
 
+CREATE TABLE category (
+    id Int32,
+    name String,
+    PRIMARY KEY (id)
+) ENGINE = MergeTree()
+ORDER BY id;
+
 CREATE TABLE dim_date (
     id Int32,
     full_date Date,
