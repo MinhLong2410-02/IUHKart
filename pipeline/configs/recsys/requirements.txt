@@ -1,0 +1,6 @@
+kafka-python
+pymongo
+python-dotenv
+qdrant-client
+requests
+psycopg2-binary
