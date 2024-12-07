@@ -4,83 +4,86 @@ networks:
         external: true
 
 services:
-    cloudflare:
-        image: cloudflare/cloudflared:latest
-        container_name: database-cloudflare
-        restart: always
-        command: tunnel --no-autoupdate run --token ${CLOUDFLARE_TUNNEL_TOKEN}
-        networks:
-            - iuhkart-network
+    # cloudflare:
+    #     image: cloudflare/cloudflared:latest
+    #     container_name: database-cloudflare
+    #     restart: always
+    #     command: tunnel --no-autoupdate run --token ${CLOUDFLARE_TUNNEL_TOKEN}
+    #     networks:
+    #         - iuhkart-network
 
-    postgres-database:
-        image: postgres:17.0
-        container_name: postgres-database
-        environment:
-            POSTGRES_USER: iuhkart
-            POSTGRES_PASSWORD: iuhkartpassword
-            POSTGRES_DB: postgres
-        command: [ "postgres", "-c", "wal_level=logical" ]
-        ports:
-            - 5432:5432
-        volumes:
-            - ./data/postgres-data:/data/postgres
-        networks:
-            - iuhkart-network
-        restart: always
-        healthcheck:
-            test: ["CMD", "pg_isready", "-U", "iuhkart"]
-            interval: 10s
-            timeout: 5s
-            retries: 5
+    # postgres-oltp:
+    #     image: postgres:17.0
+    #     container_name: postgres-oltp
+    #     environment:
+    #         POSTGRES_USER: iuhkart
+    #         POSTGRES_PASSWORD: iuhkartpassword
+    #         POSTGRES_DB: postgres
+    #     command: [ "postgres", "-c", "wal_level=logical" ]
+    #     ports:
+    #         - 5432:5432
+    #     volumes:
+    #         - ./data/postgres-data:/data/postgres
+    #     networks:
+    #         - iuhkart-network
+    #     restart: always
+    #     healthcheck:
+    #         test: ["CMD", "pg_isready", "-U", "iuhkart"]
+    #         interval: 10s
+    #         timeout: 5s
+    #         retries: 5
 
-    mongodb:
-        image: mongo:7.0.2
-        restart: always
-        container_name: mongodb
-        ports:
-            - 27017:27017
-        # environment:
-        #     MONGO_INITDB_ROOT_USERNAME: iuhkart
-        #     MONGO_INITDB_ROOT_PASSWORD: iuhkartpassword
-        #     MONGO_INITDB_DATABASE: e-commerce
-        command: ["--replSet", "rs0", "--bind_ip_all"]
-        networks:
-            - iuhkart-network
-        volumes:
-            - ./data/mongo-data:/data/db
+    # mongodb:
+    #     image: mongo:7.0.2
+    #     restart: always
+    #     container_name: mongodb
+    #     ports:
+    #         - 27017:27017
+    #     # environment:
+    #     #     MONGO_INITDB_ROOT_USERNAME: iuhkart
+    #     #     MONGO_INITDB_ROOT_PASSWORD: iuhkartpassword
+    #     #     MONGO_INITDB_DATABASE: e-commerce
+    #     command: ["--replSet", "rs0", "--bind_ip_all"]
+    #     networks:
+    #         - iuhkart-network
+    #     volumes:
+    #         - ./data/mongo-data:/data/db
 
-    qdrant:
-        container_name: qdrant
-        image: qdrant/qdrant:v1.12.1
-        ports:
-            - 6334:6333
-        volumes:
-            - ./data/qdrant-data:/qdrant/storage
-        networks:
-            - iuhkart-network
-        restart: always
-        healthcheck:
-            test:
-                - CMD-SHELL
-                - bash -c ':> /dev/tcp/127.0.0.1/6333' || exit 1
-            interval: 5s
-            timeout: 5s
-            retries: 3
+    # qdrant:
+    #     container_name: qdrant
+    #     image: qdrant/qdrant:v1.12.1
+    #     ports:
+    #         - 6334:6333
+    #     volumes:
+    #         - ./data/qdrant-data:/qdrant/storage
+    #     networks:
+    #         - iuhkart-network
+    #     restart: always
+    #     healthcheck:
+    #         test:
+    #             - CMD-SHELL
+    #             - bash -c ':> /dev/tcp/127.0.0.1/6333' || exit 1
+    #         interval: 5s
+    #         timeout: 5s
+    #         retries: 3
 
     clickhouse:
-        image: 'clickhouse/clickhouse-server:24.7-alpine'
+        image: 'clickhouse/clickhouse-server' #:24.7-alpine
         container_name: 'clickhouse-server'
         hostname: clickhouse
+        environment:
+            CLICKHOUSE_ALWAYS_RUN_INITDB_SCRIPTS: 1
         ports:
             - '8123:8123'
             - '9000:9000'
-        ulimits:
-            nofile:
-                soft: 262144
-                hard: 262144
+        # ulimits:
+        #     nofile:
+        #         soft: 262144
+        #         hard: 262144
         volumes:
-            - './configs/clickhouse/config.xml:/etc/clickhouse-server/config.xml'
-            - './configs/clickhouse/users.xml:/etc/clickhouse-server/users.xml'
+            # - './configs/clickhouse/config.xml:/etc/clickhouse-server/config.xml'
+            # - './configs/clickhouse/users.xml:/etc/clickhouse-server/users.xml'
+            - './configs/clickhouse/schema.sql:/docker-entrypoint-initdb.d/schema.sql'
         networks:
             - iuhkart-network
         restart: always
@@ -90,19 +93,19 @@ services:
             timeout: 5s
             retries: 5
 
-    minio:
-        image: minio/minio:latest
-        container_name: minio
-        restart: unless-stopped
-        ports:
-            - "29000:9000"
-            - "29001:9001"
-        environment:
-            MINIO_ROOT_USER: "${MINIO_ROOT_USER}"
-            MINIO_ROOT_PASSWORD: "${MINIO_ROOT_PASSWORD}"
-        networks:
-            - iuhkart-network
-        volumes:
-            - ./data/minio:/data
-        command: server /data --console-address ":9001"
+    # minio:
+    #     image: minio/minio:latest
+    #     container_name: minio
+    #     restart: unless-stopped
+    #     ports:
+    #         - "29000:9000"
+    #         - "29001:9001"
+    #     environment:
+    #         MINIO_ROOT_USER: "${MINIO_ROOT_USER}"
+    #         MINIO_ROOT_PASSWORD: "${MINIO_ROOT_PASSWORD}"
+    #     networks:
+    #         - iuhkart-network
+    #     volumes:
+    #         - ./data/minio:/data
+    #     command: server /data --console-address ":9001"
 

@@ -84,7 +84,7 @@ def main():
 @dag(
     dag_id='generate_review',
     start_date=datetime(2024, 11, 25),
-    schedule=timedelta(seconds=5),
+    schedule=timedelta(seconds=30),
     catchup=False,
 )
 def review():

@@ -1,0 +1,4 @@
+kafka-python
+python-dotenv
+qdrant-client
+requests
