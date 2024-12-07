@@ -1,136 +1,86 @@
 services:
-  mongo_db:
-    image: mongo:latest
-    command: mongod --auth
-    container_name: mongo_db
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: admin
-      MONGO_INITDB_ROOT_PASSWORD: admin
-      MONGO_INITDB_DATABASE: customer-keep-track
-      MONGO_DATA_DIR: /data/db
-      MONGO_LOG_DIR: /dev/null
-    ports:
-      - "27017:27017"
-    networks:
-      - iuhkart-network
-    volumes:
-      - ./services/mongo-db-volume:/data/db
-    restart: unless-stopped
-
-  iuhkart-redis:
-    image: redis:latest
-    ports:
-      - "6379:6379"
-    volumes:
-      - ./services/redis_data:/data
-    networks:
-      - iuhkart-network
-    restart: unless-stopped
-
   tracking_api:
     container_name: tracking-api
     build: 
-      context: ./services/customer-tracking-app
+      context: ./tracking-api
       dockerfile: Dockerfile
     ports:
-      - "8007:8000"
+      - "5000:8000"
     env_file:
-      - ./services/customer-tracking-app/.env
-    environment:
-      - MONGO_HOST=mongo_db
+      - .env
     working_dir: /app
     networks:
       - iuhkart-network
-    depends_on:
-      - mongo_db
     volumes:
-      - ./services/customer-tracking-app:/app
+      - ./tracking-api:/app
     restart: unless-stopped
 
-  # qdrant_fastapi:
-  #   build: ./services/app
-  #   ports:
-  #     - "8008:8000"
-  #   environment:
-  #     - TEXT_EMBEDDING_URL=http://embedding_api:8000/embedding
-  #   working_dir: /app
-  #   networks:
-  #     - iuhkart-network
-  #   depends_on:
-  #     - mongo_db
-  #   volumes:
-  #     - ./services/app:/app
-  #   restart: unless-stopped
+  search_api:
+    container_name: search-api
+    build:
+      context: ./search-api
+      dockerfile: Dockerfile
+    ports:
+      - "5001:8000"
+    working_dir: /app
+    networks:
+      - iuhkart-network
+    volumes:
+      - ./search-api:/app
+    restart: unless-stopped
 
   cloudflare:
     image: cloudflare/cloudflared:latest
     container_name: iuhkart-cloudflare
     restart: unless-stopped
-    command: tunnel --no-autoupdate run --token eyJhIjoiYjEyNTc2NjEwYTQyYzVmM2JmZTZlZThhZjE1MjIwM2EiLCJ0IjoiNDQ3Yzk4ZTQtOWZjNi00OWUxLTlhMjktM2MyZTI3ZjJkMjZkIiwicyI6IlpUVTFPREpsWVdFdE5EWTBaaTAwTldZMExUaGlNMkl0TlRJMllXSmhZakV5Tm1KayJ9
+    command: tunnel --no-autoupdate run --token $CLOUDFLARE_TOKEN
     networks:
       - iuhkart-network
     depends_on:
       - django_main
+      - search_api
+      - tracking_api
 
   django_main:
     build: ./iuhkart
     ports:
       - "8009:8000"
     env_file:
-      - ./iuhkart/.env
+      - .env
     working_dir: /app
     networks:
       - iuhkart-network
     volumes:
       - ./iuhkart:/app
     restart: unless-stopped
-    depends_on:
-      - mongo_db
-      - iuhkart-redis
+    # depends_on:
+    #   - mongo_db
+    #   - iuhkart-redis
   
-  vendor_fe:
-    build: ./iuhkart-vendor
-    ports:
-      - "8006:8000"
-    env_file:
-      - ./iuhkart-vendor/.env
-    working_dir: /app
-    networks:
-      - iuhkart-network
-    depends_on:
-      - django_main
-  customer_fe:
-    build: ./iuhkart-customer
-    ports:
-      - "8005:8000"
-    env_file:
-      - ./iuhkart-customer/.env
-    working_dir: /app
-    networks:
-      - iuhkart-network
-    depends_on:
-      - django_main
-
-
-  iuhkart-recsys:
-    build:
-      context: ./services/recsys
-      dockerfile: Dockerfile
-    env_file:
-      - ./services/recsys/.env
-    networks:
-      - iuhkart-network
-    depends_on:
-      - mongo_db
-      - iuhkart-redis
-    volumes:
-      - ./services/recsys:/app
-    restart: unless-stopped
+  # vendor_fe:
+  #   build: ./iuhkart-vendor
+  #   ports:
+  #     - "8006:8000"
+  #   env_file:
+  #     - ./iuhkart-vendor/.env
+  #   working_dir: /app
+  #   networks:
+  #     - iuhkart-network
+  #   depends_on:
+  #     - django_main
+  # customer_fe:
+  #   build: ./iuhkart-customer
+  #   ports:
+  #     - "8005:8000"
+  #   env_file:
+  #     - ./iuhkart-customer/.env
+  #   working_dir: /app
+  #   networks:
+  #     - iuhkart-network
+  #   depends_on:
+  #     - django_main
   
 networks:
   iuhkart-network:
     name: iuhkart-network
     external: true
-
-volumes:
-  mongo-db-volume:

@@ -46,7 +46,6 @@ const ProductGrid = () => {
         PRODUCT_PAGING.pageSize
       );
       const dataCount = data?.count || 0;
-
       setLoading(false);
       setProductDataSet(data);
       setPageCount(Math.ceil(dataCount / PRODUCT_PAGING.pageSize));

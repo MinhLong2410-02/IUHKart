@@ -1,3 +1,29 @@
+from qdrant_client import QdrantClient, models
+from qdrant_client.http.models import Distance, VectorParams, PointStruct
+import os, requests
+from dotenv import load_dotenv
+TEXT_EMBEDDING_URL = os.getenv('TEXT_EMBEDDING_URL')
+HOST = os.getenv('HOST')
+HOST = 'http://crawl.serveftp.com'
+PORT = 6334
+
+def getTextEmbedding(text: str):
+    response = requests.get(TEXT_EMBEDDING_URL + text)
+    vector = response.json()['embedding'] if response.status_code == 200 else None
+    return vector
+
+def init_qdrant():
+    collection_name='product'
+    client = QdrantClient(url=HOST, port=PORT)
+    if collection_name in [c.name for c in client.get_collections().collections]:
+        client.delete_collection(collection_name=collection_name)
+    client.create_collection(collection_name=collection_name, vectors_config=VectorParams(size=384, distance=Distance.COSINE))
+
+init_qdrant()
+
+###
+
+
 from iuhkart.wsgi import *
 from iuhkart.settings import *
 from django.contrib.auth import get_user_model
@@ -469,26 +495,3 @@ def create_transaction():
 create_transaction()
 
 
-from qdrant_client import QdrantClient, models
-from qdrant_client.http.models import Distance, VectorParams, PointStruct
-import os, requests
-from dotenv import load_dotenv
-from uuid import uuid4
-TEXT_EMBEDDING_URL = os.getenv('TEXT_EMBEDDING_URL')
-HOST = os.getenv('HOST')
-HOST = 'http://crawl.serveftp.com'
-PORT = 6334
-
-def getTextEmbedding(text: str):
-    response = requests.get(TEXT_EMBEDDING_URL + text)
-    vector = response.json()['embedding'] if response.status_code == 200 else None
-    return vector
-
-def init_qdrant():
-    collection_name='product'
-    client = QdrantClient(url=HOST, port=PORT)
-    if collection_name in [c.name for c in client.get_collections().collections]:
-        client.delete_collection(collection_name=collection_name)
-    client.create_collection(collection_name=collection_name, vectors_config=VectorParams(size=384, distance=Distance.COSINE))
-
-# init_qdrant()

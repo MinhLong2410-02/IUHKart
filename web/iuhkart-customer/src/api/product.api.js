@@ -7,6 +7,7 @@ const productApi = {
     }page=${page}&page_size=${pageSize}`;
     return axiosClient.get(url);
   },
+
   getProductByID: async (productID) => {
     const url = `/product/api/customer/view-product/${productID}`;
     
@@ -29,6 +30,7 @@ const productApi = {
     return dataProduct;
     
   },
+  
   getProductCategory: (categoryID) => {
     // const url = `/product/api/get-category?category_id=${categoryID}`;
     const url = `/product/api/get-category${

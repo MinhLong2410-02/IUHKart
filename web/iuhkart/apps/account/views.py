@@ -68,17 +68,6 @@ class LogoutView(generics.CreateAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def create(self, request, *args, **kwargs):
-        # try:
-        #     refresh_token = request.data.get("refresh")
-        #     if not refresh_token:
-        #         return Response({"detail": "Refresh token is required."}, status=status.HTTP_400_BAD_REQUEST)
-            
-        #     token = RefreshToken(refresh_token)
-        #     token.blacklist()
-
-        #     return Response({"detail": "Logout successful."}, status=status.HTTP_205_RESET_CONTENT)
-        # except Exception as e:
-        #     return Response({"detail": "Invalid or expired refresh token."}, status=status.HTTP_400_BAD_REQUEST)
         
         refresh_token = request.data.get("refresh")
         if not refresh_token:
