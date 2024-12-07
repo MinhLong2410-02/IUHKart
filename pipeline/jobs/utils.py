@@ -1,5 +1,6 @@
 from datetime import datetime
 import holidays
+import json
 
 def get_holiday(date):
     vn_holidays = holidays.Vietnam()
@@ -23,6 +24,30 @@ def parse_date(date_str:str) -> dict:
         'is_weekend': date.weekday() in [5, 6],
         'is_holiday': get_holiday(date_str)
     }
+
+def process_debezium_message(message: str):
+    """Phân tích thông điệp Debezium và trích xuất thông tin thay đổi."""
+    try:
+        message_json = json.loads(message)
+        operation = message_json.get('op')
+        before = message_json.get('before')
+        after = message_json.get('after')
+
+        if operation == 'c':
+            data = after
+        elif operation == 'u':
+            data = after
+        elif operation == 'd':
+            data = before
+        else:
+            data = {}
+
+        return operation, data
+
+    except json.JSONDecodeError as e:
+        print(f"🔻 Lỗi khi giải mã JSON: {e}")
+    except Exception as e:
+        print(f"❌ Đã xảy ra lỗi: {e}")
 
 if __name__ == "__main__":
     res = parse_date("2024-12-06")

@@ -1,7 +1,6 @@
-import json, os
+import os, json
 import logging
 import clickhouse_connect
-from datetime import datetime
 
 from pyflink.common import Types, WatermarkStrategy
 from pyflink.common.serialization import SimpleStringSchema
@@ -10,7 +9,6 @@ from pyflink.datastream.connectors.kafka import (
     KafkaOffsetsInitializer,
     KafkaSource,
 )
-
 from dotenv import load_dotenv
 load_dotenv()
 KAFKA_HOST = os.getenv("KAFKA_HOST")
@@ -30,6 +28,7 @@ logger.addHandler(logging.StreamHandler())
 def initialize_env() -> StreamExecutionEnvironment:
     """Makes stream execution environment initialization"""
     env = StreamExecutionEnvironment.get_execution_environment()
+    env.set_parallelism(4)
 
     # Get current directory
     root_dir_list = __file__.split("/")[:-2]
@@ -40,6 +39,30 @@ def initialize_env() -> StreamExecutionEnvironment:
         f"file://{root_dir}/lib/flink-sql-connector-kafka-3.1.0-1.18.jar",
     )
     return env
+
+def process_debezium_message(message: str):
+    """Phân tích thông điệp Debezium và trích xuất thông tin thay đổi."""
+    try:
+        message_json = json.loads(message)
+        operation = message_json.get('op')
+        before = message_json.get('before')
+        after = message_json.get('after')
+
+        if operation == 'c':
+            data = after
+        elif operation == 'u':
+            data = after
+        elif operation == 'd':
+            data = before
+        else:
+            data = {}
+        print(f"🟢 Action: {operation}")
+        return operation, data
+
+    except json.JSONDecodeError as e:
+        print(f"🔻 Lỗi khi giải mã JSON: {e}")
+    except Exception as e:
+        print(f"❌ Đã xảy ra lỗi: {e}")
 
 def configure_source(server:str, topic:str,  earliest:bool = False) -> KafkaSource:
     """Makes kafka source initialization"""
@@ -62,36 +85,6 @@ def configure_source(server:str, topic:str,  earliest:bool = False) -> KafkaSour
     )
     return kafka_source
 
-def process_debezium_message(message: str):
-    """Phân tích thông điệp Debezium và trích xuất thông tin thay đổi."""
-    try:
-        message_json = json.loads(message)
-        payload = message_json.get('payload', {})
-        operation = payload.get('op')
-        before = payload.get('before')
-        after = payload.get('after')
-
-        if operation == 'c':
-            action = "Create"
-            data = after
-        elif operation == 'u':
-            action = "Update"
-            data = after
-        elif operation == 'd':
-            action = "Delete"
-            data = before
-        else:
-            action = "Unknown"
-            data = {}
-
-        logger.info(f"🟢 Action: {action}")
-        return operation, data
-
-    except json.JSONDecodeError as e:
-        logger.error(f"🔻 Lỗi khi giải mã JSON: {e}")
-    except Exception as e:
-        logger.error(f"❌ Đã xảy ra lỗi: {e}")
-
 def get_clickhouse_client():
     """Initialize ClickHouse client."""
     client = clickhouse_connect.get_client(
@@ -103,9 +96,10 @@ def get_clickhouse_client():
     )
     return client
 
-def stream_customer(message: str, client):
+def stream_dim_customer(message: str, client):
     """Process and sink data into ClickHouse."""
     attributes = ['id', 'first_name', 'middle_name', 'last_name', 'gender', 'date_of_birth', 'signup_date']
+    print("\n🔵 Processing customer")
     try:
         # Parse the Kafka message
         mode, data = process_debezium_message(message)
@@ -123,13 +117,7 @@ def stream_customer(message: str, client):
         row = (customer_id, first_name, middle_name, last_name, gender, date_of_birth, signup_date)
 
         # Insert data into ClickHouse
-        client = clickhouse_connect.get_client(
-            host=CLICKHOUSE_HOST,
-            port=CLICKHOUSE_PORT,
-            username=CLICKHOUSE_USER,
-            password=CLICKHOUSE_PASSWORD,
-            database=CLICKHOUSE_DATABASE,
-        )
+        client = get_clickhouse_client()
         if mode == 'c':
             client.insert('dim_customer', [row], column_names=['id', 'first_name', 'middle_name', 'last_name', 'gender', 'date_of_birth', 'signup_date'])
         client.close()
@@ -137,38 +125,61 @@ def stream_customer(message: str, client):
 
     except Exception as e:
         logger.error(f"❌ Error processing message: {e}")
+    print('-'*120)
+
+def stream_dim_store(message: str):
+    """Process and sink data into ClickHouse."""
+    print("\n🔵 Processing store")
+    try:
+        mode, data = process_debezium_message(message)
+        _id = data.get('id')
+        shop_name = data.get('name')
+        establish_date = data.get('date_join')
+        
+        # Prepare data for ClickHouse
+        row = (_id, shop_name, establish_date)
+
+        client = get_clickhouse_client()
+        if mode == 'c':
+            client.insert('dim_store', [row], column_names=['id', 'shop_name', 'establish_date'])
+        client.close()
+        logger.info(f"✅ Inserted into ClickHouse: {row}")
+
+    except Exception as e:
+        logger.error(f"❌ Error processing message: {e}")
+    print('-'*120)
 
 def stream_product(message: str):
     """Process and sink data into ClickHouse."""
     attributes = ['id', 'name', 'brand', 'price', 'stock', 'category']
+    print("\n🔵 Processing product")
     try:
+        client = get_clickhouse_client()
+        query_result = client.query('SELECT * FROM category')
+        mapper = {i[0]:i[1] for i in query_result.result_set}
+
         # Parse the Kafka message
         mode, data = process_debezium_message(message)
         product_id = data.get('product_id')
         product_name = data.get('product_name')
         price = data.get('original_price')
         stock = data.get('stock')
-        category_id = data.get('category_id')
+        category = mapper[data.get('category_id')]
         brand = data.get('brand')
+        shop_id = data.get('vendor_id')
         
         # Prepare data for ClickHouse
-        row = (product_id, product_name, brand, price, stock, category_id)
-
-        # Insert data into ClickHouse
-        client = clickhouse_connect.get_client(
-            host=CLICKHOUSE_HOST,
-            port=CLICKHOUSE_PORT,
-            username=CLICKHOUSE_USER,
-            password=CLICKHOUSE_PASSWORD,
-            database=CLICKHOUSE_DATABASE,
-        )
+        row = (product_id, product_name, brand, price, stock, category)
+        
         if mode == 'c':
             client.insert('dim_product', [row], column_names=['id', 'name', 'brand', 'price', 'stock', 'category'])
+            client.insert('product_store', [(shop_id, product_id)], column_names=['product_id', 'store_id'])
         client.close()
         logger.info(f"✅ Inserted into ClickHouse: {row}")
 
     except Exception as e:
         logger.error(f"❌ Error processing message: {e}")
+    print('-'*120)
 
 def stream_category(message: str):
     """Process and sink data into ClickHouse."""
@@ -176,7 +187,7 @@ def stream_category(message: str):
         # Parse the Kafka message
         mode, data = process_debezium_message(message)
         category_id = data.get('category_id')
-        category_name = data.get('name')
+        category_name = data.get('category_name')
         
         # Prepare data for ClickHouse
         row = (category_id, category_name)
@@ -191,42 +202,37 @@ def stream_category(message: str):
     except Exception as e:
         logger.error(f"❌ Error processing message: {e}")
 
-###################################################
-#  Hàm chuyển đổi dữ liệu và ghi vào ClickHouse   #
-###################################################
-# def product_dim(record):
-#     client = clickhouse_connect.get_client(host=CLICKHOUSE_HOST, database=CLICKHOUSE_DATABASE)
-#     try:
-#         # Parse JSON record
-#         data = json.loads(record)
-        
-#         # Trích xuất các trường và chuyển đổi timestamp thành đối tượng datetime
-#         id = int(data.get("id"))
-#         name = data.get("name")
-#         slug_name = data.get("slug_name")
-#         description = data.get("description")
-#         category = data.get("category")
-#         version = data.get("version")
-        
-#         # Chuẩn bị dữ liệu để chèn vào ClickHouse
-#         row = (id, name, slug_name, description, category, version)
-        
-#         # Ghi dữ liệu vào ClickHouse
-#         client.insert('product_dim', [row])
-#         logger.info(f"Ghi thành công bản ghi: {row}")
+def stream_review(message: str):
+    """Process and sink data into ClickHouse."""
+    attributes = ['id', 'content', 'rating', 'sentiment_score', 'date_id', 'product_id', 'customer_id', 'store_id']
+    print("\n🔵 Processing review")
+    try:
+        client = get_clickhouse_client()
+        query_result = client.query('SELECT * FROM product_store')
+        mapper = {i[0]:i[1] for i in query_result.result_set}
 
-#     except Exception as e:
-#         logger.error(f"Lỗi khi xử lý bản ghi: {e}")
-#     client.close()
+        # Parse the Kafka message
+        mode, data = process_debezium_message(message)
+        id = data.get('review_id')
+        content = data.get('review_content')
+        rating = data.get('review_rating')
+        sentiment_score = 1
+        date_id = data.get('review_date')
+        product_id = data.get('product_id_id')
+        customer_id = data.get('customer_id_id')
+        store_id = mapper.get(product_id)
+        
+        # Prepare data for ClickHouse
+        row = (id, content, rating, sentiment_score, date_id, product_id, customer_id, store_id)
+        
+        if mode == 'c':
+            client.insert('fact_review', [row], column_names=['id', 'content', 'rating', 'sentiment_score', 'date_id', 'product_id', 'customer_id', 'store_id'])
+        client.close()
+        logger.info(f"✅ Inserted into ClickHouse: {row}")
 
-# def product():
-#     df_p = pd.read_csv('Database/products.csv')
-#     df_c = pd.read_csv('Database/categories.csv')
-#     df_p = df_p[['product_id','product_name','brand','original_price','stock','category_id']]
-#     df_p['category'] = df_p['category_id'].map(df_c.set_index('category_id')['name'])
-#     df_p = df_p.drop(columns=['category_id'])
-#     df_p.to_csv('dim_product.csv',index=False)
-
+    except Exception as e:
+        logger.error(f"❌ Error processing message: {e}")
+    print('-'*120)
 
 def main() -> None:
     """Main flow controller"""
@@ -234,9 +240,29 @@ def main() -> None:
     # Initialize environment
     env = initialize_env()
     logger.info("✅ Initializing environment")
+    # topics = {
+    #     # 'dim_customer': 'postgresDB.public.customers',
+    #     # 'dim_store': 'postgresDB.public.stores',
+    #     'dim_product': stream_product,
+    #     # 'fact_review': stream_review
+    # }
+
+    # for topic, func in topics.items():
+    #     kafka_source = configure_source(f"{KAFKA_HOST}:{KAFKA_PORT}", topic)
+    #     data_stream = env.from_source(
+    #         kafka_source, WatermarkStrategy.no_watermarks(), f"Kafka {topic} topic"
+    #     )
+    #     logger.info(f"🚀 Create a DataStream from the Kafka source and assign watermarks for {topic}")
+    #     data_stream.map(
+    #         func,
+    #         output_type=Types.STRING()
+    #     )
+    #     data_stream.print()
+
+    # env.execute("Flink ETL Job")
 
     # Define source and sinks
-    kafka_source = configure_source(f"{KAFKA_HOST}:{KAFKA_PORT}", 'category')
+    kafka_source = configure_source(f"{KAFKA_HOST}:{KAFKA_PORT}", 'postgresDB.public.reviews')
     logger.info("🐿️ Configuring source and sinks")
 
     data_stream = env.from_source(
@@ -246,7 +272,7 @@ def main() -> None:
 
     # Áp dụng hàm xử lý cho mỗi message
     data_stream.map(
-        stream_category,
+        stream_review,
         output_type=Types.STRING()
     )
     data_stream.print()

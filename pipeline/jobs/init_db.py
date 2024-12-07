@@ -57,10 +57,13 @@ def main():
 
     # Tạo các bảng
     # create_tables(client)
-    insert_data(client, 'dim_product')
-    insert_data(client, 'dim_customer')
-    insert_data(client, 'dim_store')
-    insert_data(client, 'dim_promotion')
+    # insert_data(client, 'category')
+    # insert_data(client, 'province')
+    # insert_data(client, 'dim_product')
+    insert_data(client, 'product_store')
+    # insert_data(client, 'dim_customer')
+    # insert_data(client, 'dim_store')
+    # insert_data(client, 'dim_promotion')
     client.close()
 
 if __name__ == "__main__":

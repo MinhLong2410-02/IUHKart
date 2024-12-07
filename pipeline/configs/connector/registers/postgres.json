@@ -10,6 +10,9 @@
         "database.dbname": "postgres",
         "plugin.name": "pgoutput",
         "topic.prefix": "postgresDB",
-        "schema.include.list": "public"
+        "schema.include.list": "public",
+        "value.converter": "org.apache.kafka.connect.json.JsonConverter",
+        "value.converter.schemas.enable": "false",
+        "value.converter.decimal.handling.mode": "numeric"
     }
 }
