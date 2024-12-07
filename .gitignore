@@ -33,6 +33,7 @@ MANIFEST
 *.spec
 
 # Installer logs
+logs/
 pip-log.txt
 pip-delete-this-directory.txt
 
@@ -202,6 +203,7 @@ yarn-error.log*
 
 databases/data
 
-*_initial.py
+*initial*.py
 
 data
+
