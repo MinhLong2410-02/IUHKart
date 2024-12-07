@@ -334,3 +334,14 @@ services:
             - ./configs/search-engine:/app
         restart: always
 
+    recsys:
+        container_name: recsys
+        build: configs/recsys
+        depends_on:
+            kafka-postgres:
+                condition: service_healthy
+        networks:
+            - iuhkart-network
+        volumes:
+            - ./configs/recsys:/app 
+        restart: always
