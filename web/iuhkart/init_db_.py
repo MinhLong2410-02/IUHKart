@@ -22,8 +22,6 @@ def init_qdrant():
 init_qdrant()
 
 ###
-
-
 from iuhkart.wsgi import *
 from iuhkart.settings import *
 from django.contrib.auth import get_user_model
@@ -66,7 +64,7 @@ connection = psycopg2.connect(
 connection.autocommit = True
 cursor = connection.cursor()
 
-# Execute a simple SQL query
+# Delete all tables in public schema
 cursor.execute('''DO $$ 
 DECLARE
     r RECORD;
