@@ -202,6 +202,6 @@ yarn-error.log*
 
 databases/data
 
-*_initial.py
+*initial*.py
 
 data
