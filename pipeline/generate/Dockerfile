@@ -11,7 +11,7 @@ RUN apt-get update \
 USER airflow
 
 # Install Python packages required for your DAGs
-RUN pip install --no-cache-dir pendulum==2.1.2 faker geopy
+RUN pip install --no-cache-dir pendulum==2.1.2 faker geopy python-dotenv
 
 # Set environment variables from the .env file
 ENV REDIS_HOST=${REDIS_HOST}

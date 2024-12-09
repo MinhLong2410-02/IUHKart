@@ -4,11 +4,18 @@ from airflow.decorators import dag, task
 
 import psycopg2
 import random
-import time
+import os
 from datetime import datetime
 import pandas as pd
 from faker import Faker
 fake = Faker()
+from dotenv import load_dotenv
+load_dotenv(".env")
+POSTGRES_HOST=os.getenv("POSTGRES_HOST")
+POSTGRES_PORT=os.getenv("POSTGRES_PORT")
+POSTGRES_USER=os.getenv("POSTGRES_USER")
+POSTGRES_PASSWORD=os.getenv("POSTGRES_PASSWORD")
+POSTGRES_DB=os.getenv("POSTGRES_DB")
 
 def _generate_random_id(list_id):
     return random.choice(list_id)
@@ -49,11 +56,11 @@ def insert_product(conn):
 def main():
     # Cấu hình kết nối tới PostgreSQL
     conn = psycopg2.connect(
-        host="crawl.serveftp.com",
-        port="5567",
-        database="postgres",
-        user="iuhkart",
-        password="iuhkartpassword"
+        host=POSTGRES_HOST,
+        port=POSTGRES_HOST,
+        database=POSTGRES_DB,
+        user=POSTGRES_USER,
+        password=POSTGRES_PASSWORD
     )
     print("✅ Kết nối tới PostgreSQL thành công.")
 

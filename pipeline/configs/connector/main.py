@@ -25,5 +25,5 @@ def create_connection(file_config:str):
 
 if __name__ == "__main__":
     create_connection("postgres")
-    # create_connection("mongo")
+    create_connection("mongo")
 

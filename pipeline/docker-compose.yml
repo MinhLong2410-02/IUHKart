@@ -1,7 +1,7 @@
 networks:
-  iuhkart-network:
-    name: iuhkart-network
-    external: true
+    iuhkart-network:
+        name: iuhkart-network
+        external: true
 
 services:
     zookeeper-postgres:
@@ -18,7 +18,7 @@ services:
             retries: 5
             start_period: 20s
         restart: always
-
+    
     zookeeper-mongo:
         container_name: zookeeper-mongo
         image: wurstmeister/zookeeper:latest
@@ -33,7 +33,7 @@ services:
             retries: 5
             start_period: 20s
         restart: always
-
+    
     kafka-postgres:
         container_name: kafka-postgres
         image: wurstmeister/kafka:latest
@@ -64,7 +64,7 @@ services:
             retries: 5
             start_period: 30s
         restart: always
-
+    
     kafka-mongo:
         container_name: kafka-mongo
         image: wurstmeister/kafka:latest
@@ -95,10 +95,13 @@ services:
             retries: 5
             start_period: 30s
         restart: always
-
+    
     kafka-ui:
         container_name: kafka-ui
         image: provectuslabs/kafka-ui:latest
+        depends_on:
+            - kafka-postgres
+            - kafka-mongo
         ports:
             - "18081:8081"
         environment:
@@ -112,7 +115,7 @@ services:
         networks:
             - iuhkart-network
         restart: always
-
+    
     debezium-postgres:
         container_name: debezium-postgres
         image: debezium/connect:3.0.0.Final
@@ -132,7 +135,7 @@ services:
             timeout: 10s
             retries: 5
         restart: always
-
+    
     debezium-mongo:
         container_name: debezium-mongo
         image: debezium/connect:3.0.0.Final
@@ -152,7 +155,7 @@ services:
             timeout: 10s
             retries: 5
         restart: always
-
+    
     debezium-ui:
         container_name: debezium-ui
         image: debezium/debezium-ui:latest
@@ -167,7 +170,7 @@ services:
         networks:
             - iuhkart-network
         restart: always
-
+    
     init-connect:
         container_name: init-connect
         build: configs/connector
