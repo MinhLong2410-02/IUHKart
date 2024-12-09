@@ -22,7 +22,7 @@
         "transforms.flatten.type": "org.apache.kafka.connect.transforms.Flatten$Value",
         "transforms.flatten.delimiter": ".",
         "transforms.convertTimestamp.type": "org.apache.kafka.connect.transforms.TimestampConverter$Value",
-        "transforms.convertTimestamp.field": "review_date",
+        "transforms.convertTimestamp.field": "review_date, date_of_birth, date_join, order_date, shipping_date",
         "transforms.convertTimestamp.target.type": "Timestamp",
         "transforms.convertTimestamp.format": "yyyy-MM-dd HH:mm:ss"
     }
