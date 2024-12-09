@@ -1,8 +1,9 @@
 from datetime import datetime, timedelta
+from pytz import timezone
 from airflow import AirflowException
 from airflow.decorators import dag, task
 
-import psycopg2
+import psycopg2 
 import random
 import time
 from faker import Faker
@@ -36,7 +37,7 @@ def insert_random_data(conn):
 
             # Tạo dữ liệu ngẫu nhiên
             random_rating = _generate_review_rating()
-            random_date = datetime.now()
+            random_date = datetime.now(tz=timezone('Asia/Ho_Chi_Minh')).strftime('%Y-%m-%d %H:%M:%S')
             random_content = _generate_random_content()
 
             insert_query = """

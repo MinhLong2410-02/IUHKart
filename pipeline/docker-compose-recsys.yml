@@ -1,0 +1,49 @@
+networks:
+    iuhkart-network:
+        name: iuhkart-network
+        external: true
+
+services:
+    embedding:
+        container_name: embedding
+        image: qxnam/embedding-api:latest
+        environment:
+            - NVIDIA_VISIBLE_DEVICES="0"
+        ports:
+            - 8065:8000
+        networks:
+            - iuhkart-network
+        volumes:
+            - ./configs/embedding-app:/app
+        restart: always
+        deploy:
+            resources:
+                reservations:
+                    devices:
+                        - driver: nvidia
+                          count: all
+                          capabilities: [gpu]
+        healthcheck:
+            test: ["CMD", "curl", "-f", "http://embedding:8000/health"]
+            interval: 10s
+            timeout: 5s
+            retries: 3
+
+    search-engine:
+        container_name: search-engine
+        build: configs/search-engine
+        networks:
+            - iuhkart-network
+        volumes:
+            - ./configs/search-engine:/app
+        restart: always
+
+    recsys:
+        container_name: recsys
+        build: configs/recsys
+        networks:
+            - iuhkart-network
+        volumes:
+            - ./configs/recsys:/app 
+        restart: always
+

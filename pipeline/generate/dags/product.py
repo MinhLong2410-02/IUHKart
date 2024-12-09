@@ -23,7 +23,7 @@ def insert_product(conn):
     attributes = ["product_id", "product_name", "original_price", "stock", "brand", "slug", "product_description", "date_created", "ratings", "date_add", "category_id", "vendor_id"]
     id_categories = _load_ids(conn, "categories", "category_id")
     id_vendors = _load_ids(conn, "vendors", "id")
-
+    
     category_id = _generate_random_id(id_categories)
     vendor_id = _generate_random_id(id_vendors)
     product_name = fake.slug()
