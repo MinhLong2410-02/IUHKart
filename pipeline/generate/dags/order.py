@@ -107,7 +107,13 @@ def insert_order(conn):
 
 def main():
     # Cấu hình kết nối tới PostgreSQL
-cc
+    conn = psycopg2.connect(
+        host=POSTGRES_HOST,
+        port=POSTGRES_HOST,
+        database=POSTGRES_DB,
+        user=POSTGRES_USER,
+        password=POSTGRES_PASSWORD
+    )
     print("✅ Kết nối tới PostgreSQL thành công.")
 
     insert_order(conn)

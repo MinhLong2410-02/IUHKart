@@ -73,7 +73,7 @@ def main():
     )
     
     print("Kết nối tới PostgreSQL thành công.")
-   
+    
     with conn.cursor() as cursor:
         # Xác định sequence của bảng reviews
         # SELECT pg_get_serial_sequence('reviews', 'review_id');
