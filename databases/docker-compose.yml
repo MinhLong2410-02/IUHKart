@@ -83,8 +83,8 @@ services:
     clickhouse:
         image: 'clickhouse/clickhouse-server' #:24.7-alpine
         container_name: clickhouse
-        # environment:
-        #     CLICKHOUSE_ALWAYS_RUN_INITDB_SCRIPTS: 1
+        environment:
+            CLICKHOUSE_ALWAYS_RUN_INITDB_SCRIPTS: 1
         ports:
             - '8123:8123'
             - '9000:9000'
@@ -95,7 +95,7 @@ services:
         volumes:
             - './configs/clickhouse/config.xml:/etc/clickhouse-server/config.xml'
             - './configs/clickhouse/users.xml:/etc/clickhouse-server/users.xml'
-            - './configs/clickhouse/schema.sql:/docker-entrypoint-initdb.d/schema.sql'
+            - ./configs/clickhouse/test.sql:/docker-entrypoint-initdb.d/schema.sql:ro
         networks:
             - iuhkart-network
         restart: always

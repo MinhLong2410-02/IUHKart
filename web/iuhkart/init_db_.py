@@ -15,14 +15,14 @@ def getTextEmbedding(text: str):
     return vector
 
 def init_qdrant():
-    client = QdrantClient(url=Q_HOST, port=Q_PORT)
+    client = QdrantClient(url=f"http://{Q_HOST}:{Q_PORT}")
     if COLLECTION in [c.name for c in client.get_collections().collections]:
         client.delete_collection(collection_name=COLLECTION)
     client.create_collection(collection_name=COLLECTION, vectors_config=VectorParams(size=384, distance=Distance.COSINE))
 
 init_qdrant()
+print("🟢 Khởi tạo thành công qdrant")
 
-exit()
 ###
 from iuhkart.wsgi import *
 from iuhkart.settings import *

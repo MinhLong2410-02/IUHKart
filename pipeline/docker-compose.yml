@@ -181,4 +181,3 @@ services:
         volumes:
             - ./configs/connector:/app
         restart: "no"
-

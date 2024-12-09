@@ -1,0 +1,50 @@
+services:
+    superset-db:
+        init: true
+        image: postgres:alpine
+        container_name: superset-db
+        restart: unless-stopped
+        ports:
+            - '15555:5432'
+        environment:
+            POSTGRES_USER: superset
+            POSTGRES_PASSWORD: superset
+            POSTGRES_DB: superset
+        volumes:
+            - ./data/superset_db:/var/lib/postgresql/data
+        networks:
+            - iuhkart-network
+        healthcheck:
+            test: ["CMD", "pg_isready", "-U", "superset"]
+            interval: 10s
+            timeout: 5s
+            retries: 5
+
+    superset:
+        init: true
+        build: configs/superset
+        container_name: superset
+        restart: unless-stopped
+        ports:
+            - "8088:8088"
+        environment:
+            SUPERSET_ENV: production
+            SUPERSET_LOAD_EXAMPLES: "yes"
+            DATABASE_URL: postgresql+psycopg2://superset:superset@superset-db:5432/superset
+            DATABASE_DB: superset
+            DATABASE_HOST: superset-db
+            DATABASE_PASSWORD: superset
+            DATABASE_USER: superset
+            DATABASE_PORT: 5432
+        networks:
+            - iuhkart-network
+        depends_on:
+            - superset-db
+        volumes:
+            - ./data/superset_home:/home/superset
+
+networks:
+    iuhkart-network:
+        name: iuhkart-network
+        external: true
+

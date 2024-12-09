@@ -2,17 +2,28 @@
     "name": "postgres-connector",
     "config": {
         "connector.class": "io.debezium.connector.postgresql.PostgresConnector",
-        "tasks.max": "1",
-        "database.hostname": "crawl.serveftp.com",
-        "database.port": "5567",
+        "database.hostname": "postgres",
+        "database.port": "5432",
         "database.user": "iuhkart",
         "database.password": "iuhkartpassword",
         "database.dbname": "postgres",
         "plugin.name": "pgoutput",
         "topic.prefix": "postgresDB",
         "schema.include.list": "public",
+        "table.include.list": "public.*",
         "value.converter": "org.apache.kafka.connect.json.JsonConverter",
         "value.converter.schemas.enable": "false",
-        "value.converter.decimal.handling.mode": "numeric"
+        "key.converter": "org.apache.kafka.connect.json.JsonConverter",
+        "key.converter.schemas.enable": "false",
+        "snapshot.mode": "initial",
+        "tombstones.on.delete": "false",
+        "time.precision.mode": "connect",
+        "transforms": "flatten,convertTimestamp",
+        "transforms.flatten.type": "org.apache.kafka.connect.transforms.Flatten$Value",
+        "transforms.flatten.delimiter": ".",
+        "transforms.convertTimestamp.type": "org.apache.kafka.connect.transforms.TimestampConverter$Value",
+        "transforms.convertTimestamp.field": "review_date",
+        "transforms.convertTimestamp.target.type": "Timestamp",
+        "transforms.convertTimestamp.format": "yyyy-MM-dd HH:mm:ss"
     }
 }
