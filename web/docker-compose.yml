@@ -22,6 +22,8 @@ services:
       dockerfile: Dockerfile
     ports:
       - "5001:8000"
+    env_file:
+      - .env
     working_dir: /app
     networks:
       - iuhkart-network
@@ -29,17 +31,7 @@ services:
       - ./search-api:/app
     restart: unless-stopped
 
-  cloudflare:
-    image: cloudflare/cloudflared:latest
-    container_name: iuhkart-cloudflare
-    restart: unless-stopped
-    command: tunnel --no-autoupdate run --token $CLOUDFLARE_TOKEN
-    networks:
-      - iuhkart-network
-    depends_on:
-      - django_main
-      - search_api
-      - tracking_api
+  
 
   django_main:
     build: ./iuhkart
@@ -53,9 +45,18 @@ services:
     volumes:
       - ./iuhkart:/app
     restart: unless-stopped
-    # depends_on:
-    #   - mongo_db
-    #   - iuhkart-redis
+
+  cloudflare:
+    image: cloudflare/cloudflared:latest
+    container_name: iuhkart-cloudflare
+    restart: unless-stopped
+    command: tunnel --no-autoupdate run --token $CLOUDFLARE_TOKEN
+    networks:
+      - iuhkart-network
+    depends_on:
+      - django_main
+      - search_api
+      - tracking_api
   
   # vendor_fe:
   #   build: ./iuhkart-vendor

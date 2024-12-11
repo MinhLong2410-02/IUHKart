@@ -29,7 +29,7 @@ SECRET_KEY = environ.get('SECRET_KEY')
 DEBUG = True
 
 CORS_ALLOW_CREDENTIALS = True
-CORS_ALLOWED_ORIGINS  = ['https://3f70-2405-4802-811d-8a80-10b8-2988-6f1b-1e57.ngrok-free.app']
+CORS_ALLOWED_ORIGINS  = ['https://3f70-2405-4802-811d-8a80-10b8-2988-6f1b-1e57.ngrok-free.app', 'https://*.iuhkart.systems']
 CORS_ORIGIN_ALLOW_ALL = True   
 ALLOWED_HOSTS = ['*']
 
