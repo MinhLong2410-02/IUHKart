@@ -1,0 +1,83 @@
+networks:
+    iuhkart-network:
+        name: iuhkart-network
+        external: true
+
+x-common:
+    &airflow-common
+    build:
+        context: ./generate
+        dockerfile: Dockerfile
+    user: "${AIRFLOW_UID:-50000}:0"
+    env_file:
+        - .env
+    volumes:
+        - ./generate/dags:/opt/airflow/dags
+        - ./generate/logs:/opt/airflow/logs
+        - ./generate/config:/opt/airflow/config
+        - ./generate/plugins:/opt/airflow/plugins
+    networks:
+        - iuhkart-network
+
+services:
+    airflow-postgres:
+        platform: linux/amd64
+        image: postgres:16-alpine
+        container_name: postgres_airflow
+        hostname: postgres_airflow
+        healthcheck:
+            test: ["CMD", "pg_isready", "-U", "airflow"]
+            interval: 5s
+            retries: 5
+        networks:
+            - iuhkart-network
+        environment:
+            - POSTGRES_USER=${POSTGRES_AIRFLOW_USER:-airflow}
+            - POSTGRES_PASSWORD=${POSTGRES_AIRFLOW_PASSWORD:-airflow}
+            - POSTGRES_DB=${POSTGRES_AIRFLOW_DB:-airflow}
+    
+    airflow-scheduler:
+        <<: *airflow-common
+        platform: linux/amd64
+        container_name: airflow-scheduler
+        command: scheduler
+        restart: on-failure
+        ports:
+            - "13006:8793"
+        depends_on:
+            airflow-init:
+                condition: service_completed_successfully
+    
+    airflow-webserver:
+        <<: *airflow-common
+        platform: linux/amd64
+        container_name: airflow-webserver
+        restart: always
+        command: webserver
+        ports:
+            - "13008:8080"
+        healthcheck:
+            test: ["CMD", "curl", "--fail", "http://localhost:8080/health"]
+            interval: 30s
+            timeout: 30s
+            retries: 5
+        depends_on:
+            airflow-init:
+                condition: service_completed_successfully
+    
+    airflow-init:
+        <<: *airflow-common
+        platform: linux/amd64
+        container_name: airflow-init
+        entrypoint: /bin/bash
+        depends_on:
+            airflow-postgres:
+                condition: service_healthy
+        command:
+            - -c
+            - |
+                mkdir -p /sources/logs /sources/dags /sources/plugins
+                chown -R "${AIRFLOW_UID}:0" /sources/{logs,dags,plugins}
+                exec /entrypoint airflow version
+    
+

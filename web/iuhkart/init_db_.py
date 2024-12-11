@@ -2,10 +2,14 @@ from qdrant_client import QdrantClient, models
 from qdrant_client.http.models import Distance, VectorParams, PointStruct
 import os, requests
 from dotenv import load_dotenv
+import warnings
+warnings.filterwarnings("ignore")
+
+load_dotenv('.env')
 TEXT_EMBEDDING_URL = os.getenv('TEXT_EMBEDDING_URL')
-HOST = os.getenv('HOST')
-HOST = 'http://crawl.serveftp.com'
-PORT = 6334
+Q_HOST = os.getenv('QDRANT_HOST')
+Q_PORT = os.getenv('QDRANT_PORT')
+COLLECTION = os.getenv('COLLECTION')
 
 def getTextEmbedding(text: str):
     response = requests.get(TEXT_EMBEDDING_URL + text)
@@ -13,13 +17,13 @@ def getTextEmbedding(text: str):
     return vector
 
 def init_qdrant():
-    collection_name='product'
-    client = QdrantClient(url=HOST, port=PORT)
-    if collection_name in [c.name for c in client.get_collections().collections]:
-        client.delete_collection(collection_name=collection_name)
-    client.create_collection(collection_name=collection_name, vectors_config=VectorParams(size=384, distance=Distance.COSINE))
+    client = QdrantClient(url=f"http://{Q_HOST}:{Q_PORT}")
+    if COLLECTION in [c.name for c in client.get_collections().collections]:
+        client.delete_collection(collection_name=COLLECTION)
+    client.create_collection(collection_name=COLLECTION, vectors_config=VectorParams(size=384, distance=Distance.COSINE))
 
 init_qdrant()
+print("🟢 Khởi tạo thành công qdrant")
 
 ###
 from iuhkart.wsgi import *
@@ -42,10 +46,9 @@ from rest_framework_simplejwt.tokens import RefreshToken
 import ssl
 import requests
 from tqdm import tqdm
-
 ssl._create_default_https_context = ssl._create_stdlib_context
-
 load_dotenv('.env')
+
 PROJECT_STATUS = environ.get('STATUS')
 DB_NAME = os.getenv('NAME')
 DB_USER = os.getenv('DBUSER')
@@ -54,12 +57,12 @@ DB_HOST = 'localhost' if PROJECT_STATUS == 'DEV' else os.getenv('HOST')
 DB_PORT = os.getenv('PORT')
 print(F'✅ STATUS: {PROJECT_STATUS}')
 connection = psycopg2.connect(
-        dbname=DB_NAME,
-        user=DB_USER,
-        password=DB_PASS,
-        host=DB_HOST,
-        port=DB_PORT
-    )
+    dbname=DB_NAME,
+    user=DB_USER,
+    password=DB_PASS,
+    host=DB_HOST,
+    port=DB_PORT
+)
 
 connection.autocommit = True
 cursor = connection.cursor()
@@ -263,22 +266,34 @@ def create_vendor_with_jwt(email, password, name, phone, description):
     refresh_token = str(refresh)
     return user, vendor, access_token, refresh_token
 
-def create_customer_with_jwt(email, password, fullname, phone, date_of_birth, address):
+def create_customer_with_jwt(email, password, fullname, phone, date_of_birth, address, gender=None):
     user = User.objects.create_user(
         email=email,
         password=password,  # No need to hash the password here
         is_customer=True,
     )
     cart = Cart.objects.create()
-    customer = Customer.objects.create(
-        user=user,
-        fullname=fullname,
-        phone=phone,
-        date_of_birth=date_of_birth,
-        cart = cart,
-        age = 2024 - int(date_of_birth.split('-')[0])
-    )
-    
+    customer = None
+    if not gender:
+        customer = Customer.objects.create(
+            user=user,
+            fullname=fullname,
+            phone=phone,
+            date_of_birth=date_of_birth,
+            cart = cart,
+            age = 2024 - int(date_of_birth.split('-')[0])
+        )
+    else:
+        customer = Customer.objects.create(
+            user=user,
+            fullname=fullname,
+            phone=phone,
+            date_of_birth=date_of_birth,
+            cart = cart,
+            age = 2024 - int(date_of_birth.split('-')[0]),
+            gender = gender
+        )
+
     user.address = address
     user.save()
     refresh = RefreshToken.for_user(user)
@@ -286,51 +301,58 @@ def create_customer_with_jwt(email, password, fullname, phone, date_of_birth, ad
     refresh_token = str(refresh)
     
     # Cart.objects.create(customer=customer)
-    
     return user, customer, access_token, refresh_token
 
 ##--------------------- Shop 
 user1, vendor1, token1, refresh1 = create_vendor_with_jwt(
     email='minhlong2002@gmail.com',
     password='123',  # Pass the plain password
-    name='Minh Long',
+    name='Polar',
     phone='1234567890',
     description='This is a description for Vendor One.'
 )
-print(f'✅ Vendor: {user1.email}, Access Token: {token1}, Refresh Token: {refresh1}')
+print(f'✅ Vendor: {user1.email}')
+# print(f'Access Token: {token1}')
+# print(f'Refresh Token: {refresh1}')
 
 user2, vendor2, token2, refresh2 = create_vendor_with_jwt(
     email='quachnam311@gmail.com',
     password='123',  # Pass the plain password
-    name='Qx Nam',
+    name='Penguin',
     phone='0398089311',
     description='This is a description for Vendor Three.'
 )
-print(f'✅ Vendor: {user2.email}, Access Token: {token2}, Refresh Token: {refresh2}')
+print(f'✅ Vendor: {user2.email}')
+# print(f'Access Token: {token2}')
+# print(f'Refresh Token: {refresh2}')
 
 ##--------------------- Customer
-address = create_address(79, 764, 26899, '12 Nguyễn Văn Bảo, Phường 4, quận Gò Vấp, TP.HCM')
+address = create_address(79, 764, 26899, '12 Nguyễn Văn Bảo, Phường 4, quận Gò Vấp, Hồ Chí Minh')
 user3, customer3, token3, refresh3 = create_customer_with_jwt(
     email='vanhau20022018@gmail.com',
     password='123',  # Pass the plain password
-    fullname='Văn Hậu',
+    fullname='Nguyễn Văn Hậu',
     phone='0987654321',
     date_of_birth='2002-02-20',
     address=address
 )
-print(f'✅ Customer: {user3.email}, Access Token: {token3}, Refresh Token: {refresh3}')
+print(f'✅ Customer: {user3.email}')
+# print(f'Access Token: {token3}')
+# print(f'Refresh Token: {refresh3}')
 
-address = create_address(79, 764, 26881, '273/34/1 Nguyễn Văn Đậu, Phường 11, Bình Thạnh, TP.HCM')
+address = create_address(79, 764, 26881, '273/34/1 Nguyễn Văn Đậu, Phường 11, Bình Thạnh, Hồ Chí Minh')
 user4, customer4, token4, refresh4 = create_customer_with_jwt(
-    email='lamthanhthanh@gmail.com',
-    password='123',  # Pass the plain password
-    fullname='Lê Thành Nghĩa',
+    email='lethanhnghia@gmail.com',
+    password='123',
+    fullname='Lê Tâm Như',
     phone='0987654322',
     date_of_birth='2003-07-31',
-    address=address
-    
+    address=address,
+    gender='female'
 )
-print(f'✅ Customer: {user4.email}, Access Token: {token4}, Refresh Token: {refresh4}')
+print(f'✅ Customer: {user4.email}')
+# print(f'Access Token: {token4}')
+# print(f'Refresh Token: {refresh4}')
 
 address = create_address(79, 764, 26898, '185b Nguyễn Oanh, Phường 10, Gò Vấp, Hồ Chí Minh')
 user5, customer5, token5, refresh5 = create_customer_with_jwt(
@@ -340,9 +362,10 @@ user5, customer5, token5, refresh5 = create_customer_with_jwt(
     phone='0987654324',
     date_of_birth='2002-03-20',
     address=address
-    
 )
-print(f'✅ Customer: {user5.email}, Access Token: {token5}, Refresh Token: {refresh5}')
+print(f'✅ Customer: {user5.email}')
+# print(f'Access Token: {token5}')
+# print(f'Refresh Token: {refresh5}')
 
 address = create_address(79, 764, 26898, '190 Đ. Quang Trung, Phường 10, Gò Vấp, Hồ Chí Minh')
 user6, customer6, token6, refresh6 = create_customer_with_jwt(
@@ -352,9 +375,10 @@ user6, customer6, token6, refresh6 = create_customer_with_jwt(
     phone='0987654324',
     date_of_birth='2002-03-20',
     address=address
-    
 )
-print(f'✅ Customer: {user6.email}, Access Token: {token6}, Refresh Token: {refresh6}')
+print(f'✅ Customer: {user6.email}')
+# print(f'Access Token: {token6}')
+# print(f'Refresh Token: {refresh6}')
 
 print(f'✅ Create a fake address acount with address_id: {address.address_id}')
 insert_product()

@@ -1,0 +1,4 @@
+ENABLE_PROXY_FIX = True
+SECRET_KEY = "nfak8C8sRrfrk22mw4FZqi9Dq3Aidfh9xVDjlGenYxxU9SB9t0Wf+cjf" # openssl rand -base64 42
+PREVENT_UNSAFE_DB_CONNECTIONS = False
+TALISMAN_ENABLED = False
