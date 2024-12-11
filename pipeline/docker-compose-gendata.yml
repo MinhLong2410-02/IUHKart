@@ -35,7 +35,7 @@ services:
             - POSTGRES_USER=${POSTGRES_AIRFLOW_USER:-airflow}
             - POSTGRES_PASSWORD=${POSTGRES_AIRFLOW_PASSWORD:-airflow}
             - POSTGRES_DB=${POSTGRES_AIRFLOW_DB:-airflow}
-
+    
     airflow-scheduler:
         <<: *airflow-common
         platform: linux/amd64
@@ -47,7 +47,7 @@ services:
         depends_on:
             airflow-init:
                 condition: service_completed_successfully
-
+    
     airflow-webserver:
         <<: *airflow-common
         platform: linux/amd64
@@ -64,7 +64,7 @@ services:
         depends_on:
             airflow-init:
                 condition: service_completed_successfully
-
+    
     airflow-init:
         <<: *airflow-common
         platform: linux/amd64
@@ -79,3 +79,5 @@ services:
                 mkdir -p /sources/logs /sources/dags /sources/plugins
                 chown -R "${AIRFLOW_UID}:0" /sources/{logs,dags,plugins}
                 exec /entrypoint airflow version
+    
+

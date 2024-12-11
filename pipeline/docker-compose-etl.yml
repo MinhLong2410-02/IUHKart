@@ -1,7 +1,7 @@
 networks:
-  iuhkart-network:
-    name: iuhkart-network
-    external: true
+    iuhkart-network:
+        name: iuhkart-network
+        external: true
 
 services:
     flink-jobmanager:
@@ -23,7 +23,7 @@ services:
         volumes:
             - ./jobs:/opt/flink/jobs
         restart: always
-
+    
     flink-taskmanager:
         container_name: flink-taskmanager
         # build: configs/flink-1.18.1

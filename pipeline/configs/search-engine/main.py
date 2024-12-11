@@ -1,23 +1,18 @@
 from kafka import KafkaConsumer
 from qdrant_client import QdrantClient
-from qdrant_client.http.models import Distance, VectorParams, PointStruct
+from qdrant_client.http.models import PointStruct
 import os, requests, json
 from uuid import uuid4
 from dotenv import load_dotenv
-from pprint import pprint
-import signal
-import sys
+from time import time
 
-# Load environment variables
 load_dotenv()
-
 KAFKA_HOST = os.getenv("KAFKA_HOST")
 KAFKA_PORT = os.getenv("KAFKA_PORT")
 KAFKA_TOPIC = os.getenv("KAFKA_TOPIC")
 URL_EMBEDDING = os.getenv("URL_EMBEDDING")
 QDRANT_HOST = os.getenv("QDRANT_HOST")
 QDRANT_PORT = os.getenv("QDRANT_PORT")
-
 
 def create_consumer():
     """Create Kafka consumer instance."""
@@ -30,16 +25,13 @@ def create_consumer():
         value_deserializer=lambda m: m.decode('utf-8')
     )
 
-
 def decode_message(message: str):
     """Decode Kafka message and extract change data."""
     try:
         message_json = json.loads(message)
-        # payload = message_json.get('payload', {})
         operation = message_json.get('op')
-        before = message_json.get('before')
-        after = message_json.get('after')
-
+        before = {k.split(".")[-1]: v for k, v in message_json.items() if k.startswith('before') and k.split(".")[-1] in ("product_id", "product_name", "slug")}
+        after = {k.split(".")[-1]: v for k, v in message_json.items() if k.startswith('after') and k.split(".")[-1] in ("product_id", "product_name", "slug")}
         if operation == 'c':
             return 'create', after
         elif operation == 'u':
@@ -51,22 +43,6 @@ def decode_message(message: str):
     except Exception as e:
         print(f"Error decoding message: {e}")
         return None, None
-
-
-def collection_init():
-    """Initialize Qdrant collection."""
-    client = QdrantClient(host=QDRANT_HOST, port=QDRANT_PORT)
-    collection_name = 'product'
-    if collection_name not in [c.name for c in client.get_collections().collections]:
-        client.create_collection(
-            collection_name=collection_name,
-            vectors_config=VectorParams(size=384, distance=Distance.COSINE)
-        )
-        print(f"✅ Collection {collection_name} created")
-    else:
-        print(f"🔍 Collection {collection_name} already exists")
-    client.close()
-
 
 def process_batch(messages):
     """Process a batch of Kafka messages."""
@@ -80,7 +56,6 @@ def process_batch(messages):
             client.delete(collection_name='product', point_ids=[data['product_id']])
         else:
             vector = requests.get(f"{URL_EMBEDDING}/embedding?q={data['slug']}").json().get('embedding')
-            print(vector)
             if vector:
                 points.append(PointStruct(
                     id=str(uuid4()),
@@ -94,35 +69,68 @@ def process_batch(messages):
         client.upsert(collection_name='product', points=points)
     client.close()
 
+# def process_messages(consumer):
+#     """Process messages from Kafka in batches or individually."""
+#     batch = []
+#     try:
+#         for message in consumer:
+#             batch.append(message.value)
+#             if len(batch) >= 100 or len(batch) == 1:  
+#                 process_batch(batch)
+#                 batch.clear()
+#         if batch:
+#             process_batch(batch)
+#     except Exception as e:
+#         print(f"Error while processing messages: {e}")
 
 def process_messages(consumer):
     """Process messages from Kafka in batches or individually."""
     batch = []
+    batch_start_time = None
+    BATCH_SIZE = 100
+    BATCH_TIMEOUT = 60  # 1 phut
+    batch_index = 0
     try:
-        for message in consumer:
-            batch.append(message.value)
+        while True:
+            # Thời gian chờ tối đa để lấy tin nhắn (timeout)
+            message = consumer.poll(timeout_ms=0.5)
+            if message:
+                for tp, messages in message.items():
+                    for msg in messages:
+                        if not batch:
+                            # Đặt thời gian bắt đầu khi thêm tin nhắn đầu tiên vào lô
+                            batch_start_time = time()
+                        batch.append(msg.value)
 
-            # Process batch immediately if size is 1 or reaches 100
-            if len(batch) >= 100 or len(batch) == 1:  
-                process_batch(batch)
-                batch.clear()
-
-        # Process remaining messages in the batch (if any)
-        if batch:
-            process_batch(batch)
+                        if len(batch) >= BATCH_SIZE:
+                            batch_index += 1 
+                            print(f"🟢 Processing batch {batch_index} FULL")
+                            process_batch(batch)
+                            batch.clear()
+                            batch_start_time = None  # Reset thời gian bắt đầu lô
+            # Kiểm tra nếu có lô và đã đạt thời gian chờ
+            if batch and batch_start_time:
+                elapsed_time = time() - batch_start_time
+                if elapsed_time >= BATCH_TIMEOUT:
+                    batch_index += 1
+                    print(f"🟢 Processing batch {batch_index} TIMEOUT")
+                    process_batch(batch)
+                    batch.clear()
+                    batch_start_time = None  # Reset thời gian bắt đầu lô
 
     except Exception as e:
         print(f"Error while processing messages: {e}")
-
-
+    finally:
+        # Xử lý lô còn lại khi kết thúc
+        if batch:
+            batch_index += 1
+            print(f"🟢 Processing batch {batch_index} FINAL")
+            process_batch(batch)
 
 def main():
-
-    collection_init()
     consumer = create_consumer()
     print("🖋️ Starting to consume messages...")
     process_messages(consumer)
-
 
 if __name__ == "__main__":
     main()
