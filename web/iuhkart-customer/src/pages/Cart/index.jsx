@@ -19,6 +19,7 @@ import {
 import _ from "lodash";
 
 import cartAPI from "../../api/cart.api";
+import TrackingApi from "../../api/tracking";
 
 const Cart = () => {
   const toast = useToast();
@@ -61,6 +62,13 @@ const Cart = () => {
     },
     [toast]
   );
+
+
+  const handleClickProceedPayment = useCallback(async () => {
+    // await TrackingApi.purchase(product.product_id);
+    console.log("Proceed payment");
+  }, []);
+
 
   const renderListCartItem = useMemo(() => {
     return (
@@ -159,6 +167,7 @@ const Cart = () => {
                       _hover={{
                         backgroundColor: "#333190",
                       }}
+                      onClick={handleClickProceedPayment}
                     >
                       Proceed payment
                     </Button>
