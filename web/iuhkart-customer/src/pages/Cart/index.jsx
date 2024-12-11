@@ -66,7 +66,7 @@ const Cart = () => {
 
   const handleClickProceedPayment = useCallback(async () => {
     // await TrackingApi.purchase(product.product_id);
-    console.log("Proceed payment");
+    console.log("Proceed payment k");
   }, []);
 
 
