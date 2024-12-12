@@ -1,5 +1,5 @@
-from fastapi import FastAPI, HTTPException
-from schemas import InsertPointRequestBody, UpdatePointRequestBody
+from fastapi import FastAPI, HTTPException, Request, Path, Query, Depends
+from schemas import InsertPointRequestBody, UpdatePointRequestBody, SearchQueryParams
 from uuid import uuid4
 from fastapi.middleware.cors import CORSMiddleware
 from qdrant_base import (
@@ -12,6 +12,7 @@ from qdrant_base import (
     VectorParams, 
     Distance
 )
+from utils import search_tracking
 
 app = FastAPI()
 allowed_origins = [
@@ -148,20 +149,33 @@ async def create_collection(collection_name:str=None):
 
 # search
 @app.get("/collections/{collection_name}/search", status_code=200)
-async def search(collection_name:str=None, slug:str=None, limit:int=10, thresh:float=0.0):
+async def search(
+    request: Request,
+    collection_name: str = Path(..., description="Name of the collection"), 
+    query_params: SearchQueryParams = Depends(),
+):
     '''tìm kiếm các point gần nhất với slug trong collection_name, lấy theo giới hạn và ngưỡng'''
+    slug = query_params.slug
+    limit = query_params.limit
+    thresh = query_params.thresh
+
+    access_token = request.headers.get("access_token")
+    if not access_token:
+        raise HTTPException(status_code=401, detail="Access token missing or invalid")
+    
     if slug is None:
         raise HTTPException(status_code=404, detail="Slug not found!")
     if collection_name is None or _check_exist(collection_name)==False:
         raise HTTPException(status_code=404, detail="Collection name not found!")
-    
     vector = getTextEmbedding(slug)
     if vector is None:
         return {'detail': 'Vector is None'}
-    res = client.search(
+    products = client.search(
         collection_name=collection_name,
         query_vector=vector,
         limit=limit
     )
-    res = [{'score':i.score, 'payload':i.payload} for i in res if i.score >= thresh]
-    return {'results': res}
+    product_ids = list(set([product['payload']['product_id'] for product in products]))
+    tracking_status = search_tracking(product_ids, access_token)
+    res = [{'score':i.score, 'payload':i.payload} for i in products if i.score >= thresh]
+    return {'results': res, tracking_status: tracking_status}
