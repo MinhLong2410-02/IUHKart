@@ -24,6 +24,8 @@ services:
       - "5001:8000"
     env_file:
       - .env
+    environment:
+      - TRACKING_API=http://tracking_api:8000/
     working_dir: /app
     networks:
       - iuhkart-network

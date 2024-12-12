@@ -12,6 +12,7 @@ from qdrant_base import (
     VectorParams, 
     Distance
 )
+from utils import search_tracking
 
 app = FastAPI()
 allowed_origins = [
@@ -157,19 +158,24 @@ async def search(
     slug = query_params.slug
     limit = query_params.limit
     thresh = query_params.thresh
-    print("Headers:", request.headers)
+
+    access_token = request.headers.get("access_token")
+    if not access_token:
+        raise HTTPException(status_code=401, detail="Access token missing or invalid")
+    
     if slug is None:
         raise HTTPException(status_code=404, detail="Slug not found!")
     if collection_name is None or _check_exist(collection_name)==False:
         raise HTTPException(status_code=404, detail="Collection name not found!")
-    print(request.headers)
     vector = getTextEmbedding(slug)
     if vector is None:
         return {'detail': 'Vector is None'}
-    res = client.search(
+    products = client.search(
         collection_name=collection_name,
         query_vector=vector,
         limit=limit
     )
-    res = [{'score':i.score, 'payload':i.payload} for i in res if i.score >= thresh]
-    return {'results': res}
+    product_ids = list(set([product['payload']['product_id'] for product in products]))
+    tracking_status = search_tracking(product_ids, access_token)
+    res = [{'score':i.score, 'payload':i.payload} for i in products if i.score >= thresh]
+    return {'results': res, tracking_status: tracking_status}
