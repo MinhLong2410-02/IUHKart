@@ -51,7 +51,7 @@ class CustomerDOBUpdateSerializer(serializers.ModelSerializer):
 
 
 class CustomerSerializer(serializers.ModelSerializer):
-    email = serializers.EmailField(write_only=True)  # Capture email directly since there's no user link
+    email = serializers.EmailField(write_only=True)  
     date_of_birth = serializers.DateField(required=False, allow_null=True)
 
     class Meta:
