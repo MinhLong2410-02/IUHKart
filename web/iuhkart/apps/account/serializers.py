@@ -51,7 +51,7 @@ class CustomerDOBUpdateSerializer(serializers.ModelSerializer):
 
 
 class CustomerSerializer(serializers.ModelSerializer):
-    email = serializers.EmailField(write_only=True)  # Capture email directly since there's no user link
+    email = serializers.EmailField(write_only=True)  
     date_of_birth = serializers.DateField(required=False, allow_null=True)
 
     class Meta:
@@ -77,7 +77,7 @@ class CustomerSerializer(serializers.ModelSerializer):
 
 class CustomerSerializer(serializers.ModelSerializer):
     user = UserSerializer()
-    date_of_birth = serializers.DateField(required=False, allow_null=True)
+    date_of_birth = serializers.DateTimeField(required=False, allow_null=True)
 
     class Meta:
         model = Customer

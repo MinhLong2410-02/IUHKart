@@ -8,7 +8,7 @@ urlpatterns = [
     path('api/register/customer/', RegisterCustomerView.as_view(), name='register_customer'),
     
     path('api/vendor/me', VendorDetailView.as_view(), name='vendor-detail'),
-    path('api/customer/me', VendorDetailView.as_view(), name='vendor-detail'),
+    path('api/customer/me', CustomerDetailView.as_view(), name='customer-detail'),
 
     path('api/register/vendor/', RegisterVendorView.as_view(), name='register_vendor'),
     path('api/update-image/customer/', UpdateCustomerAvatarView.as_view(), name='update-img-customer'),

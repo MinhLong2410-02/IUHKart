@@ -18,11 +18,7 @@ BEHAVIOR_WEIGHTS = {
 # add middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost",  
-        "http://*.iuhkart.systems",  
-        "https://*.iuhkart.systems" 
-    ],
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["GET", "POST"],
     allow_headers=["*"],

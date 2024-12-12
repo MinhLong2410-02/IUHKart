@@ -31,8 +31,6 @@ services:
       - ./search-api:/app
     restart: unless-stopped
 
-  
-
   django_main:
     build: ./iuhkart
     ports:
@@ -45,7 +43,36 @@ services:
     volumes:
       - ./iuhkart:/app
     restart: unless-stopped
+  
+  
+  shop_fe:
+    build: ./iuhkart-shop
+    ports:
+      - "3005:3000"
+    env_file:
+      - .env
+    working_dir: /app
+    networks:
+      - iuhkart-network
+    depends_on:
+      - django_main
+      - search_api
+      - tracking_api
 
+  customer_fe:
+    build: ./iuhkart-customer
+    ports:
+      - "3006:3000"
+    env_file:
+      - .env
+    working_dir: /app
+    networks:
+      - iuhkart-network
+    depends_on:
+      - django_main
+      - search_api
+      - tracking_api
+  
   cloudflare:
     image: cloudflare/cloudflared:latest
     container_name: iuhkart-cloudflare
@@ -57,30 +84,7 @@ services:
       - django_main
       - search_api
       - tracking_api
-  
-  # vendor_fe:
-  #   build: ./iuhkart-vendor
-  #   ports:
-  #     - "8006:8000"
-  #   env_file:
-  #     - ./iuhkart-vendor/.env
-  #   working_dir: /app
-  #   networks:
-  #     - iuhkart-network
-  #   depends_on:
-  #     - django_main
-  # customer_fe:
-  #   build: ./iuhkart-customer
-  #   ports:
-  #     - "8005:8000"
-  #   env_file:
-  #     - ./iuhkart-customer/.env
-  #   working_dir: /app
-  #   networks:
-  #     - iuhkart-network
-  #   depends_on:
-  #     - django_main
-  
+
 networks:
   iuhkart-network:
     name: iuhkart-network

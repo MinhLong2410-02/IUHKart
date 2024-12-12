@@ -52,7 +52,7 @@ const createAxiosClient = (baseURL) => {
 };
 
 // Create Axios Clients
-const axiosClient = createAxiosClient(process.env.REACT_APP_BACKEND_URL);
+const axiosClient = createAxiosClient(process.env.REACT_APP_DJANGO_URL);
 const axiosClientTracking = createAxiosClient("https://tracking.iuhkart.systems/");
 
 export { axiosClientTracking };
