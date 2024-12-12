@@ -3,6 +3,8 @@ import queryString from "query-string";
 
 const axiosClient = axios.create({
   baseURL: "https://qdrant-iuhkart.aiclubiuh.com/",
+  baseURL: process.env.REACT_APP_SEARCH_API,
+
   headers: {
     "Content-Type": "application/json",
   },

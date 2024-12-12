@@ -3,7 +3,7 @@ import queryString from 'query-string';
 import Cookies from 'js-cookie';
 
 const axiosClient = axios.create({
-    baseURL: process.env.REACT_APP_DJANGO_URL,
+    baseURL: process.env.REACT_APP_DJANGO_API,
     headers: {
         'Content-Type': 'application/json',
     },

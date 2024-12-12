@@ -12,3 +12,8 @@ class UpdatePointRequestBody(BaseModel):
     product_id: int
     product_name: Optional[str] = None
     product_image_url: Optional[str] = None
+    
+class SearchQueryParams(BaseModel):
+    slug: str  
+    limit: int = 10  # Optional, with default value
+    thresh: float = 0.0  # Optional, with default value

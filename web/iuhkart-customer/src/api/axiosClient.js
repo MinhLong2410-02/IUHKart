@@ -52,8 +52,8 @@ const createAxiosClient = (baseURL) => {
 };
 
 // Create Axios Clients
-const axiosClient = createAxiosClient(process.env.REACT_APP_DJANGO_URL);
-const axiosClientTracking = createAxiosClient("https://tracking.iuhkart.systems/");
+const axiosClient = createAxiosClient(process.env.REACT_APP_DJANGO_API);
+const axiosClientTracking = createAxiosClient(process.env.REACT_APP_TRACKING_API);
 
 export { axiosClientTracking };
 export default axiosClient;
