@@ -3,8 +3,8 @@ services:
         image: portainer/portainer:latest
         container_name: portainer
         ports:
-            - 28000:8000
-            - 29011:9000
+            - 28001:8000
+            - 29015:9000
         volumes:
             - ./data/portainer-data:/data
             - /var/run/docker.sock:/var/run/docker.sock
@@ -79,17 +79,19 @@ services:
     clickhouse:
         image: 'clickhouse/clickhouse-server'
         container_name: clickhouse
-        environment:
-            CLICKHOUSE_ALWAYS_RUN_INITDB_SCRIPTS: 1
+        # environment:
+        #     CLICKHOUSE_ALWAYS_RUN_INITDB_SCRIPTS: 1
         ports:
-            - '8123:8123'
-            - '9000:9000'
+            - '8125:8123'
+            - '9056:9000'
         volumes:
-            - './configs/clickhouse/config.xml:/etc/clickhouse-server/config.xml'
-            - './configs/clickhouse/users.xml:/etc/clickhouse-server/users.xml'
-            # - ./configs/clickhouse/schema.sql:/docker-entrypoint-initdb.d/schema.sql:ro
+            - ./configs/clickhouse/config.xml:/etc/clickhouse-server/config.xml
+            - ./configs/clickhouse/users.xml:/etc/clickhouse-server/users.xml
+            - ./configs/clickhouse/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+            - clickhouse-data:/var/lib/clickhouse
         networks:
             - db-network
+            - iuhkart-network
         restart: always
         healthcheck:
             test: wget --no-verbose --tries=1 --spider http://clickhouse:8123/ping || exit 1
@@ -102,8 +104,8 @@ services:
         container_name: minio
         restart: unless-stopped
         ports:
-            - "29000:9000"
-            - "29001:9001"
+            - "29062:9000"
+            - "29038:9001"
         environment:
             MINIO_ROOT_USER: "${MINIO_ROOT_USER}"
             MINIO_ROOT_PASSWORD: "${MINIO_ROOT_PASSWORD}"
@@ -146,3 +148,7 @@ networks:
     iuhkart-network:
         name: iuhkart-network
         external: true
+
+volumes:
+    clickhouse-data:
+        name: clickhouse-data

@@ -5,6 +5,7 @@ import os, requests, json
 from uuid import uuid4
 from dotenv import load_dotenv
 from time import time
+import sys
 
 load_dotenv()
 KAFKA_HOST = os.getenv("KAFKA_HOST")
@@ -103,8 +104,9 @@ def process_messages(consumer):
                         batch.append(msg.value)
 
                         if len(batch) >= BATCH_SIZE:
-                            batch_index += 1 
+                            batch_index += 1
                             print(f"🟢 Processing batch {batch_index} FULL")
+                            sys.stdout.flush()
                             process_batch(batch)
                             batch.clear()
                             batch_start_time = None  # Reset thời gian bắt đầu lô
@@ -114,6 +116,7 @@ def process_messages(consumer):
                 if elapsed_time >= BATCH_TIMEOUT:
                     batch_index += 1
                     print(f"🟢 Processing batch {batch_index} TIMEOUT")
+                    sys.stdout.flush()
                     process_batch(batch)
                     batch.clear()
                     batch_start_time = None  # Reset thời gian bắt đầu lô
@@ -125,11 +128,13 @@ def process_messages(consumer):
         if batch:
             batch_index += 1
             print(f"🟢 Processing batch {batch_index} FINAL")
+            sys.stdout.flush()
             process_batch(batch)
 
 def main():
     consumer = create_consumer()
     print("🖋️ Starting to consume messages...")
+    sys.stdout.flush()
     process_messages(consumer)
 
 if __name__ == "__main__":

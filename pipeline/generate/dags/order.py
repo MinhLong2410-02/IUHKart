@@ -6,14 +6,8 @@ import psycopg2
 import random
 import os
 from datetime import datetime
+from pytz import timezone
 import pandas as pd
-from dotenv import load_dotenv
-load_dotenv(".env")
-POSTGRES_HOST=os.getenv("POSTGRES_HOST")
-POSTGRES_PORT=os.getenv("POSTGRES_PORT")
-POSTGRES_USER=os.getenv("POSTGRES_USER")
-POSTGRES_PASSWORD=os.getenv("POSTGRES_PASSWORD")
-POSTGRES_DB=os.getenv("POSTGRES_DB")
 
 def _get_length(conn, table_name):
     with conn.cursor() as cursor:
@@ -62,8 +56,8 @@ def insert_order(conn):
         # Tạo dữ liệu ngẫu nhiên
         order_id = _get_length(conn, "orders") + 1
         order_number = order_id
-        shipping_date = datetime.now()
-        order_date = datetime.now()
+        shipping_date = datetime.now(tz=timezone('Asia/Ho_Chi_Minh')).strftime('%Y-%m-%d %H:%M:%S')
+        order_date = datetime.now(tz=timezone('Asia/Ho_Chi_Minh')).strftime('%Y-%m-%d %H:%M:%S')
         order_status = random.choices(['completed', 'completed', 'completed', 'completed', 'completed', 'completed', 'cancelled'])[0]
 
         # order_product
@@ -74,7 +68,7 @@ def insert_order(conn):
 
         # transaction
         transaction_id = order_id
-        transaction_date = datetime.now()
+        transaction_date = datetime.now(tz=timezone('Asia/Ho_Chi_Minh')).strftime('%Y-%m-%d %H:%M:%S')
         transaction_amount = price
         transaction_status = 'completed' if order_status == 'completed' else 'failed'
         
@@ -108,11 +102,11 @@ def insert_order(conn):
 def main():
     # Cấu hình kết nối tới PostgreSQL
     conn = psycopg2.connect(
-        host=POSTGRES_HOST,
-        port=POSTGRES_HOST,
-        database=POSTGRES_DB,
-        user=POSTGRES_USER,
-        password=POSTGRES_PASSWORD
+        host=os.getenv("POSTGRES_HOST"),
+        port=os.getenv("POSTGRES_PORT"),
+        database=os.getenv("POSTGRES_DB"),
+        user=os.getenv("POSTGRES_USER"),
+        password=os.getenv("POSTGRES_PASSWORD")
     )
     print("✅ Kết nối tới PostgreSQL thành công.")
 
