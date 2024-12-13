@@ -12,7 +12,7 @@ from qdrant_base import (
     VectorParams, 
     Distance
 )
-from utils import search_tracking
+from utils import search_tracking, remove_vietnamese_accents
 
 app = FastAPI()
 allowed_origins = [
@@ -158,7 +158,7 @@ async def search(
     slug = query_params.slug
     limit = query_params.limit
     thresh = query_params.thresh
-
+    
     access_token = request.headers.get("access_token")
     if not access_token:
         raise HTTPException(status_code=401, detail="Access token missing or invalid")
@@ -167,6 +167,7 @@ async def search(
         raise HTTPException(status_code=404, detail="Slug not found!")
     if collection_name is None or _check_exist(collection_name)==False:
         raise HTTPException(status_code=404, detail="Collection name not found!")
+    slug = remove_vietnamese_accents(slug)
     vector = getTextEmbedding(slug)
     if vector is None:
         return {'detail': 'Vector is None'}

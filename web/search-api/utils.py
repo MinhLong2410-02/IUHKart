@@ -1,4 +1,5 @@
 import os, requests
+import unicodedata, string
 
 TRACKING_API_URL = os.getenv('TRACKING_API')
 tracking_session = requests.Session()
@@ -19,13 +20,21 @@ def search_tracking(product_ids: list, access_token: str):
     
     headers = {"Authorization": f"Bearer {access_token}"}  
     payload = {"event_type": "search", "product_ids": product_ids}
-    response = tracking_session.post(TRACKING_API_URL, json=payload, headers=headers, timeout=10)
-    response.raise_for_status() 
-    # try:
-    #     response = tracking_session.post(TRACKING_API_URL, json=payload, headers=headers, timeout=10)
-    #     response.raise_for_status()  # Raise HTTPError for bad responses (4xx, 5xx)
+    try:
+        response = tracking_session.post(TRACKING_API_URL, json=payload, headers=headers, timeout=10)
+        response.raise_for_status()  # Raise HTTPError for bad responses (4xx, 5xx)
 
-    #     # Parse and return the response JSON
-    #     return response.json().get('results', {})
-    # except requests.exceptions.RequestException as e:
-    #     raise RuntimeError(f"Error while calling tracking API: {e}") from e
+        # Parse and return the response JSON
+        return response.json().get('results', {})
+    except requests.exceptions.RequestException as e:
+        raise RuntimeError(f"Error while calling tracking API: {e}") from e
+
+
+def remove_vietnamese_accents(text: str) -> str:
+    text = unicodedata.normalize('NFD', text)
+    text = text.encode('ascii', 'ignore').decode('utf-8')
+    text = ''.join(ch for ch in text if ch not in string.punctuation)
+    text = text.replace(" ", "-")
+    return text
+
+
