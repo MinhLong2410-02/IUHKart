@@ -132,6 +132,7 @@ def consume_kafka_messages():
         logger.info("✈️ Kafka consumer started. Waiting for messages...")
         sys.stdout.flush()
         for message in consumer:
+            logger.info(f"⚙️ Received message: {message.value.decode('utf-8')}")
             process_kafka_message(message)
     except Exception as e:
         logger.error(f"Error in Kafka consumer: {e}")
