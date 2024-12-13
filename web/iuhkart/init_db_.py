@@ -4,6 +4,7 @@ import os, requests
 from dotenv import load_dotenv
 import warnings
 warnings.filterwarnings("ignore")
+import ssl
 
 load_dotenv('.env')
 TEXT_EMBEDDING_URL = os.getenv('TEXT_EMBEDDING_URL')
@@ -93,7 +94,7 @@ path = {
     'product': '../schema/Database/products.csv',
     'product_image': '../schema/Database/product_images.csv',
     'product_image_main': '../schema/Database/product_images_main.csv',
-    'discount': '../schema/Database/discount_new.csv',
+    'discount': '../schema/Database/discounts.csv',
     'product_discount': '../schema/Database/product_discount.csv',
     'order_products': '../schema/Database/order_products.csv',
     'orders': '../schema/Database/orders.csv',

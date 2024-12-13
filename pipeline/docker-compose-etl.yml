@@ -15,9 +15,6 @@ services:
                 FLINK_PROPERTIES=
                 jobmanager.rpc.address: flink-jobmanager
         command: jobmanager
-        depends_on:
-            kafka-postgres:
-                condition: service_healthy
         networks:
             - iuhkart-network
         volumes:
@@ -36,7 +33,7 @@ services:
             - |
                 FLINK_PROPERTIES=
                 jobmanager.rpc.address: flink-jobmanager
-                taskmanager.numberOfTaskSlots: 2
+                taskmanager.numberOfTaskSlots: 10
         networks:
             - iuhkart-network
         volumes:
