@@ -17,14 +17,15 @@ def search_tracking(product_ids: list, access_token: str):
     if not TRACKING_API_URL:
         raise ValueError("TRACKING_API_URL is not set in the environment variables.")
     
-    headers = {"access_token": access_token}  
-    payload = {"product_ids": product_ids, "event_type": "search"}
+    headers = {"Authorization": f"Bearer {access_token}"}  
+    payload = {"event_type": "search", "product_ids": product_ids}
+    response = tracking_session.post(TRACKING_API_URL, json=payload, headers=headers, timeout=10)
+    response.raise_for_status() 
+    # try:
+    #     response = tracking_session.post(TRACKING_API_URL, json=payload, headers=headers, timeout=10)
+    #     response.raise_for_status()  # Raise HTTPError for bad responses (4xx, 5xx)
 
-    try:
-        response = tracking_session.post(TRACKING_API_URL, json=payload, headers=headers, timeout=10)
-        response.raise_for_status()  # Raise HTTPError for bad responses (4xx, 5xx)
-
-        # Parse and return the response JSON
-        return response.json().get('results', {})
-    except requests.exceptions.RequestException as e:
-        raise RuntimeError(f"Error while calling tracking API: {e}") from e
+    #     # Parse and return the response JSON
+    #     return response.json().get('results', {})
+    # except requests.exceptions.RequestException as e:
+    #     raise RuntimeError(f"Error while calling tracking API: {e}") from e

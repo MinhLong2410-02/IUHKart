@@ -175,7 +175,7 @@ async def search(
         query_vector=vector,
         limit=limit
     )
-    product_ids = list(set([product['payload']['product_id'] for product in products]))
+    product_ids = list(set([product.payload['product_id'] for product in products]))
     tracking_status = search_tracking(product_ids, access_token)
     res = [{'score':i.score, 'payload':i.payload} for i in products if i.score >= thresh]
     return {'results': res, tracking_status: tracking_status}
