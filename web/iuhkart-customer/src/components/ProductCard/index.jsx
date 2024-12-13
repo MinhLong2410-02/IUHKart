@@ -10,8 +10,21 @@ import {
 import { Icon } from "@iconify/react/dist/iconify.js";
 
 import sampleImage from "../../assets/images/sample.jpg";
+import TrackingApi from "../../api/tracking";
 
 const ProductCard = ({ product, onAddCart, onClick }) => {
+  
+
+  const trackingView = async () => {
+    await TrackingApi.view(product.product_id);
+  };
+
+
+  const trackingAddToCart = async () => {
+    await TrackingApi.add_to_cart(product.product_id);
+  };
+  
+
   return (
     <Box
       position="relative"
@@ -19,6 +32,8 @@ const ProductCard = ({ product, onAddCart, onClick }) => {
       borderRadius="12px"
       boxShadow="rgba(99, 99, 99, 0.2) 0px 2px 8px 0px"
       _hover={{ cursor: "pointer" }}
+      onClick={trackingView}
+
     >
       <Stack onClick={() => onClick(product)}>
         <Box borderRadius="10px" overflow="hidden">
@@ -56,6 +71,7 @@ const ProductCard = ({ product, onAddCart, onClick }) => {
           }}
           onClick={(e) => {
             e.preventDefault();
+            trackingAddToCart();
             onAddCart(product["product_id"]);
           }}
         />

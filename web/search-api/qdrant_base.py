@@ -1,16 +1,22 @@
+
 from qdrant_client import QdrantClient, models
 from qdrant_client.http.models import Distance, VectorParams, PointStruct
-import os, requests
+import os, requests, logging
 try:
     from dotenv import load_dotenv
-    load_dotenv('./.env')
+    from pathlib import Path
+    env_path = Path(__file__).parent.parent / '.env'
+    load_dotenv(env_path)
+    logging.info("Using development env.")
 except ModuleNotFoundError:
+    logging.info("Using production env.")
     pass
+
+
 
 TEXT_EMBEDDING_URL = os.getenv('TEXT_EMBEDDING_URL')
 QDRANT_HOST = os.getenv('QDRANT_HOST')
 QDRANT_PORT = os.getenv('QDRANT_PORT')
-
 
 client = QdrantClient(host=QDRANT_HOST, port=QDRANT_PORT)
 
