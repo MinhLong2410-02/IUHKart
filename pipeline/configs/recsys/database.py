@@ -1,7 +1,8 @@
 from psycopg2 import pool
 from pymongo import MongoClient
 from qdrant_client import QdrantClient
-from .configs import *
+from configs import *
+import sys
 
 # MongoDB connection setup
 mongo_client = MongoClient(CONNECTION_STRING)
@@ -26,7 +27,8 @@ def init_postgres_pool():
             password=POSTGRES_PASSWORD,
             database=POSTGRES_DB
         )
-        print("PostgreSQL connection pool initialized.")
+        print("🟢 PostgreSQL connection pool initialized.")
+        sys.stdout.flush()
 
 def get_postgres_connection():
     # Get a connection from the pool
@@ -73,7 +75,8 @@ def update_recommendations_in_postgres(user_id: str, recommended_product_ids: li
     try:
         # Use the execute_query function to handle the query
         execute_query(query, params)
-        print(f"Updated recommendations for user {user_id}: {recommended_product_ids}")
+        print(f"🟢 Updated recommendations for user {user_id}: {recommended_product_ids}")
+        sys.stdout.flush()
     except Exception as e:
         print(f"Error updating recommendations for user {user_id}: {e}")
 

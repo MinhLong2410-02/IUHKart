@@ -1,10 +1,10 @@
 from qdrant_client import models
 from kafka import KafkaConsumer
-import json
+import json, sys
 import logging
 from datetime import datetime, timedelta
-from .database import db, qdrant_client as client, update_recommendations_in_postgres
-from .configs import KAFKA_HOST, KAFKA_PORT, KAFKA_TOPIC
+from database import db, qdrant_client as client, update_recommendations_in_postgres
+from configs import KAFKA_HOST, KAFKA_PORT, KAFKA_TOPIC
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -98,7 +98,8 @@ def recommend_for_user(user_id: str, top_k: int = 5):
 
         update_recommendations_in_postgres(user_id, recommended_product_ids)
         
-        logger.info(f"Recommendations for user {user_id}: {recommended_product_ids}")
+        logger.info(f"🟢 Recommendations for user {user_id}: {recommended_product_ids}")
+        sys.stdout.flush()
         return recommended_product_ids
     except Exception as e:
         logger.error(f"Error generating recommendations for user {user_id}: {e}")
@@ -113,7 +114,8 @@ def process_kafka_message(message):
         user_id = document.get("user_id")
         if user_id:
             recommendations = recommend_for_user(user_id, 20)
-            logger.info(f"Processed message for user {user_id} with recommendations: {recommendations}")
+            logger.info(f"⚙️ Processed message for user {user_id} with recommendations: {recommendations}")
+            sys.stdout.flush()
     except Exception as e:
         logger.error(f"Error processing Kafka message: {e}")
 
@@ -127,8 +129,8 @@ def consume_kafka_messages():
             group_id='recommendation-group'
         )
 
-        logger.info("Kafka consumer started. Waiting for messages...")
-
+        logger.info("✈️ Kafka consumer started. Waiting for messages...")
+        sys.stdout.flush()
         for message in consumer:
             process_kafka_message(message)
     except Exception as e:
