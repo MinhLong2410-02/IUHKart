@@ -1,42 +1,46 @@
 import axiosClient from "./axiosClient";
 
 const productApi = {
-  getProducts: (categoryID, page = 1, pageSize = 10) => {
-    const url = `/product/api/customer?${
-      categoryID ? `category_id=${categoryID}&` : ""
-    }page=${page}&page_size=${pageSize}`;
-    return axiosClient.get(url);
+  getProducts: async (categoryID, page = 1, pageSize = 10) => {
+    try {
+      const url = `/product/api/customer?${
+        categoryID ? `category_id=${categoryID}&` : ""
+      }page=${page}&page_size=${pageSize}`;
+      return await axiosClient.get(url);
+    } catch (error) {
+      console.error("Error fetching products:", error.response || error.message);
+      throw error;
+    }
   },
 
   getProductByID: async (productID) => {
-    const url = `/product/api/customer/view-product/${productID}`;
-    
-    console.log(productID);
-    const dataProduct = await axiosClient.get(url);
+    try {
+      if (!productID) {
+        throw new Error("Product ID is required.");
+      }
 
-    const trackingApi = 'https://tracking_api-iuhkart.aiclubiuh.com/api/v1/keep-track';
-    console.log(dataProduct);
-    const trackingData = {
-      product_id: dataProduct.product_id,
-      ratings: dataProduct.ratings,
-      slug: dataProduct.slug,
-      original_price: dataProduct.original_price,
-      category_id: dataProduct.category,
-      stock: dataProduct.stock,
-    };
-    
-    await axiosClient.post(trackingApi, trackingData);
+      const url = `/product/api/customer/view-product/${productID}`;
+      console.log("Fetching product with ID:", productID);
 
-    return dataProduct;
-    
+      const dataProduct = await axiosClient.get(url);
+
+      return dataProduct;
+    } catch (error) {
+      console.error("Error fetching product by ID:", error.response || error.message);
+      throw error;
+    }
   },
-  
-  getProductCategory: (categoryID) => {
-    // const url = `/product/api/get-category?category_id=${categoryID}`;
-    const url = `/product/api/get-category${
-      categoryID ? `?category_id=${categoryID}` : ""
-    }`;
-    return axiosClient.get(url);
+
+  getProductCategory: async (categoryID) => {
+    try {
+      const url = `/product/api/get-category${
+        categoryID ? `?category_id=${categoryID}` : ""
+      }`;
+      return await axiosClient.get(url);
+    } catch (error) {
+      console.error("Error fetching product category:", error.response || error.message);
+      throw error;
+    }
   },
 };
 

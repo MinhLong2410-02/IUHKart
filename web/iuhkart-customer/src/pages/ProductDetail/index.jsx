@@ -18,15 +18,12 @@ import {
 import _ from "lodash";
 
 import { GlobalContext } from "../../contexts/GlobalContext";
-
 import productApi from "../../api/product.api";
 import cartAPI from "../../api/cart.api";
-
 import sampleImage from "../../assets/images/sample.jpg";
 
 const ProductDetail = () => {
   const toast = useToast();
-
   const { productID } = useContext(GlobalContext);
 
   const [isLoading, setLoading] = useState(true);
@@ -34,20 +31,36 @@ const ProductDetail = () => {
   const [productCategory, setProductCategory] = useState([]);
 
   useEffect(() => {
+    if (productID) {
+      localStorage.setItem('productID', productID);
+    }
+  }, [productID]);
+
+  useEffect(() => {
     const getProductByID = async () => {
-      if (productID) {
-        const dataProduct = await productApi.getProductByID(productID);
-        const categoryOfProduct = await productApi.getProductCategory(
-          dataProduct?.category
-        );
-        setProduct(dataProduct);
-        setProductCategory(categoryOfProduct);
-        setLoading(false);
+      const savedProductID = localStorage.getItem('productID');
+
+      if (savedProductID) {
+        try {
+          const dataProduct = await productApi.getProductByID(savedProductID);
+          const categoryOfProduct = await productApi.getProductCategory(dataProduct?.category);
+
+          setProduct(dataProduct);
+          setProductCategory(categoryOfProduct);
+          setLoading(false);
+        } catch (error) {
+          console.error("Failed to fetch product:", error);
+          toast({
+            title: "Failed to load product.",
+            status: "error",
+            position: "top-right",
+          });
+        }
       }
     };
 
     getProductByID();
-  }, [productID, setProduct, setProductCategory]);
+  }, []);
 
   const handleAddCart = async () => {
     try {
@@ -89,9 +102,7 @@ const ProductDetail = () => {
               boxShadow="rgba(99, 99, 99, 0.2) 0px 2px 8px 0px"
             >
               <Image
-                src={
-                  product?.images ? product?.images[0]?.image_url : sampleImage
-                }
+                src={product?.images ? product?.images[0]?.image_url : sampleImage}
                 width="100%"
                 aspectRatio={1}
                 objectFit="cover"
@@ -110,10 +121,9 @@ const ProductDetail = () => {
                 </Text>
               </Flex>
 
-              <Text
-                as="b"
-                fontSize="xl"
-              >{`${product?.original_price} VND`}</Text>
+              <Text as="b" fontSize="xl">
+                {new Intl.NumberFormat('vi-VN').format(product?.original_price) + " VNĐ"}
+              </Text>
 
               <Box>
                 <Button
@@ -144,10 +154,7 @@ const ProductDetail = () => {
                       {!_.isEmpty(productCategory) &&
                         productCategory.map((category, index) => {
                           const categoryName = category.category_name;
-
-                          if (productCategory[index + 1])
-                            return `${categoryName}, `;
-
+                          if (productCategory[index + 1]) return `${categoryName}, `;
                           return categoryName;
                         })}
                     </Td>
