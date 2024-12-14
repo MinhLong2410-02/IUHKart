@@ -62,7 +62,7 @@ LOCAL_APPS = [
     'apps.discount',
     'apps.review',
     'apps.order',
-    'apps.dashboard'
+    # 'apps.dashboard'
 ]
 
 INSTALLED_APPS = DEFAULT_APPS + LOCAL_APPS + THIRD_PARTY_APPS
@@ -195,25 +195,8 @@ SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(days=30),
 }
 STATIC_URL = '/static/'
+# MEDIA_URL = 'https://image.iuhkart.systems/'
 
-
-# MEDIA_URL = '/media/'
-# MEDIA_ROOT = BASE_DIR / 'media' 
-DEFAULT_FILE_STORAGE = 'storages.backends.azure_storage.AzureStorage'
-AZURE_ACCOUNT_NAME = environ.get('AZURE_ACCOUNT_NAME')
-AZURE_ACCOUNT_KEY = environ.get('AZURE_ACCOUNT_KEY')
-AZURE_CUSTOM_DOMAIN = f'{AZURE_ACCOUNT_NAME}.blob.core.windows.net'
-DEFAULT_FILE_STORAGE = 'storages.backends.azure_storage.AzureStorage'
-AZURE_CONNECTION_STRING = environ.get('AZURE_CONNECTION_STRING')
-
-# Specify Azure storage settings
-class AzureStorageSettings:
-    def __init__(self):
-        self.account_name = AZURE_ACCOUNT_NAME
-        self.account_key = AZURE_ACCOUNT_KEY
-        self.custom_domain = AZURE_CUSTOM_DOMAIN
-
-AZURE_STORAGE_SETTINGS = AzureStorageSettings()
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
@@ -230,8 +213,3 @@ EMAIL_USE_TLS = True
 #METABASE
 METABASE_SITE_URL = environ.get('METABASE_SITE_URL')
 METABASE_EMBEDDING_SECRET_KEY = environ.get('METABASE_EMBEDDING_SECRET_KEY')
-
-#PAYOS
-PAYOS_CLIENT_ID = environ.get('PAYOS_CLIENT_ID')
-PAYOS_API_KEY = environ.get('PAYOS_API_KEY')
-PAYOS_CHECKSUM_KEY = environ.get('PAYOS_CHECKSUM_KEY')

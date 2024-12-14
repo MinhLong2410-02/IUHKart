@@ -8,6 +8,7 @@ import { Summary } from "./components/summary";
 import { Info } from "./components/info";
 import { Products } from "./components/products";
 import { Product } from "./components/product";
+import Dashboard from "./components/Dashboard";
 
 
 function Home() {
@@ -24,6 +25,7 @@ function Home() {
             <SimpleSidebar />
             <div className="home w-[100vw] min-h-[100vh] pl-[300px] pr-[50px]">
                 <Routes>
+                    <Route path="dashboard" element={<Dashboard />} />
                     <Route path="summary" element={<Summary />} />
                     <Route path="info" element={<Info />} />
                     <Route path="products" element={<Products />} />

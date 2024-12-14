@@ -40,47 +40,47 @@ export const Products = () => {
     return (
         <div>
             <h2
-                className="text-[30px] font-bold text-[#333] mt-[20px] mb-4 pb-[20px] border-b-2 border-black"
+                className="text-[30px] font-bold text-white mt-[20px] mb-4 pb-[20px] border-b-2 border-black"
             >
                 Quản lý sản phẩm
             </h2>
             <div className="!p-4 boxPrimary min-h-[80vh]">
                 <div className="">
                     <div className="flex justify-between items-center">
-                        <h3 className="text-[18px] font-bold text-[#333]">Tổng số lượng sản phẩm: {productsData?.count}</h3>
+                        <h3 className="text-[18px] font-bold text-white">Tổng số lượng sản phẩm: {productsData?.count}</h3>
                     </div>
                     <div className="mt-5">
-                        <table className="w-full min-w-max table-auto shadow-md bg-white">
-                            <thead className="bg-gray-100">
+                        <table className="w-full min-w-max table-auto shadow-md bg-[#272740]">
+                            <thead className="bg-[#272740]">
                                 <tr>
-                                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">STT</th>
-                                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product name</th>
-                                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
-                                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stock</th>
-                                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Brand</th>
-                                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
-                                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
+                                    <th className="px-4 py-2 text-left text-xs font-medium text-white uppercase tracking-wider">STT</th>
+                                    <th className="px-4 py-2 text-left text-xs font-medium text-white uppercase tracking-wider">Product name</th>
+                                    <th className="px-4 py-2 text-left text-xs font-medium text-white uppercase tracking-wider">Price</th>
+                                    <th className="px-4 py-2 text-left text-xs font-medium text-white uppercase tracking-wider">Stock</th>
+                                    <th className="px-4 py-2 text-left text-xs font-medium text-white uppercase tracking-wider">Brand</th>
+                                    <th className="px-4 py-2 text-left text-xs font-medium text-white uppercase tracking-wider">Category</th>
+                                    <th className="px-4 py-2 text-left text-xs font-medium text-white uppercase tracking-wider">Action</th>
                                 </tr>
                             </thead>
-                            <tbody className="bg-white divide-y divide-gray-200">
+                            <tbody className="bg-[#272740] divide-y divide-gray-200">
                                 {
                                     productsData?.results?.map((product, index) => (
-                                        <tr key={index} className="hover:bg-gray-50">
-                                            <td className="px-4 py-2 whitespace-nowrap text-sm font-medium text-gray-900">{index + 1}</td>
-                                            <td className="px-4 py-2 whitespace-normal text-sm text-gray-500" style={{ maxWidth: "200px", lineHeight: "1.25rem" }}>
+                                        <tr key={index} className="hover:bg-slate-500">
+                                            <td className="px-4 py-2 whitespace-nowrap text-sm font-medium text-white">{index + 1}</td>
+                                            <td className="px-4 py-2 whitespace-normal text-sm text-white" style={{ maxWidth: "200px", lineHeight: "1.25rem" }}>
                                                 {product?.product_name}
                                             </td>
-                                            <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-500">{product?.original_price}</td>
-                                            <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-500">{product?.stock}</td>
-                                            <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-500">{product?.brand}</td>
-                                            <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-500">{
+                                            <td className="px-4 py-2 whitespace-nowrap text-sm text-white">{product?.original_price}</td>
+                                            <td className="px-4 py-2 whitespace-nowrap text-sm text-white">{product?.stock}</td>
+                                            <td className="px-4 py-2 whitespace-nowrap text-sm text-white">{product?.brand}</td>
+                                            <td className="px-4 py-2 whitespace-nowrap text-sm text-white">{
                                                 category?.map((cate, index) => {
                                                     if (cate?.category_id === product?.category) {
                                                         return cate?.category_name;
                                                     }
                                                 })
                                             }</td>
-                                            <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-500">
+                                            <td className="px-4 py-2 whitespace-nowrap text-sm text-white">
                                                 <div className="flex gap-2">
                                                     <Link
                                                         to={`/product/${product?.product_id}`}
