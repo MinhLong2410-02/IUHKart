@@ -1,8 +1,39 @@
 from django.shortcuts import render
 from rest_framework import generics, permissions, status
 from apps.order.models import Order
-from apps.order.serializers import OrderSerializer, OrderCancelSerializer
+from apps.order.serializers import *
 from rest_framework.response import Response
+
+class CreateOrderByVendorView(generics.CreateAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = CreateOrderByVendorSerializer
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        created_orders = serializer.save()
+
+        # Prepare the response
+        response_data = [
+            {
+                "order_number": order.order_number,
+                "order_total": order.order_total,
+                "vendor": order.orderproduct_set.first().product.created_by.name,
+                "products": [
+                    {
+                        "product_name": op.product.product_name,
+                        "price": op.price,
+                        "quantity": op.quantity,
+                    }
+                    for op in order.orderproduct_set.all()
+                ]
+            }
+            for order in created_orders
+        ]
+
+        return Response(response_data, status=status.HTTP_201_CREATED)
+
+
 class CreateOrderView(generics.CreateAPIView):
     queryset = Order.objects.all()
     serializer_class = OrderSerializer

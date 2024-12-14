@@ -23,7 +23,7 @@ def init_qdrant():
         client.delete_collection(collection_name=COLLECTION)
     client.create_collection(collection_name=COLLECTION, vectors_config=VectorParams(size=384, distance=Distance.COSINE))
 
-init_qdrant()
+# init_qdrant()
 print("🟢 Khởi tạo thành công qdrant")
 
 ###
