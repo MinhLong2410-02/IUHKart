@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractBaseUser
 from apps.account.manager import UserManager
 from django.utils.translation import gettext_lazy as _
-from apps.custom_storage import AzureCustomerStorage, AzureVendorStorage
+from apps.custom_storage import CustomerStorage, ShopStorage
 from django.contrib.postgres.fields import ArrayField
 from django.utils import timezone
 # Create your models here.
@@ -30,7 +30,7 @@ class Customer(models.Model):
     date_of_birth = models.DateTimeField(blank=True, null=True)
     age = models.SmallIntegerField()
     gender = models.CharField(max_length=10, default='male')
-    avatar_url = models.ImageField(storage=AzureCustomerStorage(), max_length=255, blank=True, null=True)
+    avatar_url = models.ImageField(storage=CustomerStorage(), max_length=255, blank=True, null=True)
     date_join = models.DateTimeField(default=timezone.now)
     recommend_products = ArrayField(models.IntegerField(), blank=True, default=list, size=20, db_column='recommend_product_ids')
     class Meta:
@@ -43,7 +43,7 @@ class Vendor(models.Model):
     name = models.CharField(max_length=255, blank=True, null=True)
     phone = models.CharField(max_length=20, blank=True, null=True)
     description = models.TextField(blank=True, null=True)
-    logo_url = models.ImageField(storage=AzureVendorStorage(), blank=True, null=True)
+    logo_url = models.ImageField(storage=ShopStorage(), blank=True, null=True)
     date_join = models.DateTimeField(default=timezone.now)
 
     class Meta:
