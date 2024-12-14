@@ -227,7 +227,7 @@ def stream_review(message: json):
 
     except Exception as e:
         logger.error(f"\n❌ Error processing message: {e}")
-    print('-'*120)
+    print('\n' + '-'*120)
 
 def main() -> None:
     """Main flow controller"""
@@ -250,6 +250,7 @@ def main() -> None:
         stream_review,
         output_type=Types.STRING()
     )
+    data_stream.print()
 
     # Thực thi job Flink
     env.execute("Flink ETL Job")

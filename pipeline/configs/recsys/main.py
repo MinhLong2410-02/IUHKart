@@ -124,7 +124,7 @@ def consume_kafka_messages():
         consumer = KafkaConsumer(
             KAFKA_TOPIC,
             bootstrap_servers=f"{KAFKA_HOST}:{KAFKA_PORT}",
-            auto_offset_reset='earliest',
+            auto_offset_reset='latest',
             enable_auto_commit=True,
             group_id='recommendation-group'
         )
@@ -132,6 +132,8 @@ def consume_kafka_messages():
         logger.info("✈️ Kafka consumer started. Waiting for messages...")
         sys.stdout.flush()
         for message in consumer:
+            logger.info(f"⚙️ Received message: {message.value.decode('utf-8')}")
+            sys.stdout.flush()
             process_kafka_message(message)
     except Exception as e:
         logger.error(f"Error in Kafka consumer: {e}")

@@ -1,36 +1,41 @@
-import clickhouse_connect
 import pandas as pd
-from datetime import datetime
-from dotenv import load_dotenv
-import os
-load_dotenv()
-KAFKA_HOST = os.getenv("KAFKA_HOST")
-KAFKA_PORT = os.getenv("KAFKA_PORT")
-KAFKA_TOPIC = os.getenv("KAFKA_TOPIC")
+from utils import get_clickhouse_client
 
-CLICKHOUSE_HOST = os.getenv("CLICKHOUSE_HOST")
-CLICKHOUSE_PORT = os.getenv("CLICKHOUSE_PORT")
-CLICKHOUSE_USER = os.getenv("CLICKHOUSE_USER")
-CLICKHOUSE_PASSWORD = os.getenv("CLICKHOUSE_PASSWORD")
-CLICKHOUSE_DATABASE = os.getenv("CLICKHOUSE_DATABASE")
+def drop_all_tables(client):
+    try:
+        # Lấy danh sách tất cả các bảng trong cơ sở dữ liệu hiện tại
+        tables = client.query("SHOW TABLES").result_rows
+        if not tables:
+            print("Không có bảng nào để xóa.")
+            return
+        # Xóa từng bảng
+        for table in tables:
+            table_name = table[0]
+            try:
+                client.command(f"DROP TABLE IF EXISTS `{table_name}`")
+                print(f"🟢 Đã xóa bảng: {table_name}")
+            except Exception as e:
+                print(f"❌ Lỗi khi xóa bảng {table_name}: {e}")
+        print("🟢 Đã xóa tất cả các bảng thành công.")
+    except Exception as e:
+        print(f"❌ Lỗi khi lấy danh sách bảng: {e}")
 
 def create_tables(client):
-    with open("schema.sql", 'r') as f:
+    with open("./clickhouse.sql", 'r') as f:
         schema = f.read()
     create_commands = schema.split('\n\n')
-    
     for command in create_commands:
         try:
             client.command(command)
-            print(f'✅ successfully.')
         except Exception as e:
             print(f"❌ Error executing command: {e}")
+    print(f'✅ create all table successfully!')
 
 # insert data csv
 def insert_data(client, table_name):
     try:
         df = pd.read_csv(f'db/{table_name}.csv')
-        for col_name in ["date_of_birth", "signup_date", "establish_date"]:
+        for col_name in ["date_of_birth", "date_join", "date_post", "full_date"]:
             if col_name in df.columns:
                 df[col_name] = pd.to_datetime(df[col_name], errors='coerce')
 
@@ -47,23 +52,18 @@ def insert_data(client, table_name):
 
 def main():
     # Kết nối tới ClickHouse
-    client = clickhouse_connect.get_client(
-        host=CLICKHOUSE_HOST,
-        port=CLICKHOUSE_PORT,
-        username=CLICKHOUSE_USER,
-        password=CLICKHOUSE_PASSWORD,
-        database=CLICKHOUSE_DATABASE
-    )
-
+    client = get_clickhouse_client()
     # Tạo các bảng
-    # create_tables(client)
-    # insert_data(client, 'category')
-    # insert_data(client, 'province')
-    # insert_data(client, 'dim_product')
-    insert_data(client, 'product_store')
-    # insert_data(client, 'dim_customer')
-    # insert_data(client, 'dim_store')
-    # insert_data(client, 'dim_promotion')
+    drop_all_tables(client)
+    create_tables(client)
+    insert_data(client, 'dim_province')
+    insert_data(client, 'dim_product')
+    insert_data(client, 'dim_customer')
+    insert_data(client, 'dim_store')
+    insert_data(client, 'dim_promotion')
+    insert_data(client, 'dim_date')
+    insert_data(client, 'fact_sales')
+    insert_data(client, 'fact_review')
     client.close()
 
 if __name__ == "__main__":

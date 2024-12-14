@@ -4,6 +4,23 @@ networks:
         external: true
 
 services:
+    storage-stream:
+        image: postgres:16-alpine
+        container_name: storage-stream
+        networks:
+            - iuhkart-network
+        ports:
+            - 15361:5432
+        environment:
+            - POSTGRES_USER=postgres
+            - POSTGRES_PASSWORD=postgres
+            - POSTGRES_DB=postgres
+        restart: always
+        healthcheck:
+            test: ["CMD", "pg_isready", "-U", "postgres"]
+            interval: 5s
+            retries: 5
+    
     flink-jobmanager:
         container_name: flink-jobmanager
         # build: configs/flink-1.18.1
@@ -33,7 +50,7 @@ services:
             - |
                 FLINK_PROPERTIES=
                 jobmanager.rpc.address: flink-jobmanager
-                taskmanager.numberOfTaskSlots: 10
+                taskmanager.numberOfTaskSlots: 8
         networks:
             - iuhkart-network
         volumes:

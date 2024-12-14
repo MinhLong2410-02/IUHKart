@@ -261,62 +261,48 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 logger.addHandler(logging.StreamHandler())
 
-def stream_sales(message: json):
+def stream_review(message: json):
     """Process and sink data into ClickHouse."""
-    logger.info(f"\n🚩 [sales] processing ...")
+    logger.info(f"\n🚩 [Review] processing ...")
     try:
         pg = Postgres()
-        mode, data = decode_message(message)
-        df_o = pd.read_csv("Database/orders.csv")
-        df_od = pd.read_csv("Database/order_products.csv")
-        df_dis = pd.read_csv("Database/discounts.csv")
-        df_pd = pd.read_csv("Database/product_discount.csv")
-        df_p = pd.read_csv("Database/products.csv")
-        df_ad = pd.DataFrame({
-            'address_id': [1, 2, 3, 4],
-            'province_id': [79, 79, 79, 79]
-        })
-        df_pro = pd.read_csv("https://raw.githubusercontent.com/MinhLong2410-02/VN-province-api-test/main/province.csv")
-        df_a_p = pd.merge(df_ad,df_pro,on="province_id")
-        province_map = df_a_p.set_index('address_id')['province_id'].to_dict()
-        discount_map = df_pd.set_index('product_id')['discount_id'].to_dict()
-        product_shop = df_p.set_index('product_id')['vendor_id'].to_dict()
+        data_map = pg.query("SELECT * FROM product;")
+        data_map = data_map.set_index('id')['shop_id'].to_dict()
         pg.close()
         
-        df_sales = pd.merge(df_od, df_o, on='order_id')
-        df_sales["date_id"] = df_sales["order_date"].apply(lambda x: parse_date(x)['id'])
-        date = [parse_date(x) for x in df_sales['order_date']]
-        df_sales["promotion_id"] = df_sales["product_id"].apply(lambda x: discount_map[x] if x in discount_map else None)
-        df_sales["location_id"] = df_sales["customer_id"].apply(lambda x: province_map[x] if x in province_map else None)
-        df_sales["shop_id"] = df_sales["product_id"].apply(lambda x: product_shop[x] if x in product_shop else None)
-        df_sales = df_sales[["order_product_id", "quantity", "total_price", "order_status", "date_id", "promotion_id", "location_id", "product_id", "customer_id", "shop_id"]]
-        df_sales.columns = ["id", "quantity", "total_amount", "status", "date_id", "promotion_id", "location_id", "product_id", "customer_id", "shop_id"]
+        mode, data = decode_message(message)
+        id = data.get('review_id')
+        content = data.get('review_content')
+        rating = data.get('review_rating')
+        date_post = pd.to_datetime(data.get('review_date'), errors='coerce')
+        product_id = data.get('product_id_id')
+        customer_id = data.get('customer_id_id')
+        store_id = data_map.get(product_id)
         
         # Prepare data for ClickHouse
         row = (id, content, rating, date_post, product_id, customer_id, store_id)
         if mode == 'Create':
             client = get_clickhouse_client()
-            client.insert('fact_sales', [row], column_names=['id', 'content', 'rating', 'date_post', 'product_id', 'customer_id', 'shop_id'])
+            client.insert('fact_review', [row], column_names=['id', 'content', 'rating', 'date_post', 'product_id', 'customer_id', 'shop_id'])
             client.close()
-        
-        logger.info(f"\n🟢 [sales] Inserted into ClickHouse: {row}")
+        logger.info(f"\n🟢 [Review] Inserted into ClickHouse: {row}")
 
     except Exception as e:
-        logger.error(f"\n❌ [sales] Error processing message: {e}")
+        logger.error(f"\n❌ [Review] Error processing message: {e}")
     print('\n' + '-'*120)
     
 def main() -> None:
     """Main flow controller"""
     env = initialize_env()
-    kafka_source = configure_source(topic='postgresDB.public.saless')
+    kafka_source = configure_source(topic='postgresDB.public.reviews')
     data_stream = env.from_source(
-        kafka_source, WatermarkStrategy.no_watermarks(), "Kafka sensors topic 3"
+        kafka_source, WatermarkStrategy.no_watermarks(), "Kafka sensors topic 2"
     )
     data_stream.map(
-        stream_sales,
+        stream_review,
         output_type=Types.STRING()
     )
-    env.execute("Stream sales job")
+    env.execute("Stream review job")
 
 if __name__ == "__main__":
     main()

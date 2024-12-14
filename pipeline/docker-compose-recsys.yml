@@ -43,6 +43,8 @@ services:
     recsys:
         container_name: recsys
         build: configs/recsys
+        env_file:
+            - configs/recsys/.env
         depends_on:
             - embedding
         networks:
