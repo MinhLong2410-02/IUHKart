@@ -5,12 +5,13 @@ from fastapi.middleware.cors import CORSMiddleware
 from pymongo.collection import Collection
 from database import get_db
 from auth import get_current_user
-from pydantic import BaseModel
+from pydantic import BaseModel, Field, ValidationError
 
 app = FastAPI()
 class TrackEventRequest(BaseModel):
-    event_type: str
-    product_ids: List[str]
+    event_type: str = Field(..., description="Type of event (search, view, add_to_cart, purchase)")
+    product_ids: List[str] = Field(..., description="List of product IDs to track")
+    
 # Define behavior weights globally for easy reuse
 BEHAVIOR_WEIGHTS = {
     "search": 1,
@@ -24,7 +25,7 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
     allow_credentials=True,
-    allow_methods=["GET", "POST"],
+    allow_methods=["GET", "POST","OPTIONS"],
     allow_headers=["*"],
 )
 
@@ -52,15 +53,18 @@ async def track_event(
     if isinstance(product_ids, str):
         product_ids = [product_ids]
 
-    db.behaviors.insert_many([
-        {
-            "user_id": user_id,
-            "event_type": event_type,
-            "product_id": product_id,
-            "weight": weight,
-            "timestamp": datetime.utcnow(),
-        } for product_id in product_ids
-    ])
+    try:
+        db.behaviors.insert_many([
+            {
+                "user_id": user_id,
+                "event_type": event_type,
+                "product_id": product_id,
+                "weight": weight,
+                "timestamp": datetime.utcnow(),
+            } for product_id in product_ids
+        ])
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 
     return {"status": "success"}
 
