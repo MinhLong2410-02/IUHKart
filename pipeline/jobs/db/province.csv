@@ -1,64 +1,64 @@
-id,province_name,is_city
-89,An Giang,False
-77,Bà Rịa - Vũng Tàu,False
-24,Bắc Giang,False
-6,Bắc Kạn,False
-95,Bạc Liêu,False
-27,Bắc Ninh,False
-83,Bến Tre,False
-74,Bình Dương,False
-70,Bình Phước,False
-60,Bình Thuận,False
-52,Bình Định,False
-96,Cà Mau,False
-92,Cần Thơ,False
-4,Cao Bằng,False
-64,Gia Lai,False
-2,Hà Giang,False
-35,Hà Nam,False
-1,Hà Nội,True
-42,Hà Tĩnh,False
-30,Hải Dương,False
-31,Hải Phòng,False
-93,Hậu Giang,False
-79,Hồ Chí Minh,True
-17,Hoà Bình,False
-33,Hưng Yên,False
-56,Khánh Hòa,False
-91,Kiên Giang,False
-62,Kon Tum,False
-12,Lai Châu,False
-68,Lâm Đồng,False
-20,Lạng Sơn,False
-10,Lào Cai,False
-80,Long An,False
-36,Nam Định,False
-40,Nghệ An,False
-37,Ninh Bình,False
-58,Ninh Thuận,False
-25,Phú Thọ,False
-54,Phú Yên,False
-44,Quảng Bình,False
-49,Quảng Nam,False
-51,Quảng Ngãi,False
-22,Quảng Ninh,False
-45,Quảng Trị,False
-94,Sóc Trăng,False
-14,Sơn La,False
-72,Tây Ninh,False
-34,Thái Bình,False
-19,Thái Nguyên,False
-38,Thanh Hóa,False
-46,Thừa Thiên Huế,False
-82,Tiền Giang,False
-84,Trà Vinh,False
-8,Tuyên Quang,False
-86,Vĩnh Long,False
-26,Vĩnh Phúc,False
-15,Yên Bái,False
-48,Đà Nẵng,True
-66,Đắk Lắk,False
-67,Đắk Nông,False
-11,Điện Biên,False
-75,Đồng Nai,False
-87,Đồng Tháp,False
+id,province_name,province_name_en,type
+89,An Giang,An Giang,province
+77,Bà Rịa - Vũng Tàu,Ba Ria - Vung Tau,province
+24,Bắc Giang,Bac Giang,province
+6,Bắc Kạn,Bac Kan,province
+95,Bạc Liêu,Bac Lieu,province
+27,Bắc Ninh,Bac Ninh,province
+83,Bến Tre,Ben Tre,province
+74,Bình Dương,Binh Duong,province
+70,Bình Phước,Binh Phuoc,province
+60,Bình Thuận,Binh Thuan,province
+52,Bình Định,Binh Dinh,province
+96,Cà Mau,Ca Mau,province
+92,Cần Thơ,Can Tho,district
+4,Cao Bằng,Cao Bang,province
+64,Gia Lai,Gia Lai,province
+2,Hà Giang,Ha Giang,province
+35,Hà Nam,Ha Nam,province
+1,Hà Nội,Ha Noi,district
+42,Hà Tĩnh,Ha Tinh,province
+30,Hải Dương,Hai Duong,province
+31,Hải Phòng,Hai Phong,district
+93,Hậu Giang,Hau Giang,province
+79,Hồ Chí Minh,Ho Chi Minh,district
+17,Hoà Bình,Hoa Binh,province
+33,Hưng Yên,Hung Yen,province
+56,Khánh Hòa,Khanh Hoa,province
+91,Kiên Giang,Kien Giang,province
+62,Kon Tum,Kon Tum,province
+12,Lai Châu,Lai Chau,province
+68,Lâm Đồng,Lam Dong,province
+20,Lạng Sơn,Lang Son,province
+10,Lào Cai,Lao Cai,province
+80,Long An,Long An,province
+36,Nam Định,Nam Dinh,province
+40,Nghệ An,Nghe An,province
+37,Ninh Bình,Ninh Binh,province
+58,Ninh Thuận,Ninh Thuan,province
+25,Phú Thọ,Phu Tho,province
+54,Phú Yên,Phu Yen,province
+44,Quảng Bình,Quang Binh,province
+49,Quảng Nam,Quang Nam,province
+51,Quảng Ngãi,Quang Ngai,province
+22,Quảng Ninh,Quang Ninh,province
+45,Quảng Trị,Quang Tri,province
+94,Sóc Trăng,Soc Trang,province
+14,Sơn La,Son La,province
+72,Tây Ninh,Tay Ninh,province
+34,Thái Bình,Thai Binh,province
+19,Thái Nguyên,Thai Nguyen,province
+38,Thanh Hóa,Thanh Hoa,province
+46,Thừa Thiên Huế,Thua Thien Hue,province
+82,Tiền Giang,Tien Giang,province
+84,Trà Vinh,Tra Vinh,province
+8,Tuyên Quang,Tuyen Quang,province
+86,Vĩnh Long,Vinh Long,province
+26,Vĩnh Phúc,Vinh Phuc,province
+15,Yên Bái,Yen Bai,province
+48,Đà Nẵng,Da Nang,district
+66,Đắk Lắk,Dak Lak,province
+67,Đắk Nông,Dak Nong,province
+11,Điện Biên,Dien Bien,province
+75,Đồng Nai,Dong Nai,province
+87,Đồng Tháp,Dong Thap,province

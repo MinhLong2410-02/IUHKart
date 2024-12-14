@@ -1,1 +1,1 @@
-docker compose exec flink-jobmanager flink run -py ./jobs/etl.py -d
+docker compose exec flink-jobmanager flink run -py ./jobs/review.py -d

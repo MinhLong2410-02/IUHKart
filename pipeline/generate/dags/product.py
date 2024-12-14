@@ -28,7 +28,7 @@ def insert_product(conn):
     category_id = _generate_random_id(id_categories)
     vendor_id = _generate_random_id(id_vendors)
     product_name = fake.slug()
-    original_price = random.randint(10000, 5000000)
+    original_price = random.randint(10000, 500000)
     stock = random.randint(0, 100)
     brand = fake.company()
     slug = product_name
