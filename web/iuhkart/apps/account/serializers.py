@@ -197,10 +197,24 @@ class DetailedVendorSerializer(serializers.ModelSerializer):
 class BankAccountSerializer(serializers.ModelSerializer):
     class Meta:
         model = BankAccount
-        fields = ['bank_name', 'account_number', 'account_holder_name', 'branch_name']
+        fields = ['bank_name', 'account_number', 'account_holder_name', 'money']
         extra_kwargs = {
-            'account_number': {'write_only': True}
+            'account_number': {'write_only': True},
+            'money': {'read_only': True},  # Prevent users from modifying balance directly
         }
 
     def validate_account_number(self, value):
+        if not value.isdigit():
+            raise serializers.ValidationError("Account number must be numeric.")
+        if len(value) < 8:
+            raise serializers.ValidationError("Account number must be at least 8 digits long.")
         return value
+
+class UpdateMoneySerializer(serializers.Serializer):
+    money = serializers.IntegerField(min_value=0)
+
+    def validate(self, attrs):
+        money = attrs.get("money")
+        if money is None:
+            raise serializers.ValidationError("The 'money' field is required.")
+        return attrs
