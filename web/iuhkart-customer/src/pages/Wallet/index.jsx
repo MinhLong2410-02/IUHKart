@@ -26,7 +26,7 @@ const Wallet = () => {
       toast({
         title: "Money added successfully!",
         status: "success",
-        position: "top-right",
+        position: "top-left",
       });
 
       onClose();
@@ -35,7 +35,7 @@ const Wallet = () => {
       toast({
         title: "Failed to add money!",
         status: "error",
-        position: "top-right",
+        position: "top-left",
       });
     } finally{
         const data = await walletAPI.getWalletDetails();

@@ -82,13 +82,13 @@ const ProductGrid = () => {
           toast({
             title: "Add Cart Successful!",
             status: "success",
-            position: "top-right",
+            position: "top-left",
           });
       } catch (error) {
         toast({
           title: "Add Cart Fail!",
           status: "error",
-          position: "top-right",
+          position: "top-left",
         });
       }
     },
