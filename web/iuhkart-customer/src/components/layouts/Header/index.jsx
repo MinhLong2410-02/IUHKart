@@ -201,6 +201,7 @@ const Header = () => {
             <MenuList>
               <MenuItem onClick={() => navigate("/profile")}>Profile</MenuItem>
               <MenuItem onClick={() => navigate("/settings")}>Settings</MenuItem>
+              <MenuItem onClick={() => navigate("/wallet")}>Wallet</MenuItem>
               <MenuItem onClick={handleLogout}>Logout</MenuItem>
             </MenuList>
           </Menu>
