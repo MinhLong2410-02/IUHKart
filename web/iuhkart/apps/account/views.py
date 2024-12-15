@@ -175,16 +175,26 @@ class UpdateMoneyView(generics.RetrieveUpdateAPIView):
         try:
             bank_account = user.bank_account
         except BankAccount.DoesNotExist:
-            raise NotFound("Bank account not found. Please update your bank account details first.")
+            raise NotFound("Tài khoản chưa liên kết với tài khoản ngân hàng.")
         
         if not bank_account.bank_name or not bank_account.account_number or not bank_account.account_holder_name:
-            raise ValidationError("Bank account details are incomplete. Please update your bank account details first.")
+            raise ValidationError("Vui lòng hoàn thành tài khoản ngân hàng.")
         
         return bank_account
-    @extend_schema(
-            exclude=True,
-            methods=['GET']
-    )
+    
+    def retrieve(self, request, *args, **kwargs):
+        bank_account = self.get_object()
+
+        return Response(
+            {
+                "bank_name": bank_account.bank_name,
+                "account_number": bank_account.account_number,
+                "account_holder_name": bank_account.account_holder_name,
+                "current_balance": bank_account.money,
+            },
+            status=status.HTTP_200_OK,
+        )
+    
     def update(self, request, *args, **kwargs):
         bank_account = self.get_object()
 

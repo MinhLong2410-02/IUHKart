@@ -5,28 +5,6 @@ from dotenv import load_dotenv
 import warnings
 warnings.filterwarnings("ignore")
 import ssl
-
-load_dotenv('.env')
-TEXT_EMBEDDING_URL = os.getenv('TEXT_EMBEDDING_URL')
-Q_HOST = os.getenv('QDRANT_HOST')
-Q_PORT = os.getenv('QDRANT_PORT')
-COLLECTION = os.getenv('COLLECTION')
-
-def getTextEmbedding(text: str):
-    response = requests.get(TEXT_EMBEDDING_URL + text)
-    vector = response.json()['embedding'] if response.status_code == 200 else None
-    return vector
-
-def init_qdrant():
-    client = QdrantClient(url=f"http://{Q_HOST}:{Q_PORT}")
-    if COLLECTION in [c.name for c in client.get_collections().collections]:
-        client.delete_collection(collection_name=COLLECTION)
-    client.create_collection(collection_name=COLLECTION, vectors_config=VectorParams(size=384, distance=Distance.COSINE))
-
-# init_qdrant()
-print("🟢 Khởi tạo thành công qdrant")
-
-###
 from iuhkart.wsgi import *
 from iuhkart.settings import *
 from django.contrib.auth import get_user_model
@@ -44,12 +22,17 @@ import random, psycopg2
 from dotenv import load_dotenv
 import os
 from rest_framework_simplejwt.tokens import RefreshToken
-import ssl
 import requests
 from tqdm import tqdm
 ssl._create_default_https_context = ssl._create_stdlib_context
 load_dotenv('.env')
+TEXT_EMBEDDING_URL = os.getenv('TEXT_EMBEDDING_URL')
+Q_HOST = os.getenv('HOST')
+Q_PORT = os.getenv('QDRANT_PORT')
+COLLECTION = os.getenv('COLLECTION')
 
+
+###
 PROJECT_STATUS = environ.get('STATUS')
 DB_NAME = os.getenv('NAME')
 DB_USER = os.getenv('DBUSER')
@@ -541,3 +524,38 @@ def create_transaction():
 create_transaction()
 
 
+
+def getTextEmbedding(text: str):
+    response = requests.get(TEXT_EMBEDDING_URL + text)
+    vector = response.json()['embedding'] if response.status_code == 200 else None
+    return vector
+
+def init_qdrant():
+    broken_products = []
+    collection_name='product'
+    requests.delete(f'https://qdrant_api.iuhkart.systems/collections/delete?collection_name={collection_name}', verify=False)
+    requests.post(f'https://qdrant_api.iuhkart.systems/collections/create?collection_name={collection_name}', verify=False)
+    df = pd.read_csv('../schema/Database/products.csv')
+    product_image_df = pd.read_csv('../schema/Database/product_images_main.csv')
+    df = df[['product_id', 'product_name', 'slug']]
+    loop = tqdm(df.iterrows(), total=df.shape[0], desc='Insert to qdrantDB', colour='green')
+    for _, iter in loop:
+        product_image = product_image_df[(product_image_df['product_id']==iter['product_id']) & (product_image_df['is_main']==True)]
+        if product_image.shape[0] == 0:
+            broken_products.append((iter['product_id'], iter['product_name']))
+            continue
+        request_body = {
+            'slug': iter['slug'],
+            'product_id': iter['product_id'],
+            'product_name': f"{iter['product_name']}"
+        }
+        res = requests.post(f'https://qdrant_api.iuhkart.systems/collections/{collection_name}/insert',
+                            json=request_body,
+                            headers={"Content-Type": "application/json"}, verify=False
+                )
+        loop.set_postfix(status_code='success' if res.status_code == 201 else 'fail')
+    df = pd.DataFrame(broken_products, columns=['product_id', 'product_name'])
+    df.to_csv('../schema/Database/broken_products.csv', index=False)
+    
+init_qdrant()
+print("🟢 Khởi tạo thành công qdrant")
