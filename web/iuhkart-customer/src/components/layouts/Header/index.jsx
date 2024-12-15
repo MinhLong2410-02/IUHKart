@@ -1,29 +1,28 @@
-import React, { useCallback, useContext, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import {
+  Avatar,
   Box,
   Button,
   Flex,
   Heading,
+  IconButton,
   Image,
   Input,
-  Stack,
-  Text,
   Menu,
   MenuButton,
-  MenuList,
   MenuItem,
-  Avatar,
-  IconButton,
+  MenuList,
+  Stack
 } from "@chakra-ui/react";
 import { Icon } from "@iconify/react";
+import React, { useCallback, useContext, useMemo, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 
-import logoSVG from "../../../assets/images/logo.svg";
-import collectionAPI from "../../../api/collection.api";
-import _, { isEmpty } from "lodash";
-import { GlobalContext } from "../../../contexts/GlobalContext";
 import Cookies from "js-cookie";
+import _, { isEmpty } from "lodash";
 import authApi from "../../../api/authApi";
+import collectionAPI from "../../../api/collection.api";
+import logoSVG from "../../../assets/images/logo.svg";
+import { GlobalContext } from "../../../contexts/GlobalContext";
 
 const Header = () => {
   const navigate = useNavigate();
@@ -153,9 +152,10 @@ const Header = () => {
         </Box>
       </Flex>
       <Flex gap={10} fontWeight={600}>
-        <Text>Home</Text>
-        <Text>Products</Text>
-        <Text>Contact</Text>
+        <Link to="/">Home</Link>
+        <Link to="/products">Products</Link>
+        <Link to="/contact">Contact</Link>
+     
       </Flex>
       <Flex fontWeight={600} gap={5}>
         <Box>
