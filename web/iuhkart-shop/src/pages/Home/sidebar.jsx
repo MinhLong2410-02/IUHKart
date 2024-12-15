@@ -14,6 +14,7 @@ import {
 import Cookies from 'js-cookie'; // Import Cookies if using it for authentication
 
 const LinkItems = [
+    { path: "dashboard", name: 'DashBoard' },
     { path: "summary", name: 'Summary' },
     { path: "info", name: 'Info' },
     { path: "products", name: 'Products' },
@@ -51,18 +52,19 @@ const SidebarContent = ({ onClose, ...rest }) => {
 
     return (
         <Box
-            bg={"white"}
+            bg={"#2D324F"}
             borderRight="1px"
             borderRadius={20}
             borderRightColor={useColorModeValue('gray.200', 'gray.700')}
             w={{ base: 'full', md: 60 }}
+            className=''
             pos="fixed"
             h="80%"
             mt="20px"  
             pt="20px"
             {...rest}>
             <Flex h="20" alignItems="center" mx="8" justifyContent="space-between">
-                <Text fontSize="2xl" fontFamily="monospace" fontWeight="bold">
+                <Text fontSize="2xl" className='text-white' fontFamily="monospace" fontWeight="bold">
                     Logo
                 </Text>
                 <CloseButton display={{ base: 'flex', md: 'none' }} onClick={onClose} />
@@ -84,17 +86,19 @@ const SidebarContent = ({ onClose, ...rest }) => {
 
 const NavItem = ({ icon, children, path, ...rest }) => {
     return (
-        <Link to={path} style={{ textDecoration: 'none' }} _focus={{ boxShadow: 'none' }}>
+        <Link to={path} style={{ textDecoration: 'none' }}  _focus={{ boxShadow: 'none' }}>
             <Flex
                 align="center"
                 p="4"
                 mx="4"
                 borderRadius="lg"
+                color={"white"}
                 role="group"
                 cursor="pointer"
-                bg={useLocation().pathname === `/${path}` ? 'cyan.400' : 'white'}
+                className='mb-2'
+                bg={useLocation().pathname === `/${path}` ? '#19192b' : '#21253f'}
                 _hover={{
-                    bg: 'cyan.400',
+                    bg: '#21253f',
                     color: 'white',
                 }}
                 {...rest}>

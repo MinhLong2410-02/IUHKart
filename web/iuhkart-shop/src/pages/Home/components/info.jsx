@@ -62,12 +62,12 @@ export const Info = () => {
     return (
         <div>
             <h2
-                className="text-[30px] font-bold text-[#333] mt-[20px] mb-4 pb-[20px] border-b-2 border-black"
+                className="text-[30px] font-bold text-white mt-[20px] mb-4 pb-[20px] border-b-2 border-black"
             >
                 Info
             </h2>
             { !isEdit ? 
-            <div className="boxPrimary !p-4 flex flex-col justify-center items-center">
+            <div className="boxPrimary !p-4 flex flex-col justify-center items-center text-white" style={{border:"1px solid #ccc"}}>
                 <img className="w-[250px] h-[250px] rounded-full" src={userInfo?.logo_url || tempImg} alt="img" />
                 <div className="flex flex-col w-[400px] justify-start gap-3 mt-5">
                     <div className="flex justify-start items-center">
@@ -99,7 +99,7 @@ export const Info = () => {
                 <button onClick={() => setIsEdit(true)} className="bg-[#0bc5ea] px-4 py-2 rounded mt-4 text-white font-bold">Edit</button>
             </div> 
             : 
-            <div className="boxPrimary !p-4 flex flex-col justify-center items-center"> 
+            <div className="boxPrimary !p-4 flex flex-col justify-center items-center text-white" style={{border:"1px solid #ccc"}}> 
                     <div className="w-[250px] h-[250px] flex gap-5">
                         <input type="file" onChange={e => {
                             setFile(e.target.files[0]);
@@ -135,7 +135,7 @@ export const Info = () => {
                         <span className="opacity-40 mr-2 font-bold w-[100px]">Date join:</span>
                         <input 
                             type="date"
-                            className="font-bold" 
+                            className="font-bold text-black" 
                             name="date_join"
                             defaultValue={userInfo?.date_join}
                             onChange={(e) => setUserInfo({...userInfo, date_join: e.target.value})}

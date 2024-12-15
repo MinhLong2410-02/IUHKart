@@ -4,14 +4,11 @@ psycopg2-binary
 python-dotenv
 django-multiselectfield
 Pillow
-azure-storage-blob
 django-autoslug
 djangorestframework-simplejwt
-drf-yasg
 setuptools
 django-cors-headers
 drf-spectacular
 django-storages
-qdrant_client
-tqdm
 pandas
+boto3

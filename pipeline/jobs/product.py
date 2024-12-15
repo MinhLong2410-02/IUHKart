@@ -1,184 +1,331 @@
-from pyflink.datastream import StreamExecutionEnvironment, TimeCharacteristic
-from pyflink.datastream.connectors import FlinkKafkaConsumer
-from pyflink.common.serialization import SimpleStringSchema
-from pyflink.datastream.functions import KeyedBroadcastProcessFunction, RuntimeContext, SinkFunction
-from pyflink.common.typeinfo import Types
-from pyflink.datastream.state import MapStateDescriptor
-import json
+from datetime import datetime
+import holidays
+import json, os
 import clickhouse_connect
-
-# Định nghĩa descriptor cho broadcast state
-CATEGORY_STATE_DESCRIPTOR = MapStateDescriptor(
-    "category_state",
-    Types.INT(),   # category_id
-    Types.STRING()  # category_name
+import psycopg2
+from pyflink.datastream import StreamExecutionEnvironment
+from pyflink.common.serialization import SimpleStringSchema
+from pyflink.datastream.connectors.kafka import (
+    KafkaOffsetsInitializer,
+    KafkaSource,
 )
+from dotenv import load_dotenv
+import pandas as pd
 
-class EnrichProductWithCategory(KeyedBroadcastProcessFunction):
-    def __init__(self, initial_categories):
-        self.initial_categories = initial_categories
+load_dotenv()
+KAFKA_HOST = os.getenv("KAFKA_HOST")
+KAFKA_PORT = os.getenv("KAFKA_PORT")
+KAFKA_HEAD_TOPIC = os.getenv("KAFKA_HEAD_TOPIC")
+CLICKHOUSE_HOST = os.getenv("CLICKHOUSE_HOST")
+CLICKHOUSE_PORT = os.getenv("CLICKHOUSE_PORT")
+CLICKHOUSE_USER = os.getenv("CLICKHOUSE_USER")
+CLICKHOUSE_PASSWORD = os.getenv("CLICKHOUSE_PASSWORD")
+CLICKHOUSE_DATABASE = os.getenv("CLICKHOUSE_DATABASE")
+POSTGRES_HOST = os.getenv("POSTGRES_HOST")
+POSTGRES_PORT = os.getenv("POSTGRES_PORT")
+POSTGRES_USER = os.getenv("POSTGRES_USER")
+POSTGRES_PASSWORD = os.getenv("POSTGRES_PASSWORD")
+POSTGRES_DB = os.getenv("POSTGRES_DB")
 
-    def open(self, runtime_context: RuntimeContext):
-        # Initialize broadcast state with initial categories
-        broadcast_state = runtime_context.get_broadcast_state(CATEGORY_STATE_DESCRIPTOR)
-        for category_id, category_name in self.initial_categories.items():
-            broadcast_state.put(category_id, category_name)
+def get_holiday(date):
+    vn_holidays = holidays.Vietnam()
+    holiday = vn_holidays.get(date)
+    if not holiday:
+        return "Normal Day"
+    return holiday
 
-    def process_element(self, value, ctx: 'KeyedBroadcastProcessFunction.Context', out):
-        # Xử lý record sản phẩm
-        product = json.loads(value)
-        category_id = product.get('category_id')
-        broadcast_state = ctx.get_broadcast_state(CATEGORY_STATE_DESCRIPTOR)
-        category_name = broadcast_state.get(category_id)
-        if not category_name:
-            category_name = "Unknown"  # Hoặc thực hiện truy vấn ClickHouse để lấy lại category_name
-        enriched_product = {
-            'id': product.get('id'),
-            'name': product.get('name'),
-            'brand': product.get('brand'),
-            'price': product.get('price'),
-            'stock': product.get('stock'),
-            'category': category_name
-        }
-        out.collect(json.dumps(enriched_product))
-
-    def process_broadcast_element(self, value, ctx: 'KeyedBroadcastProcessFunction.Context', out):
-        # Cập nhật broadcast state với record danh mục mới
-        category = json.loads(value)
-        category_id = category.get('id')
-        category_name = category.get('name')
-        broadcast_state = ctx.get_broadcast_state(CATEGORY_STATE_DESCRIPTOR)
-        broadcast_state.put(category_id, category_name)
-
-class ClickHouseSink(SinkFunction):
-    def __init__(self, host, port, username, password, database, table, batch_size=1000, flush_interval=2000):
-        self.host = host
-        self.port = port
-        self.username = username
-        self.password = password
-        self.database = database
-        self.table = table
-        self.batch_size = batch_size
-        self.flush_interval = flush_interval
-        self.client = None
-        self.buffer = []
-        self.last_flush_time = None
-
-    def open(self, runtime_context: RuntimeContext):
-        self.client = clickhouse_connect.get_client(
-            host=self.host,
-            port=self.port,
-            username=self.username,
-            password=self.password,
-            database=self.database
-        )
-        self.last_flush_time = runtime_context.get_current_processing_time()
-
-    def invoke(self, value, context):
-        # value là JSON string đã được enriched
-        record = json.loads(value)
-        self.buffer.append((
-            record['id'],
-            record['name'],
-            record['brand'],
-            record['price'],
-            record['stock'],
-            record['category']
-        ))
-
-        current_time = context.timestamp()
-        if len(self.buffer) >= self.batch_size or (current_time - self.last_flush_time) >= self.flush_interval:
-            if self.buffer:
-                self.client.insert(
-                    self.table,
-                    [
-                        {'id': r[0], 'name': r[1], 'brand': r[2], 'price': r[3], 'stock': r[4], 'category': r[5]}
-                        for r in self.buffer
-                    ]
-                )
-                self.buffer = []
-                self.last_flush_time = current_time
-
-    def close(self):
-        if self.buffer:
-            self.client.insert(
-                self.table,
-                [
-                    {'id': r[0], 'name': r[1], 'brand': r[2], 'price': r[3], 'stock': r[4], 'category': r[5]}
-                    for r in self.buffer
-                ]
-            )
-        if self.client:
-            self.client.close()
-
-def load_initial_categories(clickhouse_client):
-    # Tải toàn bộ dữ liệu category từ ClickHouse
-    categories = clickhouse_client.query("SELECT id, name FROM category")
-    category_dict = {category['id']: category['name'] for category in categories}
-    return category_dict
-
-def main():
-    env = StreamExecutionEnvironment.get_execution_environment()
-    env.set_parallelism(1)  # Tùy chỉnh theo nhu cầu
-    env.set_stream_time_characteristic(TimeCharacteristic.ProcessingTime)
-
-    # Kết nối với ClickHouse để tải dữ liệu category ban đầu
-    clickhouse_client = clickhouse_connect.get_client(
-        host='clickhouse',
-        port=8123,
-        username='default',
-        password='',
-        database='default'
-    )
-    initial_categories = load_initial_categories(clickhouse_client)
-    clickhouse_client.close()
-
-    # Cấu hình Kafka consumer
-    kafka_props = {
-        'bootstrap.servers': 'kafka-postgres:9092',
-        'group.id': 'flink'
+def parse_date(date_str:str) -> dict:
+    _id = int(date_str.replace('-', ''))
+    date = datetime.strptime(date_str,  "%Y-%m-%d")
+    return {
+        'id': _id,
+        'full_date': date_str,
+        'day': date.day,
+        'month': date.month,
+        'year': date.year,
+        'quarter': (date.month - 1) // 3 + 1,
+        'day_of_week': date.weekday(),
+        'week_of_year': date.isocalendar()[1],
+        'is_weekend': date.weekday() in [5, 6],
+        'is_holiday': get_holiday(date_str)
     }
 
-    # Consumer cho products
-    product_consumer = FlinkKafkaConsumer(
-        topics='postgresDB.public.products',
-        deserialization_schema=SimpleStringSchema(),
-        properties=kafka_props
+def decode_message(message: str):
+    """Decode Kafka message and extract change data."""
+    try:
+        message_json = json.loads(message)
+        operation = message_json.get('op')
+        before = {k.split(".")[-1]: v for k, v in message_json.items() if k.startswith('before') and k.split(".")[-1]}
+        after = {k.split(".")[-1]: v for k, v in message_json.items() if k.startswith('after') and k.split(".")[-1]}
+        if operation == 'c':
+            return 'Create', after
+        elif operation == 'u':
+            return 'Update', after
+        elif operation == 'r':
+            return 'Read', after
+        elif operation == 'd':
+            return 'Delete', before
+        else:
+            return 'Unknown', None
+    except Exception as e:
+        print(f"🔻 Error decoding message: {e}")
+        return None, None
+
+def get_clickhouse_client():
+    """Initialize ClickHouse client."""
+    client = clickhouse_connect.get_client(
+        host=CLICKHOUSE_HOST,
+        port=CLICKHOUSE_PORT,
+        username=CLICKHOUSE_USER,
+        password=CLICKHOUSE_PASSWORD,
+        database=CLICKHOUSE_DATABASE,
     )
+    return client
 
-    # Consumer cho categories
-    category_consumer = FlinkKafkaConsumer(
-        topics='postgresDB.public.categories',
-        deserialization_schema=SimpleStringSchema(),
-        properties=kafka_props
+def initialize_env() -> StreamExecutionEnvironment:
+    """Initializes the Flink stream execution environment."""
+    env = StreamExecutionEnvironment.get_execution_environment()
+    env.set_parallelism(2)
+
+    # Get current directory
+    root_dir_list = __file__.split("/")[:-2]
+    root_dir = "/".join(root_dir_list)
+
+    # Adding the jar to the flink streaming environment
+    env.add_jars(
+        f"file://{root_dir}/lib/flink-sql-connector-kafka-3.1.0-1.18.jar",
     )
+    return env
 
-    # Tiêu thụ dữ liệu từ Kafka
-    product_stream = env.add_source(product_consumer)
-    category_stream = env.add_source(category_consumer)
+def configure_source(topic:str,  earliest:bool = False) -> KafkaSource:
+    """Initializes Kafka source."""
+    properties = {
+        "bootstrap.servers": f"{KAFKA_HOST}:{KAFKA_PORT}",
+        "group.id": f"flink_{topic.split('.')[-1]}_consumer",
+    }
 
-    # Broadcast category stream
-    broadcast_stream = category_stream.broadcast(CATEGORY_STATE_DESCRIPTOR)
+    offset = KafkaOffsetsInitializer.latest()
+    if earliest:
+        offset = KafkaOffsetsInitializer.earliest()
 
-    # Kết hợp product stream với broadcast category stream
-    enriched_stream = product_stream.key_by(lambda x: json.loads(x).get('category_id')) \
-        .connect(broadcast_stream) \
-        .process(EnrichProductWithCategory(initial_categories), output_type=Types.STRING())
+    kafka_source = (
+        KafkaSource.builder()
+        .set_topics(topic)
+        .set_properties(properties)
+        .set_starting_offsets(offset)
+        .set_value_only_deserializer(SimpleStringSchema())
+        .build()
+    )
+    return kafka_source
 
-    # Sink enriched stream vào ClickHouse
-    enriched_stream.add_sink(
-        ClickHouseSink(
-            host='clickhouse',
-            port=8123,
-            username='default',
-            password='',
-            database='default',
-            table='product'
+class Postgres():
+    def __init__(self):
+        self.host = POSTGRES_HOST
+        self.user = POSTGRES_USER
+        self.port = POSTGRES_PORT
+        self.password = POSTGRES_PASSWORD
+        self.database = POSTGRES_DB
+        self.conn = None
+        self.cursor = None
+        self.connect()
+    
+    def connect(self):
+        self.conn = psycopg2.connect(
+            host=self.host,
+            database=self.database,
+            user=self.user,
+            port=self.port,
+            password=self.password
         )
+        self.cursor = self.conn.cursor()
+    
+    def close(self):
+        self.cursor.close()
+        self.conn.close()
+
+    def query(self, sql_query, fetch=True):
+        try:
+            self.cursor.execute(sql_query)
+            self.conn.commit()
+            if fetch:
+                rows = self.cursor.fetchall()
+                df = pd.DataFrame(rows, columns=[desc[0] for desc in self.cursor.description])
+                return df
+            return self.cursor.fetchall()
+        except Exception as e:
+            self.cursor.execute("ROLLBACK")
+            print(f'❌ ROLLBACK: {e}')
+    
+    def create_schema(self, sql_path='*.sql'):
+        with open(sql_path, 'r') as f:
+            schema = f.read().split('\n\n')
+        try:
+            for statement in schema:
+                self.cursor.execute(statement)
+                if statement.find('CREATE TABLE') != -1:
+                    print(f'''📢 Created table {statement.split('"')[1]}''')
+                if statement.find('ALTER TABLE') != -1:
+                    alter = statement.split('"')
+                    print(f'''🔌 Linked table {alter[1]} -> {alter[5]}''')
+            self.conn.commit()
+        except Exception as e:
+            self.cursor.execute("ROLLBACK")
+            print(f'❌ ROLLBACK: {e}')
+    
+    def get_columns(self, table_name):
+        try:
+            self.cursor.execute("SELECT column_name FROM information_schema.columns WHERE table_schema = 'public' AND table_name = '{table_name}'".format(table_name=table_name))
+            cols = [i[0] for i in self.cursor.fetchall()]
+            return cols
+        except Exception as e:
+            self.cursor.execute("ROLLBACK")
+            print(f'❌ ROLLBACK: {e}')
+    
+    def get_all_table(self,):
+        try:
+            self.cursor.execute("SELECT table_name FROM information_schema.tables WHERE table_schema = 'public';")
+            tables = [i[0] for i in self.cursor.fetchall()]
+            return tables
+        except Exception as e:
+            self.cursor.execute("ROLLBACK")
+            print(f'❌ ROLLBACK: {e}')
+    
+    def delete_table(self, table_names = []):
+        for table in table_names:
+            try:
+                self.cursor.execute(f"DROP TABLE {table}")
+                print(f"🗑 Deleted {table}")
+            except Exception as e:
+                self.cursor.execute("ROLLBACK")
+                print(f'❌ ROLLBACK: {e}')
+        self.conn.commit()
+    
+    def upsert(self, data, table_name, conflict_target:str='id', updates:list=None):
+        try:
+            cols = self.get_columns(table_name)
+            _cols = [c for c in cols if c != conflict_target]
+            if updates is None:
+                updates = ','.join([f"{c}={'EXCLUDED.'+c}" for c in _cols])
+            sql_insert = f"""
+                INSERT INTO {table_name} ({','.join(cols)})
+                VALUES ({','.join(['%s']*len(cols))})
+                ON CONFLICT ({conflict_target})
+                DO UPDATE SET {updates};
+            """
+            self.cursor.execute(sql_insert, data)
+            self.conn.commit()
+        except Exception as e:
+            self.cursor.execute("ROLLBACK")
+            print(f'❌ ROLLBACK: {e}')
+            
+    def upserts(self, datas, table_name, conflict_target:str='id', updates:list=None):
+        try:
+            cols = self.get_columns(table_name)
+            _cols = [c for c in cols if c != conflict_target]
+            if updates is None:
+                updates = ','.join([f"{c}={'EXCLUDED.'+c}" for c in _cols])
+            sql_insert = f"""
+                INSERT INTO {table_name} ({','.join(cols)})
+                VALUES ({','.join(['%s']*len(cols))})
+                ON CONFLICT ({conflict_target})
+                DO UPDATE SET {updates};
+            """
+            self.cursor.executemany(sql_insert, datas)
+            self.conn.commit()
+        except Exception as e:
+            self.cursor.execute("ROLLBACK")
+            print(f'❌ ROLLBACK: {e}')
+    
+    def delete(self, table_name, pk_id):
+        try:
+            self.cursor.execute(f"DELETE FROM {table_name} WHERE id={pk_id};")
+            self.conn.commit()
+        except Exception as e:
+            self.cursor.execute("ROLLBACK")
+            print(f'❌ ROLLBACK: {e}')
+    
+    def truncate(self, table_name):
+        try:
+            self.cursor.execute(f"TRUNCATE {table_name} CASCADE")
+            self.conn.commit()
+        except Exception as e:
+            self.cursor.execute("ROLLBACK")
+            print(f'❌ ROLLBACK: {e}')
+
+## ------------------------------------------------------------------------------
+import json
+import logging
+from pyflink.common import Types, WatermarkStrategy
+# from utils import *
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+logger.addHandler(logging.StreamHandler())
+
+def stream_product(message: json):
+    """Process and sink data into ClickHouse."""
+    logger.info(f"\n🚩 [Product] processing ...")
+    try:
+        pg = Postgres()
+        data_map = pg.query("SELECT * FROM category;")
+        data_map = data_map.set_index('id')['name'].to_dict()
+        
+        client = get_clickhouse_client()
+        mode, data = decode_message(message)
+        id = data.get('product_id')
+        name = data.get('product_name')
+        brand = data.get('brand')
+        price = data.get('original_price')
+        stock = data.get('stock')
+        category_id = data.get('category_id')
+        category = data_map.get(category_id)
+        
+        # # Prepare data for ClickHouse
+        row = (id, name, brand, price, stock, category)
+        if mode == 'Create':
+            client.insert('dim_product', [row], column_names=['id', 'name', 'brand', 'price', 'stock', 'category'])
+        elif mode == 'Update':
+            # Sử dụng ALTER TABLE để cập nhật các trường
+            update_query = """
+                ALTER TABLE dim_product 
+                UPDATE 
+                    name = %(name)s,
+                    brand = %(brand)s,
+                    price = %(price)s,
+                    stock = %(stock)s,
+                    category = %(category)s
+                WHERE id = %(id)s
+            """
+            params = {
+                'name': name,
+                'brand': brand,
+                'price': price,
+                'stock': stock,
+                'category': category,
+                'id': id
+            }
+            client.execute(update_query, params)
+            logger.info(f"\n🟢 [Product] Updated in ClickHouse: {row}")
+            
+        client.close()
+        pg.close()
+        logger.info(f"\n🟢 [Product] Inserted into ClickHouse: {row}")
+
+    except Exception as e:
+        logger.error(f"\n❌ [Product] Error processing message: {e}")
+    print('\n' + '-'*120)
+    
+def main() -> None:
+    """Main flow controller"""
+    env = initialize_env()
+    kafka_source = configure_source(topic='postgresDB.public.products')
+    data_stream = env.from_source(
+        kafka_source, WatermarkStrategy.no_watermarks(), "Kafka sensors topic 1"
     )
+    data_stream.map(
+        stream_product,
+        output_type=Types.STRING()
+    )
+    env.execute("Stream product job")
 
-    # Thực thi job
-    env.execute("Flink ETL Job with Broadcast State and clickhouse_connect")
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

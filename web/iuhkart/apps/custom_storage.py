@@ -1,20 +1,18 @@
-from storages.backends.azure_storage import AzureStorage
-from os import environ
-from dotenv import load_dotenv
-load_dotenv('./.env')
-# Azure Blob Storage settings
-AZURE_CONNECTION_STRING = environ.get('AZURE_CONNECTION_STRING')
-
-class AzureCustomStorage(AzureStorage):
-    account_name = environ.get('AZURE_ACCOUNT_NAME')
-    account_key = environ.get('AZURE_ACCOUNT_KEY')
-    expiration_secs = None
+from storages.backends.s3boto3 import S3Boto3Storage
+from urllib.parse import urlparse
+class CustomStorage(S3Boto3Storage):
+    custom_domain = 'image.iuhkart.systems'
+    def url(self, name):
+        parsed = urlparse(name)
+        if parsed.scheme and parsed.netloc:
+            return name
+        return super().url(name)
     
-class AzureCustomerStorage(AzureCustomStorage):
-    azure_container = 'customer'  
+class CustomerStorage(CustomStorage):
+    bucket_name = 'customer'
 
-class AzureVendorStorage(AzureCustomStorage):
-    azure_container = 'vendor'  
-    
-class AzureProductStorage(AzureCustomStorage):
-    azure_container = 'product'  
+class ShopStorage(CustomStorage):
+    bucket_name = 'shop'
+
+class ProductStorage(CustomStorage):
+    bucket_name = 'product'

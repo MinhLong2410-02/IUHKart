@@ -14,7 +14,7 @@ class Order(models.Model):
         ('cancelled', 'Cancelled'),
     ]
 
-    order_id = models.AutoField(primary_key=True)
+    order_id = models.BigIntegerField(primary_key=True)
     order_number = models.CharField(max_length=50, unique=True, db_index=True)
     shipping_date = models.DateTimeField(default=default_shipping_date)
     order_date = models.DateTimeField(default=now)
@@ -31,7 +31,7 @@ class Order(models.Model):
         return self.order_number
 
 class OrderProduct(models.Model):
-    order_product_id = models.AutoField(primary_key=True)
+    order_product_id = models.BigIntegerField(primary_key=True)
     order = models.ForeignKey(Order, on_delete=models.CASCADE, db_column='order_id')
     product = models.ForeignKey('product.Product', on_delete=models.CASCADE, db_column='product_id')
     quantity = models.IntegerField()
@@ -50,7 +50,7 @@ class Transaction(models.Model):
         ('refunded', 'Refunded'),
     ]
 
-    transaction_id = models.AutoField(primary_key=True)
+    transaction_id = models.BigIntegerField(primary_key=True)
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='payments')
     transation_date = models.DateTimeField(default=now)
     total_money = models.BigIntegerField()

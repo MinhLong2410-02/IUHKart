@@ -1,7 +1,7 @@
 from django.db import models
 from django.utils import timezone
 from autoslug import AutoSlugField
-from apps.custom_storage import AzureProductStorage
+from apps.custom_storage import ProductStorage
 from django.utils import timezone
 # Create your models here.
 class Category(models.Model):
@@ -43,7 +43,7 @@ class Product(models.Model):
 class ProductImages(models.Model):
     product_image_id = models.AutoField(primary_key=True)
     product_id = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='images')
-    image_url = models.ImageField(storage=AzureProductStorage(), max_length=255)
+    image_url = models.ImageField(storage=ProductStorage(), max_length=255)
     is_main = models.BooleanField(default=False)
     class Meta:
         db_table = 'product_images'

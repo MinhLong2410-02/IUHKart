@@ -13,10 +13,9 @@ services:
             - iuhkart-network
         healthcheck:
             test: ["CMD", "nc", "-z", "zookeeper-postgres", "2181"]
-            interval: 30s
-            timeout: 10s
+            interval: 10s
+            timeout: 5s
             retries: 5
-            start_period: 20s
         restart: always
     
     zookeeper-mongo:
@@ -28,12 +27,11 @@ services:
             - iuhkart-network
         healthcheck:
             test: ["CMD", "nc", "-z", "zookeeper-mongo", "2181"]
-            interval: 30s
-            timeout: 10s
+            interval: 10s
+            timeout: 5s
             retries: 5
-            start_period: 20s
         restart: always
-    
+
     kafka-postgres:
         container_name: kafka-postgres
         image: wurstmeister/kafka:latest
@@ -59,12 +57,11 @@ services:
             - iuhkart-network
         healthcheck:
             test: ["CMD", "nc", "-z", "kafka-postgres", "9092"]
-            interval: 30s
-            timeout: 10s
+            interval: 10s
+            timeout: 5s
             retries: 5
-            start_period: 30s
         restart: always
-    
+
     kafka-mongo:
         container_name: kafka-mongo
         image: wurstmeister/kafka:latest
@@ -90,18 +87,14 @@ services:
             - iuhkart-network
         healthcheck:
             test: ["CMD", "nc", "-z", "kafka-mongo", "9093"]
-            interval: 30s
-            timeout: 10s
+            interval: 10s
+            timeout: 5s
             retries: 5
-            start_period: 30s
         restart: always
-    
+
     kafka-ui:
         container_name: kafka-ui
         image: provectuslabs/kafka-ui:latest
-        depends_on:
-            - kafka-postgres
-            - kafka-mongo
         ports:
             - "18081:8081"
         environment:
@@ -115,7 +108,7 @@ services:
         networks:
             - iuhkart-network
         restart: always
-    
+
     debezium-postgres:
         container_name: debezium-postgres
         image: debezium/connect:3.0.0.Final
@@ -131,11 +124,11 @@ services:
             - iuhkart-network
         healthcheck:
             test: ["CMD", "curl", "-f", "http://debezium-postgres:8083/connectors"]
-            interval: 30s
-            timeout: 10s
+            interval: 10s
+            timeout: 5s
             retries: 5
         restart: always
-    
+
     debezium-mongo:
         container_name: debezium-mongo
         image: debezium/connect:3.0.0.Final
@@ -151,11 +144,11 @@ services:
             - iuhkart-network
         healthcheck:
             test: ["CMD", "curl", "-f", "http://debezium-mongo:8083/connectors"]
-            interval: 30s
-            timeout: 10s
+            interval: 10s
+            timeout: 5s
             retries: 5
         restart: always
-    
+
     debezium-ui:
         container_name: debezium-ui
         image: debezium/debezium-ui:latest
@@ -170,7 +163,7 @@ services:
         networks:
             - iuhkart-network
         restart: always
-    
+
     init-connect:
         container_name: init-connect
         build: configs/connector

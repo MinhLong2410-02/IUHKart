@@ -31,12 +31,12 @@ export const Product = () => {
     return (
         <div>
             <h2
-                className="text-[30px] font-bold text-[#333] mt-[20px] mb-4 pb-[20px] border-b-2 border-black"
+                className="text-[30px] font-bold text-white mt-[20px] mb-4 pb-[20px] border-b-2 border-black"
             >
                 Product Detail
             </h2>
-            <div className="!p-4 boxPrimary">
-                <div className="boxPrimary flex !p-4 flex justify-center items-start gap-10">
+            <div className="!p-4 boxPrimary text-white">
+                <div className="boxPrimary flex !p-4  justify-center items-start gap-10">
                     <div className="flex flex-col w-[30%] gap-2">
                         <img src={data?.images?.[currentImage]?.image_url} alt="" className="w-[400px] h-[400px] mt-5" />
                         <div className="flex flex-wrap gap-2">

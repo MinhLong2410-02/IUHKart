@@ -1,11 +1,11 @@
 from qdrant_client import models
 from kafka import KafkaConsumer
-import json
+import json, sys
 import logging
 from datetime import datetime, timedelta
-from .database import db, qdrant_client as client, update_recommendations_in_postgres
-from .configs import KAFKA_HOST, KAFKA_PORT, KAFKA_TOPIC
-
+from database import db, qdrant_client as client, update_recommendations_in_postgres
+from configs import KAFKA_HOST, KAFKA_PORT, KAFKA_TOPIC
+from pprint import pprint
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
@@ -63,7 +63,7 @@ def compute_weighted_embedding(user_id: str):
     try:
         # Get weighted interactions
         product_weights = get_user_behavior_weights(user_id)
-        
+        logger.info(f'🟢 product_weights: {product_weights.items()}')
         # Fetch embeddings and apply weights
         weighted_embedding = None
         total_weight = 0
@@ -98,7 +98,8 @@ def recommend_for_user(user_id: str, top_k: int = 5):
 
         update_recommendations_in_postgres(user_id, recommended_product_ids)
         
-        logger.info(f"Recommendations for user {user_id}: {recommended_product_ids}")
+        logger.info(f"🟢 Recommendations for user {user_id}: {recommended_product_ids}")
+        sys.stdout.flush()
         return recommended_product_ids
     except Exception as e:
         logger.error(f"Error generating recommendations for user {user_id}: {e}")
@@ -110,10 +111,15 @@ def process_kafka_message(message):
         document = json.loads(message.value.decode('utf-8'))
         
         # Optionally, trigger recommendations or further processing based on the message
-        user_id = document.get("user_id")
+        after_data = eval(document.get("payload").get("after"))
+        logger.info(f'🟢 after_data')
+        pprint(after_data)
+        user_id = after_data.get("user_id")
+        logger.info(f'🟢 {user_id=}')
         if user_id:
             recommendations = recommend_for_user(user_id, 20)
-            logger.info(f"Processed message for user {user_id} with recommendations: {recommendations}")
+            logger.info(f"⚙️ Processed message for user {user_id} with recommendations: {recommendations}")
+            sys.stdout.flush()
     except Exception as e:
         logger.error(f"Error processing Kafka message: {e}")
 
@@ -122,14 +128,16 @@ def consume_kafka_messages():
         consumer = KafkaConsumer(
             KAFKA_TOPIC,
             bootstrap_servers=f"{KAFKA_HOST}:{KAFKA_PORT}",
-            auto_offset_reset='earliest',
+            auto_offset_reset='latest',
             enable_auto_commit=True,
             group_id='recommendation-group'
         )
 
-        logger.info("Kafka consumer started. Waiting for messages...")
-
+        logger.info("✈️ Kafka consumer started. Waiting for messages...")
+        sys.stdout.flush()
         for message in consumer:
+            # logger.info(f"⚙️ Received message: {message.value.decode('utf-8')}")
+            sys.stdout.flush()
             process_kafka_message(message)
     except Exception as e:
         logger.error(f"Error in Kafka consumer: {e}")

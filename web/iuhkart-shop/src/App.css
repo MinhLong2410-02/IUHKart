@@ -48,3 +48,11 @@ input {
         transform: rotate(360deg);
     }
 }
+
+.home {
+    background: #272740 !important;
+}
+
+.boxPrimary {
+    background: #272740 !important;
+}

@@ -12,7 +12,7 @@ from qdrant_base import (
     VectorParams, 
     Distance
 )
-from utils import search_tracking
+from utils import search_tracking, remove_vietnamese_accents
 
 app = FastAPI()
 allowed_origins = [
@@ -63,8 +63,7 @@ async def insert_point(collection_name:str, request: InsertPointRequestBody):
         return {'detail': 'Vector is None'}
     payload = {
         'product_id': request.product_id,
-        'product_name': request.product_name,
-        'product_image_url': request.product_image_url
+        'product_name': request.product_name
     }
     point = PointStruct(id=str(uuid4()),
                         vector=vector,
@@ -91,8 +90,8 @@ async def update_point(collection_name: str, request: UpdatePointRequestBody):
     payload = p.payload
     if request.product_name:
         payload["product_name"] = request.product_name
-    if request.product_image_url:
-        payload["product_image_url"] = request.product_image_url
+    # if request.product_image_url:
+    #     payload["product_image_url"] = request.product_image_url
     point = PointStruct(id=p.id, vector=vector, payload=payload)
     client.upsert(collection_name=collection_name, points=[point])
     return {'payload': payload}
@@ -158,7 +157,7 @@ async def search(
     slug = query_params.slug
     limit = query_params.limit
     thresh = query_params.thresh
-
+    
     access_token = request.headers.get("access_token")
     if not access_token:
         raise HTTPException(status_code=401, detail="Access token missing or invalid")
@@ -167,6 +166,7 @@ async def search(
         raise HTTPException(status_code=404, detail="Slug not found!")
     if collection_name is None or _check_exist(collection_name)==False:
         raise HTTPException(status_code=404, detail="Collection name not found!")
+    slug = remove_vietnamese_accents(slug)
     vector = getTextEmbedding(slug)
     if vector is None:
         return {'detail': 'Vector is None'}
@@ -175,7 +175,7 @@ async def search(
         query_vector=vector,
         limit=limit
     )
-    product_ids = list(set([product['payload']['product_id'] for product in products]))
+    product_ids = list(set([product.payload['product_id'] for product in products]))
     tracking_status = search_tracking(product_ids, access_token)
     res = [{'score':i.score, 'payload':i.payload} for i in products if i.score >= thresh]
-    return {'results': res, tracking_status: tracking_status}
+    return {'results': res, 'tracking_status': tracking_status}

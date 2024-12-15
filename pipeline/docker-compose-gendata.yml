@@ -35,6 +35,7 @@ services:
             - POSTGRES_USER=${POSTGRES_AIRFLOW_USER:-airflow}
             - POSTGRES_PASSWORD=${POSTGRES_AIRFLOW_PASSWORD:-airflow}
             - POSTGRES_DB=${POSTGRES_AIRFLOW_DB:-airflow}
+        restart: always
     
     airflow-scheduler:
         <<: *airflow-common

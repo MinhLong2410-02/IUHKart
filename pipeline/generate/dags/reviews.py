@@ -1,14 +1,12 @@
 from datetime import datetime, timedelta
 from pytz import timezone
-from airflow import AirflowException
 from airflow.decorators import dag, task
 
 import psycopg2 
 import random
 import os
 from faker import Faker
-from dotenv import load_dotenv
-load_dotenv(".env")
+
 POSTGRES_HOST=os.getenv("POSTGRES_HOST")
 POSTGRES_PORT=os.getenv("POSTGRES_PORT")
 POSTGRES_USER=os.getenv("POSTGRES_USER")
@@ -66,7 +64,7 @@ def main():
     # Cấu hình kết nối tới PostgreSQL
     conn = psycopg2.connect(
         host=POSTGRES_HOST,
-        port=POSTGRES_HOST,
+        port=POSTGRES_PORT,
         database=POSTGRES_DB,
         user=POSTGRES_USER,
         password=POSTGRES_PASSWORD

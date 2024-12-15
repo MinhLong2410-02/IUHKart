@@ -6,16 +6,10 @@ import psycopg2
 import random
 import os
 from datetime import datetime
-import pandas as pd
+from pytz import timezone
 from faker import Faker
 fake = Faker()
-from dotenv import load_dotenv
-load_dotenv(".env")
-POSTGRES_HOST=os.getenv("POSTGRES_HOST")
-POSTGRES_PORT=os.getenv("POSTGRES_PORT")
-POSTGRES_USER=os.getenv("POSTGRES_USER")
-POSTGRES_PASSWORD=os.getenv("POSTGRES_PASSWORD")
-POSTGRES_DB=os.getenv("POSTGRES_DB")
+
 
 def _generate_random_id(list_id):
     return random.choice(list_id)
@@ -34,14 +28,14 @@ def insert_product(conn):
     category_id = _generate_random_id(id_categories)
     vendor_id = _generate_random_id(id_vendors)
     product_name = fake.slug()
-    original_price = random.randint(10000, 5000000)
+    original_price = random.randint(10000, 500000)
     stock = random.randint(0, 100)
     brand = fake.company()
     slug = product_name
     product_description = fake.text()
-    date_created = datetime.now()
+    date_created = datetime.now(tz=timezone('Asia/Ho_Chi_Minh')).strftime('%Y-%m-%d %H:%M:%S')
     ratings = random.randint(1, 5)
-    date_add = datetime.now()
+    date_add = datetime.now(tz=timezone('Asia/Ho_Chi_Minh')).strftime('%Y-%m-%d %H:%M:%S')
     
     insert_product = """
         INSERT INTO products (product_name, original_price, stock, brand, slug, product_description, date_created, ratings, date_add, category_id, vendor_id)
@@ -56,11 +50,11 @@ def insert_product(conn):
 def main():
     # Cấu hình kết nối tới PostgreSQL
     conn = psycopg2.connect(
-        host=POSTGRES_HOST,
-        port=POSTGRES_HOST,
-        database=POSTGRES_DB,
-        user=POSTGRES_USER,
-        password=POSTGRES_PASSWORD
+        host=os.getenv("POSTGRES_HOST"),
+        port=os.getenv("POSTGRES_PORT"),
+        database=os.getenv("POSTGRES_DB"),
+        user=os.getenv("POSTGRES_USER"),
+        password=os.getenv("POSTGRES_PASSWORD")
     )
     print("✅ Kết nối tới PostgreSQL thành công.")
 

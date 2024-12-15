@@ -57,7 +57,9 @@ const ProductCard = ({ product, onAddCart, onClick }) => {
           </Text>
         </Flex>
 
-        <Text as="b">{`${product?.original_price} VND`}</Text>
+        <Text as="b">
+        {new Intl.NumberFormat('vi-VN').format(product?.original_price) + " VNĐ"}
+        </Text>
       </Stack>
       <Box position="absolute" right="8px" bottom="8px">
         <IconButton
