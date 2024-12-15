@@ -1,0 +1,36 @@
+services:
+  metabase:
+    image: ghcr.io/arkadiuminc/metabase:v0.37.3
+    # build:
+    #   context: ./
+    #   dockerfile: Dockerfile
+    # restart: unless-stopped
+    networks:
+      - iuhkart-network
+    environment:
+      MB_DB_TYPE: postgres
+      MB_DB_DBNAME: postgres
+      MB_DB_USER: postgres.dbktldqbijhewczgdpml
+      MB_DB_PASS: admin
+      MB_DB_HOST: aws-0-ap-southeast-1.pooler.supabase.com
+      MB_DB_PORT: 6543
+    ports:
+      - 3000:3000
+    volumes:
+      - ./data/metabase:/metabase-data
+
+  cloudflare:
+    image: cloudflare/cloudflared:latest
+    container_name: iuhkart-metabase-cloudflare
+    restart: unless-stopped
+    command: tunnel --no-autoupdate run --token eyJhIjoiYjEyNTc2NjEwYTQyYzVmM2JmZTZlZThhZjE1MjIwM2EiLCJ0IjoiNWZiM2UzOGItNjM0YS00MGYwLTgzOTctMzEzMjZhODkwYWE5IiwicyI6Ik1UZGlaVEl3WW1FdFpEVmhZeTAwTTJWaUxUa3dOVEF0TmpjNVpqWXdPVGRqWkdNMCJ9
+    networks:
+      - iuhkart-network
+    depends_on:
+      metabase:
+        condition: service_started
+
+networks:
+  iuhkart-network:
+    name: iuhkart-network
+    external: true
