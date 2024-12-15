@@ -1,6 +1,6 @@
 from rest_framework import serializers
-from apps.account.models import Customer
-from apps.order.models import Order, OrderProduct
+from apps.account.models import Customer, BankAccount, Vendor
+from apps.order.models import Order, OrderProduct, Transaction
 from apps.product.models import Product
 from apps.discount.models import Discount, OrderProductDiscount
 from apps.cart.models import CartProduct
@@ -104,3 +104,70 @@ class CreateOrderByVendorSerializer(serializers.Serializer):
 
         return created_orders
 
+class ProcessTransactionSerializer(serializers.Serializer):
+    order_ids = serializers.ListField(
+        child=serializers.IntegerField(),
+        allow_empty=False,
+        help_text="A list of order IDs to process transactions for."
+    )
+
+    def validate(self, data):
+        user = self.context['request'].user
+        orders = Order.objects.filter(order_id__in=data['order_ids'], customer=user.customer, order_status='pending')
+        
+        if not orders.exists():
+            raise serializers.ValidationError("No valid pending orders found for the given IDs.")
+        
+        total_amount = sum(order.order_total for order in orders)
+        if user.bank_account.money < total_amount:
+            raise serializers.ValidationError("Tài khoản bạn không đủ tiền.")
+
+        data['orders'] = orders
+        return data
+
+    @transaction.atomic
+    def create(self, validated_data):
+        user = self.context['request'].user
+        orders = validated_data['orders']
+        # get the largest transaction id
+        transaction_id = Transaction.objects.all().aggregate(Max('transaction_id'))['transaction_id__max'] or 0
+        transactions = []
+        for order in orders:
+            vendors = {}
+            order_total = 0
+
+            # Group money by vendor
+            for order_product in order.orderproduct_set.all():
+                transaction_id += 1
+                vendor = order_product.product.created_by
+                price = order_product.price * order_product.quantity
+
+                if vendor not in vendors:
+                    vendors[vendor] = 0
+                vendors[vendor] += price
+                order_total += price
+
+            # Deduct money from user's bank account
+            user.bank_account.money -= order_total
+            user.bank_account.save()
+
+            # Distribute money to vendors' bank accounts
+            for vendor, amount in vendors.items():
+                vendor.user.bank_account.money += amount
+                vendor.user.bank_account.save()
+
+            # Create a transaction
+            transaction = Transaction.objects.create(
+                transaction_id=transaction_id,
+                order=order,
+                customer=user.customer,
+                total_money=order_total,
+                status='completed'
+            )
+            transactions.append(transaction)
+
+            # Update order status
+            order.order_status = 'processing'
+            order.save()
+
+        return transactions

@@ -37,4 +37,24 @@ class CreateOrderByVendorView(generics.CreateAPIView):
 
         return Response(response_data, status=status.HTTP_201_CREATED)
 
+class ProcessTransactionView(generics.CreateAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = ProcessTransactionSerializer
 
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        transactions = serializer.save()
+
+        # Prepare the response
+        response_data = [
+            {
+                "transaction_id": transaction.transaction_id,
+                "order_id": transaction.order.order_id,
+                "total_money": transaction.total_money,
+                "status": transaction.status,
+            }
+            for transaction in transactions
+        ]
+
+        return Response(response_data, status=status.HTTP_201_CREATED)
