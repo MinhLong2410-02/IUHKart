@@ -53,7 +53,7 @@ const ProductDetail = () => {
           toast({
             title: "Failed to load product.",
             status: "error",
-            position: "top-right",
+            position: "top-left",
           });
         }
       }
@@ -75,13 +75,13 @@ const ProductDetail = () => {
         toast({
           title: "Add Cart Successful!",
           status: "success",
-          position: "top-right",
+          position: "top-left",
         });
     } catch (error) {
       toast({
         title: "Add Cart Fail!",
         status: "error",
-        position: "top-right",
+        position: "top-left",
       });
     }
   };
