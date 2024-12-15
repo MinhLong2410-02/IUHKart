@@ -22,7 +22,8 @@ DEBUG = True
 #EMBED
 FEATURE_FLAGS = {
     "EMBEDDED_SUPERSET": True, # Embed dashboards
-    "EMBEDDABLE_CHARTS": True # Embed individual chart
+    "EMBEDDABLE_CHARTS": True, # Embed individual chart
+    "ENABLE_TEMPLATE_PROCESSING": True # Embed templates
 }
 
 # CORS
