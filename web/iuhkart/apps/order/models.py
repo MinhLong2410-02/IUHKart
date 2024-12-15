@@ -50,7 +50,7 @@ class Transaction(models.Model):
         ('refunded', 'Refunded'),
     ]
 
-    transaction_id = models.AutoField(primary_key=True)
+    transaction_id = models.BigIntegerField(primary_key=True)
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='payments')
     transation_date = models.DateTimeField(default=now)
     total_money = models.BigIntegerField()
