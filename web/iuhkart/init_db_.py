@@ -31,7 +31,7 @@ from iuhkart.wsgi import *
 from iuhkart.settings import *
 from django.contrib.auth import get_user_model
 from apps.product.models import Category, Product, ProductImages
-from apps.account.models import Vendor, Customer, User
+from apps.account.models import Vendor, Customer, User, BankAccount
 from apps.address.models import Province, District, Ward, Address
 from apps.cart.models import Cart
 from apps.discount.models import Discount, OrderProductDiscount
@@ -250,6 +250,22 @@ def create_address(province_id, district_id, ward_id, address_detail):
     )
     return address
 
+def create_bank_account_with_user(user, bank_name: str, account_number: str, money: int = 0):
+    try:
+        customer = Customer.objects.get(user=user)
+        holder_name = customer.fullname
+    except Customer.DoesNotExist:
+        shop = Vendor.objects.get(user=user)
+        holder_name = shop.name
+    bank = BankAccount.objects.create(
+        user=user,
+        bank_name = bank_name,
+        account_number=account_number,
+        account_holder_name=holder_name,
+        money=money
+    )
+    return bank
+
 def create_vendor_with_jwt(email, password, name, phone, description):
     user = User.objects.create_user(
         email=email,
@@ -313,8 +329,10 @@ user1, vendor1, token1, refresh1 = create_vendor_with_jwt(
     description='This is a description for Vendor One.'
 )
 print(f'✅ Vendor: {user1.email}')
-# print(f'Access Token: {token1}')
-# print(f'Refresh Token: {refresh1}')
+bank = create_bank_account_with_user(user1, 'Techcombank', '1234567890', 1000000)
+if bank:
+    print(f'✅ Bank Account: {bank.account_number}')
+
 
 user2, vendor2, token2, refresh2 = create_vendor_with_jwt(
     email='quachnam311@gmail.com',
@@ -324,8 +342,9 @@ user2, vendor2, token2, refresh2 = create_vendor_with_jwt(
     description='This is a description for Vendor Three.'
 )
 print(f'✅ Vendor: {user2.email}')
-# print(f'Access Token: {token2}')
-# print(f'Refresh Token: {refresh2}')
+bank = create_bank_account_with_user(user2, 'Techcombank', '0123456789')
+if bank:
+    print(f'✅ Bank Account: {bank.account_number}')
 
 ##--------------------- Customer
 address = create_address(79, 764, 26899, '12 Nguyễn Văn Bảo, Phường 4, quận Gò Vấp, Hồ Chí Minh')
@@ -338,8 +357,9 @@ user3, customer3, token3, refresh3 = create_customer_with_jwt(
     address=address
 )
 print(f'✅ Customer: {user3.email}')
-# print(f'Access Token: {token3}')
-# print(f'Refresh Token: {refresh3}')
+bank = create_bank_account_with_user(user3, 'Vietcombank', '012345678', 10000000)
+if bank:
+    print(f'✅ Bank Account: {bank.account_number}')
 
 address = create_address(79, 764, 26881, '273/34/1 Nguyễn Văn Đậu, Phường 11, Bình Thạnh, Hồ Chí Minh')
 user4, customer4, token4, refresh4 = create_customer_with_jwt(
@@ -352,8 +372,9 @@ user4, customer4, token4, refresh4 = create_customer_with_jwt(
     gender='female'
 )
 print(f'✅ Customer: {user4.email}')
-# print(f'Access Token: {token4}')
-# print(f'Refresh Token: {refresh4}')
+bank = create_bank_account_with_user(user4, 'MB Bank', '01234568', 10000)
+if bank:
+    print(f'✅ Bank Account: {bank.account_number}')
 
 address = create_address(79, 764, 26898, '185b Nguyễn Oanh, Phường 10, Gò Vấp, Hồ Chí Minh')
 user5, customer5, token5, refresh5 = create_customer_with_jwt(
@@ -365,8 +386,9 @@ user5, customer5, token5, refresh5 = create_customer_with_jwt(
     address=address
 )
 print(f'✅ Customer: {user5.email}')
-# print(f'Access Token: {token5}')
-# print(f'Refresh Token: {refresh5}')
+bank = create_bank_account_with_user(user5, 'Agribank', '92345678')
+if bank:
+    print(f'✅ Bank Account: {bank.account_number}')
 
 address = create_address(79, 764, 26898, '190 Đ. Quang Trung, Phường 10, Gò Vấp, Hồ Chí Minh')
 user6, customer6, token6, refresh6 = create_customer_with_jwt(
@@ -378,8 +400,9 @@ user6, customer6, token6, refresh6 = create_customer_with_jwt(
     address=address
 )
 print(f'✅ Customer: {user6.email}')
-# print(f'Access Token: {token6}')
-# print(f'Refresh Token: {refresh6}')
+bank = create_bank_account_with_user(user6, 'Agribank', '92357821')
+if bank:
+    print(f'✅ Bank Account: {bank.account_number}')
 
 print(f'✅ Create a fake address acount with address_id: {address.address_id}')
 insert_product()
