@@ -200,7 +200,7 @@ yarn-error.log*
 
 # Log files
 *.log
-
+*.db
 databases/data
 
 *initial*.py
