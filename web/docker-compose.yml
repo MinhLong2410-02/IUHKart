@@ -1,4 +1,20 @@
 services:
+  dashboard_api:
+    container_name: dashboard-api
+    build:
+      context: ./dashboard-api
+      dockerfile: Dockerfile
+    ports:
+      - "5002:8000"
+    env_file:
+      - .env
+    working_dir: /app
+    networks:
+      - iuhkart-network
+    volumes:
+      - ./dashboard-api:/app
+    restart: unless-stopped
+
   tracking_api:
     container_name: tracking-api
     build: 
@@ -35,6 +51,7 @@ services:
 
   django_main:
     build: ./iuhkart
+    container_name: django-main
     ports:
       - "8009:8000"
     env_file:
