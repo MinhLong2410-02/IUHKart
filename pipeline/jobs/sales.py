@@ -9,13 +9,15 @@ from pyflink.datastream.connectors.kafka import (
     KafkaOffsetsInitializer,
     KafkaSource,
 )
+from pyflink.common import Types, WatermarkStrategy
 from dotenv import load_dotenv
 import pandas as pd
-
+import logging
+from time import sleep
+# Load environment variables
 load_dotenv()
 KAFKA_HOST = os.getenv("KAFKA_HOST")
 KAFKA_PORT = os.getenv("KAFKA_PORT")
-KAFKA_HEAD_TOPIC = os.getenv("KAFKA_HEAD_TOPIC")
 CLICKHOUSE_HOST = os.getenv("CLICKHOUSE_HOST")
 CLICKHOUSE_PORT = os.getenv("CLICKHOUSE_PORT")
 CLICKHOUSE_USER = os.getenv("CLICKHOUSE_USER")
@@ -27,6 +29,11 @@ POSTGRES_USER = os.getenv("POSTGRES_USER")
 POSTGRES_PASSWORD = os.getenv("POSTGRES_PASSWORD")
 POSTGRES_DB = os.getenv("POSTGRES_DB")
 
+# Set up logging
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+logger.addHandler(logging.StreamHandler())
+
 def get_holiday(date):
     vn_holidays = holidays.Vietnam()
     holiday = vn_holidays.get(date)
@@ -34,7 +41,7 @@ def get_holiday(date):
         return "Normal Day"
     return holiday
 
-def parse_date(date_str:str) -> dict:
+def parse_date(date_str: str) -> dict:
     _id = int(date_str.replace('-', ''))
     date = datetime.strptime(date_str,  "%Y-%m-%d")
     return {
@@ -97,7 +104,7 @@ def initialize_env() -> StreamExecutionEnvironment:
     )
     return env
 
-def configure_source(topic:str,  earliest:bool = False) -> KafkaSource:
+def configure_source(topic: str, earliest: bool = False) -> KafkaSource:
     """Initializes Kafka source."""
     properties = {
         "bootstrap.servers": f"{KAFKA_HOST}:{KAFKA_PORT}",
@@ -154,7 +161,6 @@ class Postgres():
             return self.cursor.fetchall()
         except Exception as e:
             self.cursor.execute("ROLLBACK")
-            print(f'❌ ROLLBACK: {e}')
     
     def create_schema(self, sql_path='*.sql'):
         with open(sql_path, 'r') as f:
@@ -170,7 +176,6 @@ class Postgres():
             self.conn.commit()
         except Exception as e:
             self.cursor.execute("ROLLBACK")
-            print(f'❌ ROLLBACK: {e}')
     
     def get_columns(self, table_name):
         try:
@@ -179,7 +184,6 @@ class Postgres():
             return cols
         except Exception as e:
             self.cursor.execute("ROLLBACK")
-            print(f'❌ ROLLBACK: {e}')
     
     def get_all_table(self,):
         try:
@@ -188,7 +192,6 @@ class Postgres():
             return tables
         except Exception as e:
             self.cursor.execute("ROLLBACK")
-            print(f'❌ ROLLBACK: {e}')
     
     def delete_table(self, table_names = []):
         for table in table_names:
@@ -197,7 +200,6 @@ class Postgres():
                 print(f"🗑 Deleted {table}")
             except Exception as e:
                 self.cursor.execute("ROLLBACK")
-                print(f'❌ ROLLBACK: {e}')
         self.conn.commit()
     
     def upsert(self, data, table_name, conflict_target:str='id', updates:list=None):
@@ -216,7 +218,6 @@ class Postgres():
             self.conn.commit()
         except Exception as e:
             self.cursor.execute("ROLLBACK")
-            print(f'❌ ROLLBACK: {e}')
             
     def upserts(self, datas, table_name, conflict_target:str='id', updates:list=None):
         try:
@@ -234,7 +235,6 @@ class Postgres():
             self.conn.commit()
         except Exception as e:
             self.cursor.execute("ROLLBACK")
-            print(f'❌ ROLLBACK: {e}')
     
     def delete(self, table_name, pk_id):
         try:
@@ -242,7 +242,6 @@ class Postgres():
             self.conn.commit()
         except Exception as e:
             self.cursor.execute("ROLLBACK")
-            print(f'❌ ROLLBACK: {e}')
     
     def truncate(self, table_name):
         try:
@@ -250,73 +249,163 @@ class Postgres():
             self.conn.commit()
         except Exception as e:
             self.cursor.execute("ROLLBACK")
-            print(f'❌ ROLLBACK: {e}')
 
-## ------------------------------------------------------------------------------
-import json
-import logging
-from pyflink.common import Types, WatermarkStrategy
-# from utils import *
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
-logger.addHandler(logging.StreamHandler())
+def stream_orders(message: str):
+    """Process and sink data into PostgreSQL and ClickHouse for 'orders' topic."""
+    logger.info(f"\n⌛️ [Orders] processing ...")
+    try:
+        mode, data = decode_message(message)
+        status = data.get('order_status')
+        order_id = data.get('order_id')
+        customer_id = data.get('customer_id')
+        order_date = data.get('order_date')
+        date_row = parse_date(datetime.strptime(order_date, "%Y-%m-%dT%H:%M:%S.%fZ").strftime("%Y-%m-%d"))
+        full_date = date_row['full_date']
+        row = (order_id, status, order_date, customer_id)
+        if not data:
+            logger.warning("\n⚪️ [Orders] No data to process.")
+            return
+        if status not in ['completed', 'cancelled']:
+            logger.info("\n⚪️ [Orders] not finish.")
+            return
+        pg = Postgres()
+        # Insert or update order in PostgreSQL
+        if mode != "Delete": 
+            pg.upsert(
+                data=row,
+                table_name='orders',
+                conflict_target='id'
+            )
+            logger.info(f"\n🟢 [Orders] Upsert into PostgreSQL: {row}")
+            
+            df_date = pg.query(f"SELECT * FROM order_date WHERE full_date='{full_date}' LIMIT 1;")
+            if df_date.empty:
+                # Chuyển đổi chuỗi ngày ('2024-12-16') thành đối tượng datetime
+                date_row = list(date_row.values())
+                date_str = date_row[1]
+                date_obj = datetime.strptime(date_str, '%Y-%m-%d')
+                # Thay thế giá trị chuỗi ngày bằng đối tượng datetime
+                date_row[1] = date_obj
+                # Bây giờ date_row đã được chuẩn hóa với kiểu dữ liệu datetime cho 'full_date'
+                client = get_clickhouse_client()
+                client.insert('dim_date', [date_row], column_names=['id', 'full_date', 'day', 'month', 'year', 'quarter', 'day_of_week', 'week_of_year', 'is_weekend', 'is_holiday'])
+                client.close()
+                logger.info(f"\n🟢 [Dim_Date] Inserted into Clickhouse: {date_row}")
+            else:
+                logger.info(f"\n⚪️ [Dim_Date] Exist data in order_date: {date_row}")
+            
+            pg.upsert(
+                data=date_row,
+                table_name='order_date',
+                conflict_target='id'
+            )
+            logger.info(f"\n🟢 [Order_date] Upsert into PostgreSQL: {date_row}")
+        pg.close()
+    except Exception as e:
+        logger.error(f"\n❌ [Orders | Dim_Date] Error processing message: {e}")
+    print('\n' + '-'*120)
 
-def stream_sales(message: json):
-    """Process and sink data into ClickHouse."""
-    logger.info(f"\n🚩 [sales] processing ...")
+def stream_order_products(message: str):
+    """Process and sink data into ClickHouse for 'order_products' topic."""
+    sleep(5)
+    logger.info(f"\n⌛️ [Order Products] processing ...")
+    query_sales = '''
+        SELECT 
+            op.id, 
+            op.quantity, 
+            op.total_amount, 
+            o.status, 
+            o.order_date,
+            pp.id as promotion_id,
+            pr.id AS location_id,
+            p.id AS product_id,
+            c.id AS customer_id, 
+            s.id AS shop_id
+        FROM order_product op 
+        LEFT JOIN orders o ON o.id = op.order_id
+        LEFT JOIN product p ON p.id = op.product_id
+        LEFT JOIN promotion_product pp ON pp.product_id = p.id
+        LEFT JOIN customer c ON c.id = o.customer_id
+        LEFT JOIN users u ON u.id = c.user_id
+        LEFT JOIN address ad ON ad.id = u.address_id
+        LEFT JOIN province pr ON pr.id = ad.province_id
+        LEFT JOIN store s ON s.id = p.shop_id
+        WHERE op.id = {op_id}
+        GROUP BY op.id, op.quantity, op.total_amount, o.status, o.order_date, pp.id, pr.id, p.id, o.id, c.id, s.id;
+    '''
     try:
         pg = Postgres()
         mode, data = decode_message(message)
-        df_o = pd.read_csv("Database/orders.csv")
-        df_od = pd.read_csv("Database/order_products.csv")
-        df_dis = pd.read_csv("Database/discounts.csv")
-        df_pd = pd.read_csv("Database/product_discount.csv")
-        df_p = pd.read_csv("Database/products.csv")
-        df_ad = pd.DataFrame({
-            'address_id': [1, 2, 3, 4],
-            'province_id': [79, 79, 79, 79]
-        })
-        df_pro = pd.read_csv("https://raw.githubusercontent.com/MinhLong2410-02/VN-province-api-test/main/province.csv")
-        df_a_p = pd.merge(df_ad,df_pro,on="province_id")
-        province_map = df_a_p.set_index('address_id')['province_id'].to_dict()
-        discount_map = df_pd.set_index('product_id')['discount_id'].to_dict()
-        product_shop = df_p.set_index('product_id')['vendor_id'].to_dict()
-        pg.close()
+        if not data:
+            logger.warning("\n⚪️ [Order Products] No data to process.")
+            return
+        id = data.get("order_product_id")
+        order_id = data.get('order_id')
+        product_id = data.get('product_id')
+        quantity = data.get('quantity')
+        price = data.get('price')
+        row = (id, quantity, price, order_id, product_id)
         
-        df_sales = pd.merge(df_od, df_o, on='order_id')
-        df_sales["date_id"] = df_sales["order_date"].apply(lambda x: parse_date(x)['id'])
-        date = [parse_date(x) for x in df_sales['order_date']]
-        df_sales["promotion_id"] = df_sales["product_id"].apply(lambda x: discount_map[x] if x in discount_map else None)
-        df_sales["location_id"] = df_sales["customer_id"].apply(lambda x: province_map[x] if x in province_map else None)
-        df_sales["shop_id"] = df_sales["product_id"].apply(lambda x: product_shop[x] if x in product_shop else None)
-        df_sales = df_sales[["order_product_id", "quantity", "total_price", "order_status", "date_id", "promotion_id", "location_id", "product_id", "customer_id", "shop_id"]]
-        df_sales.columns = ["id", "quantity", "total_amount", "status", "date_id", "promotion_id", "location_id", "product_id", "customer_id", "shop_id"]
+        if mode != "Delete":
+            pg.upsert(
+                data=row,
+                table_name='order_product',
+                conflict_target='id'
+            )
+            logger.info(f"\n🟢 [Order_Product] Upsert into PostgreSQL: {row}")
         
-        # Prepare data for ClickHouse
-        row = (id, content, rating, date_post, product_id, customer_id, store_id)
-        if mode == 'Create':
+        df_sales = pg.query(query_sales.format(op_id=id), fetch=True)
+        if not df_sales.empty:
+            df_sales = list(df_sales.values[-1])
+            date_obj = df_sales[4]
+            df_sales[4] = parse_date(date_obj.strftime('%Y-%m-%d'))['id']
             client = get_clickhouse_client()
-            client.insert('fact_sales', [row], column_names=['id', 'content', 'rating', 'date_post', 'product_id', 'customer_id', 'shop_id'])
+            client.insert('fact_sales', [df_sales], column_names=['id', 'quantity', 'total_amount', 'status', 'date_id', 'promotion_id', 'location_id', 'product_id', 'customer_id', 'shop_id'])
             client.close()
+            logger.info(f"\n🟢 [Order_Products] Inserted into ClickHouse: {df_sales}")
+        else:
+            logger.warning(f"\n⚪️ [Order_Products] Not found order_product_id {id}")
         
-        logger.info(f"\n🟢 [sales] Inserted into ClickHouse: {row}")
+        pg.close()
 
     except Exception as e:
-        logger.error(f"\n❌ [sales] Error processing message: {e}")
+        logger.error(f"\n❌ [Order_Products] Error processing message: {e}")
     print('\n' + '-'*120)
-    
+
 def main() -> None:
     """Main flow controller"""
     env = initialize_env()
-    kafka_source = configure_source(topic='postgresDB.public.saless')
-    data_stream = env.from_source(
-        kafka_source, WatermarkStrategy.no_watermarks(), "Kafka sensors topic 3"
+    
+    # Configure Kafka sources for both topics
+    kafka_source_orders = configure_source(topic='postgresDB.public.orders')
+    kafka_source_order_products = configure_source(topic='postgresDB.public.order_products')
+    
+    # Create data streams from each Kafka source
+    data_stream_orders = env.from_source(
+        kafka_source_orders, 
+        WatermarkStrategy.no_watermarks(), 
+        "Kafka orders topic"
     )
-    data_stream.map(
-        stream_sales,
+    
+    data_stream_order_products = env.from_source(
+        kafka_source_order_products, 
+        WatermarkStrategy.no_watermarks(), 
+        "Kafka order_products topic"
+    )
+    
+    # Map each stream to its respective processing function
+    data_stream_orders.map(
+        stream_orders,
+        output_type=Types.STRING()
+    )   
+    
+    data_stream_order_products.map(
+        stream_order_products,
         output_type=Types.STRING()
     )
-    env.execute("Stream sales job")
+    
+    # Execute the Flink job
+    env.execute("Stream ingest sales job")
 
 if __name__ == "__main__":
     main()

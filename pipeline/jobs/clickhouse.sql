@@ -72,7 +72,7 @@ CREATE TABLE fact_sales (
     total_amount Float64,
     status String,
     date_id UInt32,
-    promotion_id UInt32,
+    promotion_id Nullable(UInt32),
     location_id UInt32,
     product_id UInt32,
     customer_id UInt32,

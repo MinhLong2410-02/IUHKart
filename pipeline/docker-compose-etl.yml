@@ -15,6 +15,9 @@ services:
             - POSTGRES_USER=postgres
             - POSTGRES_PASSWORD=postgres
             - POSTGRES_DB=postgres
+        volumes:
+            - ./data/storage_stream:/data/postgres
+            - ./jobs/postgres.sql:/docker-entrypoint-initdb.d/postgres.sql:ro
         restart: always
         healthcheck:
             test: ["CMD", "pg_isready", "-U", "postgres"]

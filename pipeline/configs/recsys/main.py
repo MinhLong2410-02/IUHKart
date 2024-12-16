@@ -69,7 +69,11 @@ def compute_weighted_embedding(user_id: str):
         total_weight = 0
 
         for product_id, weight in product_weights.items():
-            embedding = fetch_product_embedding(int(product_id))  # From Qdrant or MongoDB
+            try:
+                embedding = fetch_product_embedding(int(product_id))  # From Qdrant or MongoDB
+            except Exception as e:
+                logger.error(f"Error fetching embedding for product {product_id}: {e}, moving on to next product")
+                continue
             if weighted_embedding is None:
                 weighted_embedding = [x * weight for x in embedding]
             else:
