@@ -1,4 +1,4 @@
-docker exec -it mongodb mongosh --eval "rs.initiate({_id:'rs0', members: [{_id:0, host: 'crawl.serveftp.com'}]})" # localhost mongodb
+docker exec -it mongodb mongosh --eval "rs.initiate({_id:'rs0', members: [{_id:0, host: 'iuhkartdb.serveftp.com'}]})"
 docker exec -it mongodb mongosh --eval "rs.status()"
 
 # docker exec -it mongodb mongosh

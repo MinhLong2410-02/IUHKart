@@ -154,7 +154,6 @@ class Postgres():
             return self.cursor.fetchall()
         except Exception as e:
             self.cursor.execute("ROLLBACK")
-            print(f'❌ ROLLBACK: {e}')
     
     def create_schema(self, sql_path='*.sql'):
         with open(sql_path, 'r') as f:
@@ -170,7 +169,6 @@ class Postgres():
             self.conn.commit()
         except Exception as e:
             self.cursor.execute("ROLLBACK")
-            print(f'❌ ROLLBACK: {e}')
     
     def get_columns(self, table_name):
         try:
@@ -179,7 +177,6 @@ class Postgres():
             return cols
         except Exception as e:
             self.cursor.execute("ROLLBACK")
-            print(f'❌ ROLLBACK: {e}')
     
     def get_all_table(self,):
         try:
@@ -188,7 +185,6 @@ class Postgres():
             return tables
         except Exception as e:
             self.cursor.execute("ROLLBACK")
-            print(f'❌ ROLLBACK: {e}')
     
     def delete_table(self, table_names = []):
         for table in table_names:
@@ -197,7 +193,6 @@ class Postgres():
                 print(f"🗑 Deleted {table}")
             except Exception as e:
                 self.cursor.execute("ROLLBACK")
-                print(f'❌ ROLLBACK: {e}')
         self.conn.commit()
     
     def upsert(self, data, table_name, conflict_target:str='id', updates:list=None):
@@ -216,7 +211,6 @@ class Postgres():
             self.conn.commit()
         except Exception as e:
             self.cursor.execute("ROLLBACK")
-            print(f'❌ ROLLBACK: {e}')
             
     def upserts(self, datas, table_name, conflict_target:str='id', updates:list=None):
         try:
@@ -234,7 +228,6 @@ class Postgres():
             self.conn.commit()
         except Exception as e:
             self.cursor.execute("ROLLBACK")
-            print(f'❌ ROLLBACK: {e}')
     
     def delete(self, table_name, pk_id):
         try:
@@ -242,7 +235,6 @@ class Postgres():
             self.conn.commit()
         except Exception as e:
             self.cursor.execute("ROLLBACK")
-            print(f'❌ ROLLBACK: {e}')
     
     def truncate(self, table_name):
         try:
@@ -250,7 +242,6 @@ class Postgres():
             self.conn.commit()
         except Exception as e:
             self.cursor.execute("ROLLBACK")
-            print(f'❌ ROLLBACK: {e}')
 
 ## ------------------------------------------------------------------------------
 import json
@@ -263,7 +254,7 @@ logger.addHandler(logging.StreamHandler())
 
 def stream_review(message: json):
     """Process and sink data into ClickHouse."""
-    logger.info(f"\n🚩 [Review] processing ...")
+    logger.info(f"\n⌛️ [Review] processing ...")
     try:
         pg = Postgres()
         data_map = pg.query("SELECT * FROM product;")
