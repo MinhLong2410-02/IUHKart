@@ -6,6 +6,7 @@ from apps.account.models import User
 from apps.account.serializers import *
 from drf_spectacular.utils import extend_schema
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework.exceptions import NotFound, ValidationError
 
 class RegisterCustomerView(generics.CreateAPIView):
     queryset = User.objects.all()
@@ -34,7 +35,7 @@ class RegisterVendorView(generics.CreateAPIView):
         vendor = Vendor.objects.select_related('user').get(id=vendor_id)
         user = vendor.user
         refresh = RefreshToken.for_user(user)
-        BankAccount.objects.create(vendor=user.vendor)
+        BankAccount.objects.create(user=user)
         return Response({
             'refresh': str(refresh),
             'access': str(refresh.access_token),
@@ -150,17 +151,65 @@ class CustomerDetailView(generics.RetrieveAPIView):
         instance = self.get_object()
         serializer = self.get_serializer(instance)
         return Response(serializer.data)
-
+    
 class UpdateBankAccountView(generics.UpdateAPIView):
-    queryset = BankAccount.objects.all()
     serializer_class = BankAccountSerializer
     permission_classes = [permissions.IsAuthenticated]
 
     def get_object(self):
-        # Ensure the vendor can only access their own bank account information
-        vendor = self.request.user.vendor
-        bank_account, _ = BankAccount.objects.get_or_create(vendor=vendor)  # Create if not exists
+        user = self.request.user
+        bank_account, created = BankAccount.objects.get_or_create(user=user)
         return bank_account
 
     def patch(self, request, *args, **kwargs):
         return self.partial_update(request, *args, **kwargs)
+
+
+class UpdateMoneyView(generics.RetrieveUpdateAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = UpdateMoneySerializer
+
+    def get_object(self):
+        user = self.request.user
+
+        try:
+            bank_account = user.bank_account
+        except BankAccount.DoesNotExist:
+            raise NotFound("Tài khoản chưa liên kết với tài khoản ngân hàng.")
+        
+        if not bank_account.bank_name or not bank_account.account_number or not bank_account.account_holder_name:
+            raise ValidationError("Vui lòng hoàn thành tài khoản ngân hàng.")
+        
+        return bank_account
+    
+    def retrieve(self, request, *args, **kwargs):
+        bank_account = self.get_object()
+
+        return Response(
+            {
+                "bank_name": bank_account.bank_name,
+                "account_number": bank_account.account_number,
+                "account_holder_name": bank_account.account_holder_name,
+                "current_balance": bank_account.money,
+            },
+            status=status.HTTP_200_OK,
+        )
+    
+    def update(self, request, *args, **kwargs):
+        bank_account = self.get_object()
+
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        added_amount = serializer.validated_data["money"]
+        bank_account.money += added_amount
+        bank_account.save()
+
+        return Response(
+            {
+                "message": "Đã thêm tiền vào tài khoản.",
+                "current_balance": bank_account.money,
+                "added_amount": added_amount,
+            },
+            status=status.HTTP_200_OK,
+        )

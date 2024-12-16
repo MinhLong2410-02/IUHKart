@@ -52,11 +52,11 @@ class Vendor(models.Model):
 
 class BankAccount(models.Model):
     bank_account_id = models.AutoField(primary_key=True, db_column='bank_account_id')
-    vendor = models.OneToOneField(Vendor, on_delete=models.CASCADE, related_name='bank_account', db_column='vendor_id')
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='bank_account', blank=True, null=True, db_column='user_id')
     bank_name = models.CharField(max_length=255, null=True)
     account_number = models.CharField(max_length=255, null=True) 
     account_holder_name = models.CharField(max_length=255, null=True)
-    branch_name = models.CharField(max_length=255, blank=True, null=True)
+    money = models.BigIntegerField(default=0)
     
     class Meta:
         db_table = 'bank_accounts'

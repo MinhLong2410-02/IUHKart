@@ -4,8 +4,6 @@ class CustomStorage(S3Boto3Storage):
     custom_domain = 'image.iuhkart.systems'
     def url(self, name):
         parsed = urlparse(name)
-        # If the name already looks like a full URL (e.g. starts with http or https),
-        # return it directly without modifying.
         if parsed.scheme and parsed.netloc:
             return name
         return super().url(name)

@@ -1,31 +1,60 @@
 from django.shortcuts import render
 from rest_framework import generics, permissions, status
 from apps.order.models import Order
-from apps.order.serializers import OrderSerializer, OrderCancelSerializer
+from apps.order.serializers import *
 from rest_framework.response import Response
-class CreateOrderView(generics.CreateAPIView):
-    queryset = Order.objects.all()
-    serializer_class = OrderSerializer
+
+class CreateOrderByVendorView(generics.CreateAPIView):
     permission_classes = [permissions.IsAuthenticated]
+    serializer_class = CreateOrderByVendorSerializer
 
-    def perform_create(self, serializer):
-        serializer.save(customer=self.request.user.customer)
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        created_orders = serializer.save()
 
-class OrderCancelView(generics.UpdateAPIView):
-    queryset = Order.objects.all()
-    serializer_class = OrderCancelSerializer
+        # Prepare the response
+        response_data = [
+            {
+                "order_id": order.order_id,
+                "order_number": order.order_number,
+                "order_total": order.order_total,
+                "vendor": order.orderproduct_set.first().product.created_by.name,
+                "products": [
+                    {
+                        "product_name": op.product.product_name,
+                        "price": op.price,
+                        "quantity": op.quantity,
+                        "image_url": op.product.images.filter(is_main=True).first().image_url.url
+                        if op.product.images.filter(is_main=True).exists()
+                        else None,
+                    }
+                    for op in order.orderproduct_set.all()
+                ]
+            }
+            for order in created_orders
+        ]
+
+        return Response(response_data, status=status.HTTP_201_CREATED)
+
+class ProcessTransactionView(generics.CreateAPIView):
     permission_classes = [permissions.IsAuthenticated]
+    serializer_class = ProcessTransactionSerializer
 
-    def patch(self, request, *args, **kwargs):
-        order = self.get_object()
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        transactions = serializer.save()
 
-        # Ensure that the customer requesting the cancellation owns the order
-        if order.customer != request.user.customer:
-            return Response({"detail": "Permission denied. You can only cancel your own orders."}, status=status.HTTP_403_FORBIDDEN)
+        # Prepare the response
+        response_data = [
+            {
+                "transaction_id": transaction.transaction_id,
+                "order_id": transaction.order.order_id,
+                "total_money": transaction.total_money,
+                "status": transaction.status,
+            }
+            for transaction in transactions
+        ]
 
-        serializer = self.get_serializer(order, data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response({"detail": "Order has been cancelled."}, status=status.HTTP_200_OK)
-        else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response(response_data, status=status.HTTP_201_CREATED)

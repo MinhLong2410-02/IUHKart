@@ -35,6 +35,7 @@ const ProductGrid = () => {
   const [isLoading, setLoading] = useState(false);
   const [productDataSet, setProductDataSet] = useState({});
   const [pageCount, setPageCount] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
     const getProducts = async () => {
@@ -42,7 +43,7 @@ const ProductGrid = () => {
 
       const data = await productApi.getProducts(
         categorySelected,
-        1,
+        currentPage,
         PRODUCT_PAGING.pageSize
       );
       const dataCount = data?.count || 0;
@@ -52,19 +53,11 @@ const ProductGrid = () => {
     };
 
     getProducts();
-  }, [categorySelected, setProductDataSet, setPageCount]);
+  }, [categorySelected, currentPage]);
 
   const handlePageClick = async (data) => {
-    setLoading(true);
-
     const pageSelected = data?.selected + 1;
-    const dataProduct = await productApi.getProducts(
-      pageSelected,
-      PRODUCT_PAGING.pageSize
-    );
-
-    setLoading(false);
-    setProductDataSet(dataProduct);
+    setCurrentPage(pageSelected);
   };
 
   const handleClickProduct = useCallback(
@@ -89,13 +82,13 @@ const ProductGrid = () => {
           toast({
             title: "Add Cart Successful!",
             status: "success",
-            position: "top-right",
+            position: "top-left",
           });
       } catch (error) {
         toast({
           title: "Add Cart Fail!",
           status: "error",
-          position: "top-right",
+          position: "top-left",
         });
       }
     },

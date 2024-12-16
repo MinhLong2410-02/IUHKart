@@ -63,8 +63,7 @@ async def insert_point(collection_name:str, request: InsertPointRequestBody):
         return {'detail': 'Vector is None'}
     payload = {
         'product_id': request.product_id,
-        'product_name': request.product_name,
-        'product_image_url': request.product_image_url
+        'product_name': request.product_name
     }
     point = PointStruct(id=str(uuid4()),
                         vector=vector,
@@ -91,8 +90,8 @@ async def update_point(collection_name: str, request: UpdatePointRequestBody):
     payload = p.payload
     if request.product_name:
         payload["product_name"] = request.product_name
-    if request.product_image_url:
-        payload["product_image_url"] = request.product_image_url
+    # if request.product_image_url:
+    #     payload["product_image_url"] = request.product_image_url
     point = PointStruct(id=p.id, vector=vector, payload=payload)
     client.upsert(collection_name=collection_name, points=[point])
     return {'payload': payload}
@@ -179,4 +178,4 @@ async def search(
     product_ids = list(set([product.payload['product_id'] for product in products]))
     tracking_status = search_tracking(product_ids, access_token)
     res = [{'score':i.score, 'payload':i.payload} for i in products if i.score >= thresh]
-    return {'results': res, tracking_status: tracking_status}
+    return {'results': res, 'tracking_status': tracking_status}

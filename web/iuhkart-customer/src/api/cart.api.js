@@ -13,6 +13,20 @@ const cartAPI = {
     const url = `/cart/api/delete-product/${productID}`;
     return axiosClient.delete(url);
   },
+
+
+
+  // order  
+  createOrder: (body) => {
+    const url = "/order/api/create/";
+    return axiosClient.post(url, body);
+  },
+
+  confirmOrder: (body) => {
+    const url = "/order/api/process-transaction/";
+    return axiosClient.post(url, body);
+  },
+
 };
 
 export default cartAPI;
