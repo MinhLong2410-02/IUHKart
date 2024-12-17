@@ -16,7 +16,7 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = "HS256"
 METABASE_URL = os.getenv("METABASE_URL")
 METABASE_EMBEDDING_SECRET = os.getenv("METABASE_EMBEDDING_SECRET")
-METABASE_DASHBOARD_ID=5
+METABASE_DASHBOARD_ID=1
 
 security = HTTPBearer()  
 
@@ -40,7 +40,6 @@ def decode_jwt(token: str) -> Dict:
 
 def get_current_user(credentials: HTTPAuthorizationCredentials = Security(security)) -> Dict:
     token = credentials.credentials
-    print(token)
     payload = decode_jwt(token)
     return payload 
 
@@ -56,6 +55,6 @@ def generate_metabase_embed_url(shop_id: str) -> str:
     }
 
     token = jwt.encode(payload, METABASE_EMBEDDING_SECRET, algorithm='HS256')
-    embed_url = f"{METABASE_URL}/embed/dashboard/{token}#bordered=true&titled=true"
+    embed_url = f"{METABASE_URL}embed/dashboard/{token}#bordered=true&titled=true"
 
     return embed_url
