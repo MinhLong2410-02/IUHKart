@@ -66,6 +66,7 @@ services:
   
   shop_fe:
     build: ./iuhkart-shop
+    container_name: shop
     ports:
       - "3005:3000"
     env_file:
@@ -80,6 +81,7 @@ services:
 
   customer_fe:
     build: ./iuhkart-customer
+    container_name: customer
     ports:
       - "3006:3000"
     env_file:
