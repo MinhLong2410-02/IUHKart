@@ -10,6 +10,8 @@ from pprint import pprint
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
+NUMBER_OF_RECOMMEND_PRODUCTS = 20
+
 def get_user_behavior_weights(user_id: str):
     try:
         one_month_ago = datetime.utcnow() - timedelta(days=30)
@@ -121,7 +123,7 @@ def process_kafka_message(message):
         user_id = after_data.get("user_id")
         logger.info(f'🟢 {user_id=}')
         if user_id:
-            recommendations = recommend_for_user(user_id, 20)
+            recommendations = recommend_for_user(user_id, NUMBER_OF_RECOMMEND_PRODUCTS)
             logger.info(f"⚙️ Processed message for user {user_id} with recommendations: {recommendations}")
             sys.stdout.flush()
     except Exception as e:
