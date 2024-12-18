@@ -1,4 +1,3 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   Box,
   Button,
@@ -7,11 +6,11 @@ import {
   Heading,
   Image,
   Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
   ModalBody,
+  ModalContent,
   ModalFooter,
+  ModalHeader,
+  ModalOverlay,
   NumberDecrementStepper,
   NumberIncrementStepper,
   NumberInput,
@@ -23,12 +22,13 @@ import {
   useToast,
 } from "@chakra-ui/react";
 import _ from "lodash";
-
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import cartAPI from "../../api/cart.api";
 
 const Cart = () => {
   const toast = useToast();
-
+const navigate = useNavigate();
   const [isLoading, setLoading] = useState(true);
   const [cart, setCart] = useState({ products: [], items_total: 0, grand_total: 0 });
   const [isOpenModal, setIsOpenModal] = useState(false);
@@ -114,13 +114,16 @@ const Cart = () => {
         await cartAPI.confirmOrder({
           "order_ids": dataModal.map((order) => order.order_id),
         });
+        navigate("/");
+        setIsOpenModal(false);
+
         toast({
           title: "Payment successful!",
           status: "success",
           position: "top-right",
         });
-        setIsOpenModal(false);
       } catch (error) {
+        console.log(error)
         toast({
           title: "Failed to confirm payment.",
           status: "error",

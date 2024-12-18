@@ -37,5 +37,4 @@ urlpatterns = swagger_urlpatterns + [
     path('review/', include('apps.review.urls')),
     path('order/', include('apps.order.urls')),
     path('discount/', include('apps.discount.urls')),
-    path('dashboard/', include('apps.dashboard.urls')),
 ]

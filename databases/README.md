@@ -1,4 +1,4 @@
-Vì tách ra 2 file docker-compose nên dùng network extenal.
+Vì tách ra nhiều file docker-compose nên dùng network extenal để liên kết các dịch vụ lại với nhau.
 
 Tạo trước network trên máy:
 ```bash
@@ -16,7 +16,7 @@ docker compose -f docker-compose.yml up -d
 Thông tin kết nối:
 **server**
 - host server: **crawl.serveftp.com**
-- host clouflare: **iuhkart.systems**
+- domain: **iuhkart.systems**
 
 **local**
 - postgres-database:
@@ -37,7 +37,7 @@ connection_string = "mongodb://crawl.serveftp.com:27017/?replicaSet=rs0"
 
 - clickhouse:
     - host: `localhost`
-    - port: `8123`
+    - port: `8125`
     - user: `iuhkart`
     - password: `iuhkartpassword`
     - database: `default`

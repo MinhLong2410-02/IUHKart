@@ -1,11 +1,11 @@
-# Services
-`docker-compose].yml`
+# Mô tả tổng quan 
+1. `docker-compose.yml` chạy các công cụ `CDC` và `Kafka`.
+2. `docker-compose-etl.yml` khởi tạo quá trình ETL vào DWH.
+3. `docker-compose-gendata.yml` Airflow quản lí việc sinh data (product, order, review).
+4. `docker-compose-recsys.yml` gồm mô hình embedding và hệ thống tìm kiếm + khuyến nghị.
+5. `docker-compose-superset.yml` công cụ Visualization.
 
-Khởi động các service chính:
-```bash
-docker compose up -d
-```
-
+# Chi tiết các dịch vụ
 ## API embedding
 Đã build sẵn image `qxnam/embedding-api`
 - localhost: localhost:8000
@@ -15,7 +15,7 @@ docker compose up -d
 Cần thực hiện các lệnh trong `pipeline/configs/superset/init.sh` để khởi tạo user đăng nhập.
 
 - localhost: localhost:8088
-- domain: [https://viz.iuhkart.systems/](https://viz.iuhkart.systems/)
+- domain: [https://superset.iuhkart.systems/](https://superset.iuhkart.systems/)
 
 Thông tin đăng nhập:
 - user: admin
@@ -37,6 +37,3 @@ Thông tin đăng nhập:
 - localhost: localhost:13005
 - domain: [https://airflow.iuhkart.systems/](https://airflow.iuhkart.systems/)
 
-## portainer (Manager container)
-- localhost: localhost:29011
-- domain: [https://dockerdb.iuhkart.systems/](https://dockerdb.iuhkart.systems/)

@@ -3,10 +3,8 @@ from apps.account.models import Customer, BankAccount, Vendor
 from apps.order.models import Order, OrderProduct, Transaction
 from apps.product.models import Product
 from apps.discount.models import Discount, OrderProductDiscount
-from apps.cart.models import CartProduct
 from django.db import transaction
 from django.db.models import Max
-from django.utils import timezone
 from uuid import uuid4
 
 class VendorOrderSerializer(serializers.ModelSerializer):
@@ -129,9 +127,11 @@ class ProcessTransactionSerializer(serializers.Serializer):
     def create(self, validated_data):
         user = self.context['request'].user
         orders = validated_data['orders']
-        # get the largest transaction id
+
+        # Retrieve the largest transaction_id
         transaction_id = Transaction.objects.all().aggregate(Max('transaction_id'))['transaction_id__max'] or 0
         transactions = []
+
         for order in orders:
             vendors = {}
             order_total = 0
@@ -147,14 +147,16 @@ class ProcessTransactionSerializer(serializers.Serializer):
                 vendors[vendor] += price
                 order_total += price
 
-            # Deduct money from user's bank account
-            user.bank_account.money -= order_total
-            user.bank_account.save()
+            # Deduct money from the user's bank account
+            user_bank_account = BankAccount.objects.select_for_update().get(user_id=user.pk)
+            user_bank_account.money -= order_total
+            user_bank_account.save()
 
             # Distribute money to vendors' bank accounts
             for vendor, amount in vendors.items():
-                vendor.user.bank_account.money += amount
-                vendor.user.bank_account.save()
+                vendor_bank_account = BankAccount.objects.select_for_update().get(user_id=vendor.user.pk)
+                vendor_bank_account.money += amount
+                vendor_bank_account.save()
 
             # Create a transaction
             transaction = Transaction.objects.create(
