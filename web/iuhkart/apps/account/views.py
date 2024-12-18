@@ -213,3 +213,10 @@ class UpdateMoneyView(generics.RetrieveUpdateAPIView):
             },
             status=status.HTTP_200_OK,
         )
+
+class ValidateTokenView(generics.GenericAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+    def get(self, request, *args, **kwargs):
+        token = request.user.auth_token
+        return Response({"user_id": request.user.id, "token": str(token)}, status=status.HTTP_200_OK)
+
