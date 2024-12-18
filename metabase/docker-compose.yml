@@ -1,6 +1,8 @@
+#v0.37.3
+
 services:
   metabase:
-    image: ghcr.io/arkadiuminc/metabase:v0.37.3
+    image: ghcr.io/arkadiuminc/metabase
     container_name: metabase
     networks:
       - iuhkart-network
@@ -15,6 +17,7 @@ services:
       - MB_DB_FILE=/metabase-data/
     ports:
       - 3000:3000
+    restart: always
 
   cloudflare:
     image: cloudflare/cloudflared:latest
