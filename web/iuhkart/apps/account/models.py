@@ -32,7 +32,7 @@ class Customer(models.Model):
     gender = models.CharField(max_length=10, default='male')
     avatar_url = models.ImageField(storage=CustomerStorage(), max_length=255, blank=True, null=True)
     date_join = models.DateTimeField(default=timezone.now)
-    recommend_products = ArrayField(models.IntegerField(), blank=True, default=list, size=20, db_column='recommend_product_ids')
+    recommend_products = ArrayField(models.IntegerField(), blank=True, default=list, size=32, db_column='recommend_product_ids')
     class Meta:
         verbose_name_plural = "Customers"
         db_table = 'customers'

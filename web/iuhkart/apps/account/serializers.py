@@ -8,6 +8,8 @@ from datetime import date
 
 User = get_user_model()
 
+class TokenValidationSerializer(serializers.Serializer):
+    token = serializers.CharField(required=True, help_text="JWT token to be validated")
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -48,31 +50,6 @@ class CustomerDOBUpdateSerializer(serializers.ModelSerializer):
         instance.age = today.year - instance.date_of_birth.year - ((today.month, today.day) < (instance.date_of_birth.month, instance.date_of_birth.day))
         instance.save()
         return instance
-
-
-class CustomerSerializer(serializers.ModelSerializer):
-    email = serializers.EmailField(write_only=True)  
-    date_of_birth = serializers.DateField(required=False, allow_null=True)
-
-    class Meta:
-        model = Customer
-        fields = ('id', 'email', 'fullname', 'phone', 'date_of_birth')
-
-    def create(self, validated_data):
-        email = validated_data.pop('email')
-        user, is_exist = User.objects.get_or_create(email=email)
-        user.set_password(validated_data.get('password', 'defaultpassword'))  # You can adjust this logic
-        user.save()
-
-        date_of_birth = validated_data.pop('date_of_birth', None)
-        cart = Cart.objects.create()
-        customer = Customer.objects.create(cart=cart, date_of_birth=date_of_birth, **validated_data)
-        customer.user = user
-        product_ids = Product.objects.order_by('-ratings').values_list('product_id', flat=True)[:20]
-        customer.recommend_product_ids = list(product_ids)
-        customer.save()
-        
-        return customer
 
 
 class CustomerSerializer(serializers.ModelSerializer):

@@ -2,7 +2,7 @@ from rest_framework.response import Response
 from rest_framework import generics, permissions, status
 from rest_framework.generics import GenericAPIView
 from apps.product.serializers import *
-from apps.product.pagination import VendorProductResultsSetPagination
+from apps.product.pagination import VendorProductResultsSetPagination, CustomerProductResultsSetPagination
 from apps.account.models import Customer
 from drf_spectacular.utils import extend_schema
 from drf_spectacular.openapi import OpenApiParameter
@@ -94,24 +94,35 @@ class VendorProductListView(generics.ListAPIView):
 )
 class CustomerProductListView(generics.ListAPIView):
     serializer_class = CustomerProductSerializer
-    pagination_class = VendorProductResultsSetPagination
+    pagination_class = CustomerProductResultsSetPagination
     permission_classes = [permissions.IsAuthenticated]
     queryset = Product.objects.all().select_related('created_by', 'category').prefetch_related('images')
+
     def get_queryset(self):
+        # Get the initial queryset for all products
         queryset = Product.objects.all().select_related('created_by', 'category').prefetch_related('images')
 
-        # Get the customer based on the user's email or ID
+        # Retrieve the customer instance from the user
         customer = Customer.objects.filter(id=self.request.user.id).first()
 
-        if customer and customer.recommend_products:
+        # Check if page=0 is requested
+        page = self.request.query_params.get('page', None)
+        if page == '0':
             preserved_order = Case(*[When(pk=pk, then=pos) for pos, pk in enumerate(customer.recommend_products)])
             queryset = queryset.annotate(sort_order=preserved_order).order_by('sort_order')
 
+            category_id = self.request.query_params.get('category_id', None)
+            if category_id is not None:
+                queryset = queryset.filter(category=category_id)
+            return queryset 
+
+        # Filter by category if category_id is provided
         category_id = self.request.query_params.get('category_id', None)
         if category_id is not None:
             queryset = queryset.filter(category=category_id)
-        
+
         return queryset
+
 
 class CustomerOneProductView(generics.RetrieveAPIView):
     serializer_class = CustomerSpecificProductSerializer
