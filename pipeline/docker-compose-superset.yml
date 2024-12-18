@@ -1,0 +1,32 @@
+services:
+    superset:
+        init: true
+        build: 
+            context: ./configs/superset
+            dockerfile: Dockerfile
+        container_name: superset
+        restart: unless-stopped
+        ports:
+            - "8088:8088"
+        env_file:
+            - ./configs/superset/.env
+        environment:
+            - SUPERSET_ENV=production
+            - SUPERSET_LOAD_EXAMPLES=yes
+            - SUPERSET_DATABASE_URI=postgresql+psycopg2://iuhkart:iuhkartpassword@crawl.serveftp.com:5567/postgres
+            - SECRET_KEY="django-insecure-)fl4jbp8qids&ut)=(a@55tw-^7&&kbhl*_5_0f!2$euge10d="
+        networks:
+            - iuhkart-network
+        volumes:
+            - ./configs/superset/superset_config.py:/app/superset_config.py
+        healthcheck:
+            test: ["CMD", "curl", "-f", "http://superset:8088/health"]
+            interval: 30s
+            timeout: 10s
+            retries: 5
+
+networks:
+    iuhkart-network:
+        name: iuhkart-network
+        external: true
+

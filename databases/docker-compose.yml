@@ -1,0 +1,154 @@
+services:
+    portainer:
+        image: portainer/portainer:latest
+        container_name: portainer
+        ports:
+            - 28001:8000
+            - 29015:9000
+        volumes:
+            - ./data/portainer-data:/data
+            - /var/run/docker.sock:/var/run/docker.sock
+        restart: always
+        networks:
+            - db-network
+            - iuhkart-network
+    
+    cloudflare-tunnel:
+        image: cloudflare/cloudflared:latest
+        container_name: cloudflare-tunnel
+        restart: always
+        command: tunnel --no-autoupdate run --token ${CLOUDFLARE_TUNNEL_TOKEN}
+        environment:
+            TUNNEL_METRICS: "localhost:2000"
+        networks:
+            - db-network
+            - iuhkart-network
+    
+    postgres:
+        image: postgres:17.0
+        container_name: postgres
+        environment:
+            POSTGRES_USER: iuhkart
+            POSTGRES_PASSWORD: iuhkartpassword
+            POSTGRES_DB: postgres
+        command: [ "postgres", "-c", "wal_level=logical" ]
+        ports:
+            - 25432:5432
+        volumes:
+            - ./data/postgres-data:/data/postgres
+        restart: always
+        networks:
+            - db-network
+        healthcheck:
+            test: ["CMD", "pg_isready", "-U", "iuhkart"]
+            interval: 10s
+            timeout: 5s
+            retries: 5
+    
+    mongodb:
+        image: mongo:7.0.2
+        restart: always
+        container_name: mongodb
+        ports:
+            - 27017:27017
+        command: ["--replSet", "rs0", "--bind_ip_all"]
+        networks:
+            - db-network
+        volumes:
+            - ./data/mongo-data:/data/db
+    
+    qdrant:
+        container_name: qdrant
+        image: qdrant/qdrant:v1.12.1
+        ports:
+            - 26334:6333
+        volumes:
+            - ./data/qdrant-data:/qdrant/storage
+        networks:
+            - db-network
+            - iuhkart-network
+        restart: always
+        healthcheck:
+            test:
+                - CMD-SHELL
+                - bash -c ':> /dev/tcp/127.0.0.1/6333' || exit 1
+            interval: 5s
+            timeout: 5s
+            retries: 3
+    
+    clickhouse:
+        image: 'clickhouse/clickhouse-server'
+        container_name: clickhouse
+        # environment:
+        #     CLICKHOUSE_ALWAYS_RUN_INITDB_SCRIPTS: 1
+        ports:
+            - '8125:8123'
+            - '9056:9000'
+        volumes:
+            - ./configs/clickhouse/config.xml:/etc/clickhouse-server/config.xml
+            - ./configs/clickhouse/users.xml:/etc/clickhouse-server/users.xml
+            - ./configs/clickhouse/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+            - clickhouse-data:/var/lib/clickhouse
+        networks:
+            - db-network
+            - iuhkart-network
+        restart: always
+        healthcheck:
+            test: wget --no-verbose --tries=1 --spider http://clickhouse:8123/ping || exit 1
+            interval: 10s
+            timeout: 5s
+            retries: 5
+    
+    minio:
+        image: minio/minio:latest
+        container_name: minio
+        restart: unless-stopped
+        ports:
+            - "29062:9000"
+            - "29038:9001"
+        environment:
+            MINIO_ROOT_USER: "${MINIO_ROOT_USER}"
+            MINIO_ROOT_PASSWORD: "${MINIO_ROOT_PASSWORD}"
+        networks:
+            - iuhkart-network
+            - db-network
+        volumes:
+            - ./data/minio:/data
+        command: server /data --console-address ":9001"
+        healthcheck:
+            test: ["CMD", "curl", "-f", "http://minio:9000/minio/health/live"]
+            interval: 30s
+            timeout: 20s
+            retries: 3
+    
+    minio-mc:
+        image: minio/mc:latest
+        container_name: minio-mc
+        depends_on:
+            - minio
+        environment:
+            MINIO_ROOT_USER: "${MINIO_ROOT_USER}"
+            MINIO_ROOT_PASSWORD: "${MINIO_ROOT_PASSWORD}"
+        networks:
+            - db-network
+        entrypoint: >
+            /bin/sh -c "
+            while ! nc -z minio 9000; do sleep 1; done;
+            minio-mc alias set myminio http://minio:9000 \"${MINIO_ROOT_USER}\" \"${MINIO_ROOT_PASSWORD}\";
+            minio-mc mb myminio/my-bucket;
+            minio-mc policy set public myminio/my-bucket;
+            echo '🟢 Minio mc is ready!'; sleep infinity;
+            "
+
+networks:
+    db-network:
+        name: db-network
+        driver: bridge
+    
+    iuhkart-network:
+        name: iuhkart-network
+        external: true
+
+volumes:
+    clickhouse-data:
+        name: clickhouse-data

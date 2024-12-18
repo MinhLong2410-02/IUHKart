@@ -1,0 +1,29 @@
+{
+    "name": "postgres-connector",
+    "config": {
+        "connector.class": "io.debezium.connector.postgresql.PostgresConnector",
+        "database.hostname": "",
+        "database.port": "",
+        "database.user": "",
+        "database.password": "",
+        "database.dbname": "",
+        "plugin.name": "pgoutput",
+        "topic.prefix": "postgresDB",
+        "schema.include.list": "public",
+        "table.include.list": "public.*",
+        "value.converter": "org.apache.kafka.connect.json.JsonConverter",
+        "value.converter.schemas.enable": "false",
+        "key.converter": "org.apache.kafka.connect.json.JsonConverter",
+        "key.converter.schemas.enable": "false",
+        "snapshot.mode": "initial",
+        "tombstones.on.delete": "false",
+        "time.precision.mode": "connect",
+        "transforms": "flatten,convertTimestamp",
+        "transforms.flatten.type": "org.apache.kafka.connect.transforms.Flatten$Value",
+        "transforms.flatten.delimiter": ".",
+        "transforms.convertTimestamp.type": "org.apache.kafka.connect.transforms.TimestampConverter$Value",
+        "transforms.convertTimestamp.field": "review_date, date_of_birth, date_join, order_date, shipping_date",
+        "transforms.convertTimestamp.target.type": "Timestamp",
+        "transforms.convertTimestamp.format": "yyyy-MM-dd HH:mm:ss"
+    }
+}

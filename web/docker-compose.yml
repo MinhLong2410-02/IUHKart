@@ -1,0 +1,112 @@
+services:
+  dashboard_api:
+    container_name: dashboard-api
+    build:
+      context: ./dashboard-api
+      dockerfile: Dockerfile
+    ports:
+      - "5002:8000"
+    env_file:
+      - .env
+    working_dir: /app
+    networks:
+      - iuhkart-network
+    volumes:
+      - ./dashboard-api:/app
+    restart: unless-stopped
+
+  tracking_api:
+    container_name: tracking-api
+    build: 
+      context: ./tracking-api
+      dockerfile: Dockerfile
+    ports:
+      - "5000:8000"
+    env_file:
+      - .env
+    working_dir: /app
+    networks:
+      - iuhkart-network
+    volumes:
+      - ./tracking-api:/app
+    restart: unless-stopped
+
+  search_api:
+    container_name: search-api
+    build:
+      context: ./search-api
+      dockerfile: Dockerfile
+    ports:
+      - "5001:8000"
+    env_file:
+      - .env
+    environment:
+      - TRACKING_API=http://tracking_api:8000/track
+    working_dir: /app
+    networks:
+      - iuhkart-network
+    volumes:
+      - ./search-api:/app
+    restart: unless-stopped
+
+  django_main:
+    build: ./iuhkart
+    container_name: django-main
+    ports:
+      - "8009:8000"
+    env_file:
+      - .env
+    working_dir: /app
+    networks:
+      - iuhkart-network
+    volumes:
+      - ./iuhkart:/app
+    restart: unless-stopped
+  
+  
+  shop_fe:
+    build: ./iuhkart-shop
+    container_name: shop
+    ports:
+      - "3005:3000"
+    env_file:
+      - .env
+    working_dir: /app
+    networks:
+      - iuhkart-network
+    depends_on:
+      - django_main
+      - search_api
+      - tracking_api
+
+  customer_fe:
+    build: ./iuhkart-customer
+    container_name: customer
+    ports:
+      - "3006:3000"
+    env_file:
+      - .env
+    working_dir: /app
+    networks:
+      - iuhkart-network
+    depends_on:
+      - django_main
+      - search_api
+      - tracking_api
+  
+  cloudflare:
+    image: cloudflare/cloudflared:latest
+    container_name: iuhkart-cloudflare
+    restart: unless-stopped
+    command: tunnel --no-autoupdate run --token $CLOUDFLARE_TOKEN
+    networks:
+      - iuhkart-network
+    depends_on:
+      - django_main
+      - search_api
+      - tracking_api
+
+networks:
+  iuhkart-network:
+    name: iuhkart-network
+    external: true

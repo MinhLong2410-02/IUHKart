@@ -1,0 +1,179 @@
+networks:
+    iuhkart-network:
+        name: iuhkart-network
+        external: true
+
+services:
+    zookeeper-postgres:
+        container_name: zookeeper-postgres
+        image: wurstmeister/zookeeper:latest
+        ports:
+            - "2185:2181"
+        networks:
+            - iuhkart-network
+        healthcheck:
+            test: ["CMD", "nc", "-z", "zookeeper-postgres", "2181"]
+            interval: 10s
+            timeout: 5s
+            retries: 5
+        restart: always
+    
+    zookeeper-mongo:
+        container_name: zookeeper-mongo
+        image: wurstmeister/zookeeper:latest
+        ports:
+            - "2186:2181"
+        networks:
+            - iuhkart-network
+        healthcheck:
+            test: ["CMD", "nc", "-z", "zookeeper-mongo", "2181"]
+            interval: 10s
+            timeout: 5s
+            retries: 5
+        restart: always
+
+    kafka-postgres:
+        container_name: kafka-postgres
+        image: wurstmeister/kafka:latest
+        depends_on:
+            zookeeper-postgres:
+                condition: service_healthy
+        ports:
+            - "9092:9092"
+        environment:
+            KAFKA_BROKER_ID: 1
+            KAFKA_ZOOKEEPER_CONNECT: zookeeper-postgres:2181
+            KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka-postgres:9092
+            KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
+            KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+            KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+            KAFKA_LOG_RETENTION_MS: 7200000
+            KAFKA_LOG_RETENTION_CHECK_INTERVAL_MS: 7200000
+            KAFKA_LOG_RETENTION_BYTES: -1
+            KAFKA_LOG_RETENTION_POLICY: delete
+        volumes:
+            - ./data/kafka-postgres-data:/kafka
+        networks:
+            - iuhkart-network
+        healthcheck:
+            test: ["CMD", "nc", "-z", "kafka-postgres", "9092"]
+            interval: 10s
+            timeout: 5s
+            retries: 5
+        restart: always
+
+    kafka-mongo:
+        container_name: kafka-mongo
+        image: wurstmeister/kafka:latest
+        depends_on:
+            zookeeper-mongo:
+                condition: service_healthy
+        ports:
+            - "9093:9093"
+        environment:
+            KAFKA_BROKER_ID: 2
+            KAFKA_ZOOKEEPER_CONNECT: zookeeper-mongo:2181
+            KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka-mongo:9093
+            KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9093
+            KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+            KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+            KAFKA_LOG_RETENTION_MS: 3600000
+            KAFKA_LOG_RETENTION_CHECK_INTERVAL_MS: 3600000
+            KAFKA_LOG_RETENTION_BYTES: -1
+            KAFKA_LOG_RETENTION_POLICY: delete
+        volumes:
+            - ./data/kafka-mongo-data:/kafka
+        networks:
+            - iuhkart-network
+        healthcheck:
+            test: ["CMD", "nc", "-z", "kafka-mongo", "9093"]
+            interval: 10s
+            timeout: 5s
+            retries: 5
+        restart: always
+
+    kafka-ui:
+        container_name: kafka-ui
+        image: provectuslabs/kafka-ui:latest
+        ports:
+            - "18081:8081"
+        environment:
+            KAFKA_CLUSTERS_0_NAME: "kafka-postgres-cluster"
+            KAFKA_CLUSTERS_0_BOOTSTRAP_SERVERS: "kafka-postgres:9092"
+            KAFKA_CLUSTERS_0_ZOOKEEPER: "zookeeper-postgres:2181"
+            KAFKA_CLUSTERS_1_NAME: "kafka-mongo-cluster"
+            KAFKA_CLUSTERS_1_BOOTSTRAP_SERVERS: "kafka-mongo:9093"
+            KAFKA_CLUSTERS_1_ZOOKEEPER: "zookeeper-mongo:2181"
+            SERVER_PORT: 8081
+        networks:
+            - iuhkart-network
+        restart: always
+
+    debezium-postgres:
+        container_name: debezium-postgres
+        image: debezium/connect:3.0.0.Final
+        ports:
+            - '8086:8083'
+        environment:
+            - BOOTSTRAP_SERVERS=kafka-postgres:9092
+            - GROUP_ID=postgres-connect-group
+            - CONFIG_STORAGE_TOPIC=postgres_connect_configs
+            - OFFSET_STORAGE_TOPIC=postgres_connect_offsets
+            - STATUS_STORAGE_TOPIC=postgres_connect_statuses
+        networks:
+            - iuhkart-network
+        healthcheck:
+            test: ["CMD", "curl", "-f", "http://debezium-postgres:8083/connectors"]
+            interval: 10s
+            timeout: 5s
+            retries: 5
+        restart: always
+
+    debezium-mongo:
+        container_name: debezium-mongo
+        image: debezium/connect:3.0.0.Final
+        ports:
+            - '8085:8083'
+        environment:
+            - BOOTSTRAP_SERVERS=kafka-mongo:9093
+            - GROUP_ID=mongo-connect-group
+            - CONFIG_STORAGE_TOPIC=mongo_connect_configs
+            - OFFSET_STORAGE_TOPIC=mongo_connect_offsets
+            - STATUS_STORAGE_TOPIC=mongo_connect_statuses
+        networks:
+            - iuhkart-network
+        healthcheck:
+            test: ["CMD", "curl", "-f", "http://debezium-mongo:8083/connectors"]
+            interval: 10s
+            timeout: 5s
+            retries: 5
+        restart: always
+
+    debezium-ui:
+        container_name: debezium-ui
+        image: debezium/debezium-ui:latest
+        depends_on:
+            - debezium-postgres
+            - debezium-mongo
+        ports:
+            - '8089:8080'
+        environment:
+            KAFKA_CONNECT_URIS: >
+                http://debezium-postgres:8083,http://debezium-mongo:8083
+        networks:
+            - iuhkart-network
+        restart: always
+
+    init-connect:
+        container_name: init-connect
+        build: configs/connector
+        depends_on:
+            debezium-mongo:
+                condition: service_healthy
+            debezium-postgres:
+                condition: service_healthy
+        networks:
+            - iuhkart-network
+        volumes:
+            - ./configs/connector:/app
+        restart: "no"

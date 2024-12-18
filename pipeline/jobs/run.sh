@@ -1,0 +1,1 @@
+docker compose exec flink-jobmanager flink run -py ./jobs/sales.py -d

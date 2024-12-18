@@ -1,0 +1,6 @@
+kafka-python==2.0.2
+pymongo
+python-dotenv
+qdrant-client
+requests
+psycopg2-binary

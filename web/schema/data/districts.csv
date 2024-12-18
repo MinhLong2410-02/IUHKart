@@ -1,0 +1,706 @@
+district_id,district_name,district_name_en,type,province_id_id
+760,Quận 1,1,urban,79
+771,Quận 10,10,urban,79
+772,Quận 11,11,urban,79
+761,Quận 12,12,urban,79
+770,Quận 3,3,urban,79
+773,Quận 4,4,urban,79
+774,Quận 5,5,urban,79
+775,Quận 6,6,urban,79
+778,Quận 7,7,urban,79
+776,Quận 8,8,urban,79
+481,Huyện A Lưới,A Luoi,rural,46
+908,Huyện An Biên,An Bien,rural,91
+312,Huyện An Dương,An Duong,rural,31
+623,Thị Xã An Khê,An Khe,town,64
+542,Huyện An Lão,An Lao,rural,52
+313,Huyện An Lão,An Lao,rural,31
+909,Huyện An Minh,An Minh,rural,91
+549,Thị Xã An Nhơn,An Nhon,town,52
+886,Huyện An Phú,An Phu,rural,89
+329,Huyện Ân Thi,An Thi,rural,33
+424,Huyện Anh Sơn,Anh Son,rural,40
+624,Thị Xã Ayun Pa,Ayun Pa,town,64
+61,Huyện Ba Bể,Ba Be,rural,6
+202,Huyện Ba Chẽ,Ba Che,rural,22
+748,Thành Phố Bà Rịa,Ba Ria,city,77
+386,Huyện Bá Thước,Ba Thuoc,rural,38
+535,Huyện Ba Tơ,Ba To,rural,51
+836,Huyện Ba Tri,Ba Tri,rural,83
+271,Huyện Ba Vì,Ba Vi,rural,1
+1,Quận Ba Đình,Ba Dinh,urban,1
+458,Thị Xã Ba Đồn,Ba Don,town,44
+584,Huyện Bác Ái,Bac Ai,rural,58
+596,Huyện Bắc Bình,Bac Binh,rural,60
+213,Thành Phố Bắc Giang,Bac Giang,city,24
+85,Huyện Bắc Hà,Bac Ha,rural,10
+58,Thành Phố Bắc Kạn,Bac Kan,city,6
+954,Thành Phố Bạc Liêu,Bac Lieu,city,95
+31,Huyện Bắc Mê,Bac Me,rural,2
+256,Thành Phố Bắc Ninh,Bac Ninh,city,27
+34,Huyện Bắc Quang,Bac Quang,rural,2
+185,Huyện Bắc Sơn,Bac Son,rural,20
+726,Huyện Bắc Tân Uyên,Bac Tan Uyen,rural,74
+515,Huyện Bắc Trà My,Bac Tra My,rural,49
+21,Quận Bắc Từ Liêm,Bac Tu Liem,urban,1
+121,Huyện Bắc Yên,Bac Yen,rural,14
+318,Huyện Bạch Long Vĩ,Bach Long Vi,rural,31
+63,Huyện Bạch Thông,Bach Thong,rural,6
+43,Huyện Bảo Lạc,Bao Lac,rural,4
+42,Huyện Bảo Lâm,Bao Lam,rural,4
+680,Huyện Bảo Lâm,Bao Lam,rural,68
+673,Thành Phố Bảo Lộc,Bao Loc,city,68
+86,Huyện Bảo Thắng,Bao Thang,rural,10
+87,Huyện Bảo Yên,Bao Yen,rural,10
+82,Huyện Bát Xát,Bat Xat,rural,10
+719,Huyện Bàu Bàng,Bau Bang,rural,74
+721,Thị Xã Bến Cát,Ben Cat,town,74
+711,Huyện Bến Cầu,Ben Cau,rural,72
+803,Huyện Bến Lức,Ben Luc,rural,80
+829,Thành Phố Bến Tre,Ben Tre,city,83
+731,Thành Phố Biên Hòa,Bien Hoa,city,75
+381,Thị Xã Bỉm Sơn,Bim Son,town,38
+785,Huyện Bình Chánh,Binh Chanh,rural,79
+181,Huyện Bình Gia,Binh Gia,rural,20
+296,Huyện Bình Giang,Binh Giang,rural,30
+198,Huyện Bình Liêu,Binh Lieu,rural,22
+690,Thị Xã Bình Long,Binh Long,town,70
+352,Huyện Bình Lục,Binh Luc,rural,35
+861,Thị Xã Bình Minh,Binh Minh,town,86
+524,Huyện Bình Sơn,Binh Son,rural,51
+777,Quận Bình Tân,Binh Tan,urban,79
+863,Huyện Bình Tân,Binh Tan,rural,86
+765,Quận Bình Thạnh,Binh Thanh,urban,79
+918,Quận Bình Thuỷ,Binh Thuy,urban,92
+249,Huyện Bình Xuyên,Binh Xuyen,rural,26
+835,Huyện Bình Đại,Binh Dai,rural,83
+455,Huyện Bố Trạch,Bo Trach,rural,44
+691,Huyện Bù Gia Mập,Bu Gia Map,rural,70
+696,Huyện Bù Đăng,Bu Dang,rural,70
+693,Huyện Bù Đốp,Bu Dop,rural,70
+644,Thị Xã Buôn Hồ,Buon Ho,town,66
+643,Thành Phố Buôn Ma Thuột,Buon Ma Thuot,city,66
+647,Huyện Buôn Đôn,Buon Don,rural,66
+964,Thành Phố Cà Mau,Ca Mau,city,96
+819,Huyện Cái Bè,Cai Be,rural,82
+820,Huyện Cai Lậy,Cai Lay,rural,82
+817,Thị Xã Cai Lậy,Cai Lay,town,82
+969,Huyện Cái Nước,Cai Nuoc,rural,96
+919,Quận Cái Răng,Cai Rang,urban,92
+295,Huyện Cẩm Giàng,Cam Giang,rural,30
+235,Huyện Cẩm Khê,Cam Khe,rural,25
+570,Huyện Cam Lâm,Cam Lam,rural,56
+495,Quận Cẩm Lệ,Cam Le,urban,48
+468,Huyện Cam Lộ,Cam Lo,rural,45
+739,Huyện Cẩm Mỹ,Cam My,rural,75
+195,Thành Phố Cẩm Phả,Cam Pha,city,22
+569,Thành Phố Cam Ranh,Cam Ranh,city,56
+390,Huyện Cẩm Thủy,Cam Thuy,rural,38
+446,Huyện Cẩm Xuyên,Cam Xuyen,rural,42
+787,Huyện Cần Giờ,Can Gio,rural,79
+807,Huyện Cần Giuộc,Can Giuoc,rural,80
+443,Huyện Can Lộc,Can Loc,rural,42
+806,Huyện Cần Đước,Can Duoc,rural,80
+844,Huyện Càng Long,Cang Long,rural,84
+40,Thành Phố Cao Bằng,Cao Bang,city,4
+866,Thành Phố Cao Lãnh,Cao Lanh,city,87
+873,Huyện Cao Lãnh,Cao Lanh,rural,87
+183,Huyện Cao Lộc,Cao Loc,rural,20
+154,Huyện Cao Phong,Cao Phong,rural,17
+317,Huyện Cát Hải,Cat Hai,rural,31
+683,Huyện Cát Tiên,Cat Tien,rural,68
+5,Quận Cầu Giấy,Cau Giay,urban,1
+845,Huyện Cầu Kè,Cau Ke,rural,84
+848,Huyện Cầu Ngang,Cau Ngang,rural,84
+889,Huyện Châu Phú,Chau Phu,rural,89
+708,Huyện Châu Thành,Chau Thanh,rural,72
+808,Huyện Châu Thành,Chau Thanh,rural,80
+821,Huyện Châu Thành,Chau Thanh,rural,82
+831,Huyện Châu Thành,Chau Thanh,rural,83
+847,Huyện Châu Thành,Chau Thanh,rural,84
+877,Huyện Châu Thành,Chau Thanh,rural,87
+892,Huyện Châu Thành,Chau Thanh,rural,89
+905,Huyện Châu Thành,Chau Thanh,rural,91
+933,Huyện Châu Thành,Chau Thanh,rural,93
+942,Huyện Châu Thành,Chau Thanh,rural,94
+932,Huyện Châu Thành A,Chau Thanh A,rural,93
+884,Thành Phố Châu Đốc,Chau Doc,city,89
+750,Huyện Châu Đức,Chau Duc,rural,77
+187,Huyện Chi Lăng,Chi Lang,rural,20
+290,Thành Phố Chí Linh,Chi Linh,city,30
+73,Huyện Chiêm Hóa,Chiem Hoa,rural,8
+822,Huyện Chợ Gạo,Cho Gao,rural,82
+832,Huyện Chợ Lách,Cho Lach,rural,83
+893,Huyện Chợ Mới,Cho Moi,rural,89
+65,Huyện Chợ Mới,Cho Moi,rural,6
+64,Huyện Chợ Đồn,Cho Don,rural,6
+697,Thị Xã Chơn Thành,Chon Thanh,town,70
+627,Huyện Chư Păh,Chu Pah,rural,64
+632,Huyện Chư Prông,Chu Prong,rural,64
+639,Huyện Chư Pưh,Chu Puh,rural,64
+633,Huyện Chư Sê,Chu Se,rural,64
+277,Huyện Chương Mỹ,Chuong My,rural,1
+207,Huyện Cô Tô,Co To,rural,22
+925,Huyện Cờ Đỏ,Co Do,rural,92
+471,Huyện Cồn Cỏ,Con Co,rural,45
+422,Huyện Con Cuông,Con Cuong,rural,40
+755,Huyện Côn Đảo,Con Dao,rural,77
+783,Huyện Củ Chi,Cu Chi,rural,79
+662,Huyện Cư Jút,Cu Jut,rural,67
+657,Huyện Cư Kuin,Cu Kuin,rural,66
+945,Huyện Cù Lao Dung,Cu Lao Dung,rural,94
+648,Huyện Cư M'Gar,Cu M'Gar,rural,66
+413,Thị Xã Cửa Lò,Cua Lo,town,40
+720,Huyện Dầu Tiếng,Dau Tieng,rural,74
+724,Thành Phố Dĩ An,Di An,city,74
+679,Huyện Di Linh,Di Linh,rural,68
+425,Huyện Diễn Châu,Dien Chau,rural,40
+574,Huyện Diên Khánh,Dien Khanh,rural,56
+309,Quận Dương Kinh,Duong Kinh,urban,31
+707,Huyện Dương Minh Châu,Duong Minh Chau,rural,72
+349,Thị Xã Duy Tiên,Duy Tien,town,35
+508,Huyện Duy Xuyên,Duy Xuyen,rural,49
+850,Huyện Duyên Hải,Duyen Hai,rural,84
+851,Thị Xã Duyên Hải,Duyen Hai,town,84
+645,Huyện Ea H'Leo,Ea H'Leo,rural,66
+651,Huyện Ea Kar,Ea Kar,rural,66
+646,Huyện Ea Súp,Ea Sup,rural,66
+263,Huyện Gia Bình,Gia Binh,rural,27
+18,Huyện Gia Lâm,Gia Lam,rural,1
+297,Huyện Gia Lộc,Gia Loc,rural,30
+660,Thành Phố Gia Nghĩa,Gia Nghia,city,67
+959,Thị Xã Giá Rai,Gia Rai,town,95
+373,Huyện Gia Viễn,Gia Vien,rural,37
+914,Huyện Giang Thành,Giang Thanh,rural,91
+365,Huyện Giao Thủy,Giao Thuy,rural,36
+466,Huyện Gio Linh,Gio Linh,rural,45
+906,Huyện Giồng Riềng,Giong Rieng,rural,91
+834,Huyện Giồng Trôm,Giong Trom,rural,83
+816,Thị Xã Gò Công,Go Cong,town,82
+823,Huyện Gò Công Tây,Go Cong Tay,rural,82
+824,Huyện Gò Công Đông,Go Cong Dong,rural,82
+710,Huyện Gò Dầu,Go Dau,rural,72
+907,Huyện Gò Quao,Go Quao,rural,91
+764,Quận Gò Vấp,Go Vap,urban,79
+24,Thành Phố Hà Giang,Ha Giang,city,2
+231,Huyện Hạ Hoà,Ha Hoa,rural,25
+48,Huyện Hạ Lang,Ha Lang,rural,4
+193,Thành Phố Hạ Long,Ha Long,city,22
+45,Huyện Hà Quảng,Ha Quang,rural,4
+900,Thành Phố Hà Tiên,Ha Tien,city,91
+436,Thành Phố Hà Tĩnh,Ha Tinh,city,42
+392,Huyện Hà Trung,Ha Trung,rural,38
+268,Quận Hà Đông,Ha Dong,urban,1
+306,Quận Hải An,Hai An,urban,31
+7,Quận Hai Bà Trưng,Hai Ba Trung,urban,1
+492,Quận Hải Châu,Hai Chau,urban,48
+288,Thành Phố Hải Dương,Hai Duong,city,30
+201,Huyện Hải Hà,Hai Ha,rural,22
+366,Huyện Hải Hậu,Hai Hau,rural,36
+470,Huyện Hải Lăng,Hai Lang,rural,45
+601,Huyện Hàm Tân,Ham Tan,rural,60
+597,Huyện Hàm Thuận Bắc,Ham Thuan Bac,rural,60
+598,Huyện Hàm Thuận Nam,Ham Thuan Nam,rural,60
+74,Huyện Hàm Yên,Ham Yen,rural,8
+400,Huyện Hậu Lộc,Hau Loc,rural,38
+223,Huyện Hiệp Hòa,Hiep Hoa,rural,24
+512,Huyện Hiệp Đức,Hiep Duc,rural,49
+51,Huyện Hoà An,Hoa An,rural,4
+148,Thành Phố Hòa Bình,Hoa Binh,city,17
+961,Huyện Hoà Bình,Hoa Binh,rural,95
+374,Huyện Hoa Lư,Hoa Lu,rural,37
+709,Thị Xã Hòa Thành,Hoa Thanh,town,72
+497,Huyện Hòa Vang,Hoa Vang,rural,48
+544,Huyện Hoài Ân,Hoai An,rural,52
+543,Thị Xã Hoài Nhơn,Hoai Nhon,town,52
+274,Huyện Hoài Đức,Hoai Duc,rural,1
+2,Quận Hoàn Kiếm,Hoan Kiem,urban,1
+399,Huyện Hoằng Hóa,Hoang Hoa,rural,38
+8,Quận Hoàng Mai,Hoang Mai,urban,1
+432,Thị Xã Hoàng Mai,Hoang Mai,town,40
+498,Huyện Hoàng Sa,Hoang Sa,rural,48
+32,Huyện Hoàng Su Phì,Hoang Su Phi,rural,2
+784,Huyện Hóc Môn,Hoc Mon,rural,79
+503,Thành Phố Hội An,Hoi An,city,49
+694,Huyện Hớn Quản,Hon Quan,rural,70
+903,Huyện Hòn Đất,Hon Dat,rural,91
+303,Quận Hồng Bàng,Hong Bang,urban,31
+956,Huyện Hồng Dân,Hong Dan,rural,95
+437,Thị Xã Hồng Lĩnh,Hong Linh,town,42
+868,Thành Phố Hồng Ngự,Hong Ngu,city,87
+870,Huyện Hồng Ngự,Hong Ngu,rural,87
+474,Thành Phố Huế,Hue,city,46
+339,Huyện Hưng Hà,Hung Ha,rural,34
+431,Huyện Hưng Nguyên,Hung Nguyen,rural,40
+323,Thành Phố Hưng Yên,Hung Yen,city,33
+465,Huyện Hướng Hóa,Huong Hoa,rural,45
+444,Huyện Hương Khê,Huong Khe,rural,42
+439,Huyện Hương Sơn,Huong Son,rural,42
+479,Thị Xã Hương Thủy,Huong Thuy,town,46
+480,Thị Xã Hương Trà,Huong Tra,town,46
+186,Huyện Hữu Lũng,Huu Lung,rural,20
+628,Huyện Ia Grai,Ia Grai,rural,64
+618,Huyện Ia H' Drai,Ia H' Drai,rural,62
+635,Huyện Ia Pa,Ia Pa,rural,64
+625,Huyện Kbang,Kbang,rural,64
+943,Huyện Kế Sách,Ke Sach,rural,94
+575,Huyện Khánh Sơn,Khanh Son,rural,56
+573,Huyện Khánh Vĩnh,Khanh Vinh,rural,56
+330,Huyện Khoái Châu,Khoai Chau,rural,33
+307,Quận Kiến An,Kien An,urban,31
+912,Huyện Kiên Hải,Kien Hai,rural,91
+902,Huyện Kiên Lương,Kien Luong,rural,91
+314,Huyện Kiến Thuỵ,Kien Thuy,rural,31
+795,Thị Xã Kiến Tường,Kien Tuong,town,80
+343,Huyện Kiến Xương,Kien Xuong,rural,34
+350,Huyện Kim Bảng,Kim Bang,rural,35
+153,Huyện Kim Bôi,Kim Boi,rural,17
+376,Huyện Kim Sơn,Kim Son,rural,37
+293,Huyện Kim Thành,Kim Thanh,rural,30
+331,Huyện Kim Động,Kim Dong,rural,33
+292,Thị Xã Kinh Môn,Kinh Mon,town,30
+613,Huyện Kon Plông,Kon Plong,rural,62
+614,Huyện Kon Rẫy,Kon Ray,rural,62
+608,Thành Phố Kon Tum,Kon Tum,city,62
+630,Huyện Kông Chro,Kong Chro,rural,64
+655,Huyện Krông A Na,Krong A Na,rural,66
+653,Huyện Krông Bông,Krong Bong,rural,66
+649,Huyện Krông Búk,Krong Buk,rural,66
+650,Huyện Krông Năng,Krong Nang,rural,66
+664,Huyện Krông Nô,Krong No,rural,67
+637,Huyện Krông Pa,Krong Pa,rural,64
+654,Huyện Krông Pắc,Krong Pac,rural,66
+447,Huyện Kỳ Anh,Ky Anh,rural,42
+449,Thị Xã Kỳ Anh,Ky Anh,town,42
+417,Huyện Kỳ Sơn,Ky Son,rural,40
+594,Thị Xã La Gi,La Gi,town,60
+675,Huyện Lạc Dương,Lac Duong,rural,68
+157,Huyện Lạc Sơn,Lac Son,rural,17
+159,Huyện Lạc Thủy,Lac Thuy,rural,17
+105,Thành Phố Lai Châu,Lai Chau,city,12
+876,Huyện Lai Vung,Lai Vung,rural,87
+656,Huyện Lắk,Lak,rural,66
+71,Huyện Lâm Bình,Lam Binh,rural,8
+676,Huyện Lâm Hà,Lam Ha,rural,68
+237,Huyện Lâm Thao,Lam Thao,rural,25
+388,Huyện Lang Chánh,Lang Chanh,rural,38
+217,Huyện Lạng Giang,Lang Giang,rural,24
+178,Thành Phố Lạng Sơn,Lang Son,city,20
+80,Thành Phố Lào Cai,Lao Cai,city,10
+246,Huyện Lập Thạch,Lap Thach,rural,26
+875,Huyện Lấp Vò,Lap Vo,rural,87
+305,Quận Lê Chân,Le Chan,urban,31
+457,Huyện Lệ Thủy,Le Thuy,rural,44
+490,Quận Liên Chiểu,Lien Chieu,urban,48
+188,Huyện Lộc Bình,Loc Binh,rural,20
+448,Huyện Lộc Hà,Loc Ha,rural,42
+692,Huyện Lộc Ninh,Loc Ninh,rural,70
+4,Quận Long Biên,Long Bien,urban,1
+857,Huyện Long Hồ,Long Ho,rural,86
+732,Thành Phố Long Khánh,Long Khanh,city,75
+936,Huyện Long Mỹ,Long My,rural,93
+937,Thị Xã Long Mỹ,Long My,town,93
+946,Huyện Long Phú,Long Phu,rural,94
+740,Huyện Long Thành,Long Thanh,rural,75
+883,Thành Phố Long Xuyên,Long Xuyen,city,89
+752,Huyện Long Điền,Long Dien,rural,77
+218,Huyện Lục Nam,Luc Nam,rural,24
+219,Huyện Lục Ngạn,Luc Ngan,rural,24
+135,Huyện Lục Yên,Luc Yen,rural,15
+152,Huyện Lương Sơn,Luong Son,rural,17
+264,Huyện Lương Tài,Luong Tai,rural,27
+353,Huyện Lý Nhân,Ly Nhan,rural,35
+536,Huyện Lý Sơn,Ly Son,rural,51
+652,Huyện M'Đrắk,M'Drak,rural,66
+156,Huyện Mai Châu,Mai Chau,rural,17
+125,Huyện Mai Sơn,Mai Son,rural,14
+858,Huyện Mang Thít,Mang Thit,rural,86
+629,Huyện Mang Yang,Mang Yang,rural,64
+250,Huyện Mê Linh,Me Linh,rural,1
+27,Huyện Mèo Vạc,Meo Vac,rural,2
+452,Huyện Minh Hóa,Minh Hoa,rural,44
+531,Huyện Minh Long,Minh Long,rural,51
+838,Huyện Mỏ Cày Bắc,Mo Cay Bac,rural,83
+833,Huyện Mỏ Cày Nam,Mo Cay Nam,rural,83
+533,Huyện Mộ Đức,Mo Duc,rural,51
+123,Huyện Mộc Châu,Moc Chau,rural,14
+798,Huyện Mộc Hóa,Moc Hoa,rural,80
+194,Thành Phố Móng Cái,Mong Cai,city,22
+137,Huyện Mù Căng Chải,Mu Cang Chai,rural,15
+102,Huyện Mường Ảng,Muong Ang,rural,11
+97,Huyện Mường Chà,Muong Cha,rural,11
+83,Huyện Mường Khương,Muong Khuong,rural,10
+120,Huyện Mường La,Muong La,rural,14
+384,Huyện Mường Lát,Muong Lat,rural,38
+95,Thị Xã Mường Lay,Muong Lay,town,11
+96,Huyện Mường Nhé,Muong Nhe,rural,11
+107,Huyện Mường Tè,Muong Te,rural,12
+328,Thị Xã Mỹ Hào,My Hao,town,33
+358,Huyện Mỹ Lộc,My Loc,rural,36
+815,Thành Phố Mỹ Tho,My Tho,city,82
+944,Huyện Mỹ Tú,My Tu,rural,94
+947,Huyện Mỹ Xuyên,My Xuyen,rural,94
+282,Huyện Mỹ Đức,My Duc,rural,1
+72,Huyện Na Hang,Na Hang,rural,8
+66,Huyện Na Rì,Na Ri,rural,6
+971,Huyện Năm Căn,Nam Can,rural,96
+510,Huyện Nam Giang,Nam Giang,rural,49
+112,Huyện Nậm Nhùn,Nam Nhun,rural,12
+103,Huyện Nậm Pồ,Nam Po,rural,11
+291,Huyện Nam Sách,Nam Sach,rural,30
+516,Huyện Nam Trà My,Nam Tra My,rural,49
+362,Huyện Nam Trực,Nam Truc,rural,36
+19,Quận Nam Từ Liêm,Nam Tu Liem,urban,1
+430,Huyện Nam Đàn,Nam Dan,rural,40
+356,Thành Phố Nam Định,Nam Dinh,city,36
+483,Huyện Nam Đông,Nam Dong,rural,46
+931,Thành Phố Ngã Bảy,Nga Bay,city,93
+948,Thị Xã Ngã Năm,Nga Nam,town,94
+401,Huyện Nga Sơn,Nga Son,rural,38
+62,Huyện Ngân Sơn,Ngan Son,rural,6
+429,Huyện Nghi Lộc,Nghi Loc,rural,40
+407,Thị Xã Nghi Sơn,Nghi Son,town,38
+442,Huyện Nghi Xuân,Nghi Xuan,rural,42
+532,Huyện Nghĩa Hành,Nghia Hanh,rural,51
+361,Huyện Nghĩa Hưng,Nghia Hung,rural,36
+133,Thị Xã Nghĩa Lộ,Nghia Lo,town,15
+419,Huyện Nghĩa Đàn,Nghia Dan,rural,40
+304,Quận Ngô Quyền,Ngo Quyen,urban,31
+973,Huyện Ngọc Hiển,Ngoc Hien,rural,96
+611,Huyện Ngọc Hồi,Ngoc Hoi,rural,62
+389,Huyện Ngọc Lặc,Ngoc Lac,rural,38
+494,Quận Ngũ Hành Sơn,Ngu Hanh Son,urban,48
+52,Huyện Nguyên Bình,Nguyen Binh,rural,4
+786,Huyện Nhà Bè,Nha Be,rural,79
+568,Thành Phố Nha Trang,Nha Trang,city,56
+372,Huyện Nho Quan,Nho Quan,rural,37
+742,Huyện Nhơn Trạch,Nhon Trach,rural,75
+403,Huyện Như Thanh,Nhu Thanh,rural,38
+402,Huyện Như Xuân,Nhu Xuan,rural,38
+369,Thành Phố Ninh Bình,Ninh Binh,city,37
+299,Huyện Ninh Giang,Ninh Giang,rural,30
+586,Huyện Ninh Hải,Ninh Hai,rural,58
+572,Thị Xã Ninh Hòa,Ninh Hoa,town,56
+916,Quận Ninh Kiều,Ninh Kieu,urban,92
+587,Huyện Ninh Phước,Ninh Phuoc,rural,58
+585,Huyện Ninh Sơn,Ninh Son,rural,58
+404,Huyện Nông Cống,Nong Cong,rural,38
+519,Huyện Nông Sơn,Nong Son,rural,49
+517,Huyện Núi Thành,Nui Thanh,rural,49
+917,Quận Ô Môn,O Mon,urban,92
+60,Huyện Pác Nặm,Pac Nam,rural,6
+582,Thành Phố Phan Rang - Tháp Chàm,Phan Rang - Thap Cham,city,58
+593,Thành Phố Phan Thiết,Phan Thiet,city,60
+172,Thành Phố Phổ Yên,Pho Yen,city,19
+109,Huyện Phong Thổ,Phong Tho,rural,12
+476,Huyện Phong Điền,Phong Dien,rural,46
+926,Huyện Phong Điền,Phong Dien,rural,92
+173,Huyện Phú Bình,Phu Binh,rural,19
+548,Huyện Phù Cát,Phu Cat,rural,52
+333,Huyện Phù Cừ,Phu Cu,rural,33
+722,Huyện Phú Giáo,Phu Giao,rural,74
+563,Huyện Phú Hoà,Phu Hoa,rural,54
+482,Huyện Phú Lộc,Phu Loc,rural,46
+168,Huyện Phú Lương,Phu Luong,rural,19
+347,Thành Phố Phủ Lý,Phu Ly,city,35
+545,Huyện Phù Mỹ,Phu My,rural,52
+754,Thị Xã Phú Mỹ,Phu My,town,77
+768,Quận Phú Nhuận,Phu Nhuan,urban,79
+233,Huyện Phù Ninh,Phu Ninh,rural,25
+518,Huyện Phú Ninh,Phu Ninh,rural,49
+911,Thành Phố Phú Quốc,Phu Quoc,city,91
+602,Huyện Phú Quý,Phu Quy,rural,60
+698,Huyện Phú Riềng,Phu Rieng,rural,70
+888,Huyện Phú Tân,Phu Tan,rural,89
+972,Huyện Phú Tân,Phu Tan,rural,96
+638,Huyện Phú Thiện,Phu Thien,rural,64
+228,Thị Xã Phú Thọ,Phu Tho,town,25
+478,Huyện Phú Vang,Phu Vang,rural,46
+280,Huyện Phú Xuyên,Phu Xuyen,rural,1
+122,Huyện Phù Yên,Phu Yen,rural,14
+272,Huyện Phúc Thọ,Phuc Tho,rural,1
+244,Thành Phố Phúc Yên,Phuc Yen,city,26
+934,Huyện Phụng Hiệp,Phung Hiep,rural,93
+688,Thị Xã Phước Long,Phuoc Long,town,70
+957,Huyện Phước Long,Phuoc Long,rural,95
+511,Huyện Phước Sơn,Phuoc Son,rural,49
+622,Thành Phố Pleiku,Pleiku,city,64
+29,Huyện Quản Bạ,Quan Ba,rural,2
+385,Huyện Quan Hóa,Quan Hoa,rural,38
+387,Huyện Quan Sơn,Quan Son,rural,38
+35,Huyện Quang Bình,Quang Binh,rural,2
+49,Huyện Quảng Hòa,Quang Hoa,rural,4
+522,Thành Phố Quảng Ngãi,Quang Ngai,city,51
+456,Huyện Quảng Ninh,Quang Ninh,rural,44
+454,Huyện Quảng Trạch,Quang Trach,rural,44
+462,Thị Xã Quảng Trị,Quang Tri,town,45
+406,Huyện Quảng Xương,Quang Xuong,rural,38
+206,Thị Xã Quảng Yên,Quang Yen,town,22
+477,Huyện Quảng Điền,Quang Dien,rural,46
+415,Huyện Quế Phong,Que Phong,rural,40
+509,Huyện Quế Sơn,Que Son,rural,49
+259,Thị Xã Quế Võ,Que Vo,town,27
+275,Huyện Quốc Oai,Quoc Oai,rural,1
+416,Huyện Quỳ Châu,Quy Chau,rural,40
+420,Huyện Quỳ Hợp,Quy Hop,rural,40
+540,Thành Phố Quy Nhơn,Quy Nhon,city,52
+421,Huyện Quỳnh Lưu,Quynh Luu,rural,40
+118,Huyện Quỳnh Nhai,Quynh Nhai,rural,14
+338,Huyện Quỳnh Phụ,Quynh Phu,rural,34
+899,Thành Phố Rạch Giá,Rach Gia,city,91
+88,Thị Xã Sa Pa,Sa Pa,town,10
+616,Huyện Sa Thầy,Sa Thay,rural,62
+867,Thành Phố Sa Đéc,Sa Dec,city,87
+382,Thành Phố Sầm Sơn,Sam Son,city,38
+84,Huyện Si Ma Cai,Si Ma Cai,rural,10
+108,Huyện Sìn Hồ,Sin Ho,rural,12
+16,Huyện Sóc Sơn,Soc Son,rural,1
+941,Thành Phố Sóc Trăng,Soc Trang,city,94
+76,Huyện Sơn Dương,Son Duong,rural,8
+529,Huyện Sơn Hà,Son Ha,rural,51
+560,Huyện Sơn Hòa,Son Hoa,rural,54
+116,Thành Phố Sơn La,Son La,city,14
+269,Thị Xã Sơn Tây,Son Tay,town,1
+530,Huyện Sơn Tây,Son Tay,rural,51
+527,Huyện Sơn Tịnh,Son Tinh,rural,51
+493,Quận Sơn Trà,Son Tra,urban,48
+220,Huyện Sơn Động,Son Dong,rural,24
+557,Thị Xã Sông Cầu,Song Cau,town,54
+165,Thành Phố Sông Công,Song Cong,city,19
+561,Huyện Sông Hinh,Song Hinh,rural,54
+253,Huyện Sông Lô,Song Lo,rural,26
+126,Huyện Sông Mã,Song Ma,rural,14
+127,Huyện Sốp Cộp,Sop Cop,rural,14
+860,Huyện Tam Bình,Tam Binh,rural,86
+247,Huyện Tam Dương,Tam Duong,rural,26
+502,Thành Phố Tam Kỳ,Tam Ky,city,49
+236,Huyện Tam Nông,Tam Nong,rural,25
+871,Huyện Tam Nông,Tam Nong,rural,87
+248,Huyện Tam Đảo,Tam Dao,rural,26
+370,Thành Phố Tam Điệp,Tam Diep,city,37
+106,Huyện Tam Đường,Tam Duong,rural,12
+794,Thành Phố Tân An,Tan An,city,80
+705,Huyện Tân Biên,Tan Bien,rural,72
+766,Quận Tân Bình,Tan Binh,urban,79
+706,Huyện Tân Châu,Tan Chau,rural,72
+887,Thị Xã Tân Châu,Tan Chau,town,89
+904,Huyện Tân Hiệp,Tan Hiep,rural,91
+869,Huyện Tân Hồng,Tan Hong,rural,87
+796,Huyện Tân Hưng,Tan Hung,rural,80
+423,Huyện Tân Kỳ,Tan Ky,rural,40
+155,Huyện Tân Lạc,Tan Lac,rural,17
+734,Huyện Tân Phú,Tan Phu,rural,75
+767,Quận Tân Phú,Tan Phu,urban,79
+825,Huyện Tân Phú Đông,Tan Phu Dong,rural,82
+818,Huyện Tân Phước,Tan Phuoc,rural,82
+240,Huyện Tân Sơn,Tan Son,rural,25
+799,Huyện Tân Thạnh,Tan Thanh,rural,80
+805,Huyện Tân Trụ,Tan Tru,rural,80
+723,Thành Phố Tân Uyên,Tan Uyen,city,74
+111,Huyện Tân Uyên,Tan Uyen,rural,12
+216,Huyện Tân Yên,Tan Yen,rural,24
+599,Huyện Tánh Linh,Tanh Linh,rural,60
+504,Huyện Tây Giang,Tay Giang,rural,49
+3,Quận Tây Hồ,Tay Ho,urban,1
+562,Huyện Tây Hoà,Tay Hoa,rural,54
+703,Thành Phố Tây Ninh,Tay Ninh,city,72
+547,Huyện Tây Sơn,Tay Son,rural,52
+53,Huyện Thạch An,Thach An,rural,4
+445,Huyện Thạch Hà,Thach Ha,rural,42
+391,Huyện Thạch Thành,Thach Thanh,rural,38
+276,Huyện Thạch Thất,Thach That,rural,1
+336,Thành Phố Thái Bình,Thai Binh,city,34
+414,Thị Xã Thái Hoà,Thai Hoa,town,40
+164,Thành Phố Thái Nguyên,Thai Nguyen,city,19
+341,Huyện Thái Thụy,Thai Thuy,rural,34
+110,Huyện Than Uyên,Than Uyen,rural,12
+513,Huyện Thăng Bình,Thang Binh,rural,49
+232,Huyện Thanh Ba,Thanh Ba,rural,25
+874,Huyện Thanh Bình,Thanh Binh,rural,87
+428,Huyện Thanh Chương,Thanh Chuong,rural,40
+294,Huyện Thanh Hà,Thanh Ha,rural,30
+380,Thành Phố Thanh Hóa,Thanh Hoa,city,38
+800,Huyện Thạnh Hóa,Thanh Hoa,rural,80
+491,Quận Thanh Khê,Thanh Khe,urban,48
+351,Huyện Thanh Liêm,Thanh Liem,rural,35
+300,Huyện Thanh Miện,Thanh Mien,rural,30
+278,Huyện Thanh Oai,Thanh Oai,rural,1
+837,Huyện Thạnh Phú,Thanh Phu,rural,83
+238,Huyện Thanh Sơn,Thanh Son,rural,25
+239,Huyện Thanh Thuỷ,Thanh Thuy,rural,25
+20,Huyện Thanh Trì,Thanh Tri,rural,1
+949,Huyện Thạnh Trị,Thanh Tri,rural,94
+9,Quận Thanh Xuân,Thanh Xuan,urban,1
+872,Huyện Tháp Mười,Thap Muoi,rural,87
+398,Huyện Thiệu Hóa,Thieu Hoa,rural,38
+395,Huyện Thọ Xuân,Tho Xuan,rural,38
+894,Huyện Thoại Sơn,Thoai Son,rural,89
+967,Huyện Thới Bình,Thoi Binh,rural,96
+927,Huyện Thới Lai,Thoi Lai,rural,92
+738,Huyện Thống Nhất,Thong Nhat,rural,75
+923,Quận Thốt Nốt,Thot Not,urban,92
+718,Thành Phố Thủ Dầu Một,Thu Dau Mot,city,74
+804,Huyện Thủ Thừa,Thu Thua,rural,80
+769,Thành Phố Thủ Đức,Thu Duc,city,79
+725,Thành Phố Thuận An,Thuan An,city,74
+588,Huyện Thuận Bắc,Thuan Bac,rural,58
+119,Huyện Thuận Châu,Thuan Chau,rural,14
+589,Huyện Thuận Nam,Thuan Nam,rural,58
+262,Thị Xã Thuận Thành,Thuan Thanh,town,27
+279,Huyện Thường Tín,Thuong Tin,rural,1
+396,Huyện Thường Xuân,Thuong Xuan,rural,38
+311,Huyện Thuỷ Nguyên,Thuy Nguyen,rural,31
+260,Huyện Tiên Du,Tien Du,rural,27
+342,Huyện Tiền Hải,Tien Hai,rural,34
+315,Huyện Tiên Lãng,Tien Lang,rural,31
+332,Huyện Tiên Lữ,Tien Lu,rural,33
+514,Huyện Tiên Phước,Tien Phuoc,rural,49
+199,Huyện Tiên Yên,Tien Yen,rural,22
+846,Huyện Tiểu Cần,Tieu Can,rural,84
+890,Thị Xã Tịnh Biên,Tinh Bien,town,89
+525,Huyện Trà Bồng,Tra Bong,rural,51
+849,Huyện Trà Cú,Tra Cu,rural,84
+862,Huyện Trà Ôn,Tra On,rural,86
+842,Thành Phố Trà Vinh,Tra Vinh,city,84
+139,Huyện Trạm Tấu,Tram Tau,rural,15
+968,Huyện Trần Văn Thời,Tran Van Thoi,rural,96
+138,Huyện Trấn Yên,Tran Yen,rural,15
+951,Huyện Trần Đề,Tran De,rural,94
+712,Thị Xã Trảng Bàng,Trang Bang,town,72
+737,Huyện Trảng Bom,Trang Bom,rural,75
+180,Huyện Tràng Định,Trang Dinh,rural,20
+891,Huyện Tri Tôn,Tri Ton,rural,89
+469,Huyện Triệu Phong,Trieu Phong,rural,45
+397,Huyện Triệu Sơn,Trieu Son,rural,38
+363,Huyện Trực Ninh,Truc Ninh,rural,36
+47,Huyện Trùng Khánh,Trung Khanh,rural,4
+576,Huyện Trường Sa,Truong Sa,rural,56
+298,Huyện Tứ Kỳ,Tu Ky,rural,30
+617,Huyện Tu Mơ Rông,Tu Mo Rong,rural,62
+528,Huyện Tư Nghĩa,Tu Nghia,rural,51
+261,Thành Phố Từ Sơn,Tu Son,city,27
+98,Huyện Tủa Chùa,Tua Chua,rural,11
+99,Huyện Tuần Giáo,Tuan Giao,rural,11
+418,Huyện Tương Dương,Tuong Duong,rural,40
+559,Huyện Tuy An,Tuy An,rural,54
+555,Thành Phố Tuy Hoà,Tuy Hoa,city,54
+595,Huyện Tuy Phong,Tuy Phong,rural,60
+550,Huyện Tuy Phước,Tuy Phuoc,rural,52
+667,Huyện Tuy Đức,Tuy Duc,rural,67
+453,Huyện Tuyên Hóa,Tuyen Hoa,rural,44
+70,Thành Phố Tuyên Quang,Tuyen Quang,city,8
+966,Huyện U Minh,U Minh,rural,96
+913,Huyện U Minh Thượng,U Minh Thuong,rural,91
+281,Huyện Ứng Hòa,Ung Hoa,rural,1
+196,Thành Phố Uông Bí,Uong Bi,city,22
+89,Huyện Văn Bàn,Van Ban,rural,10
+551,Huyện Vân Canh,Van Canh,rural,52
+140,Huyện Văn Chấn,Van Chan,rural,15
+326,Huyện Văn Giang,Van Giang,rural,33
+128,Huyện Vân Hồ,Van Ho,rural,14
+325,Huyện Văn Lâm,Van Lam,rural,33
+182,Huyện Văn Lãng,Van Lang,rural,20
+571,Huyện Vạn Ninh,Van Ninh,rural,56
+184,Huyện Văn Quan,Van Quan,rural,20
+136,Huyện Văn Yên,Van Yen,rural,15
+203,Huyện Vân Đồn,Van Don,rural,22
+930,Thành Phố Vị Thanh,Vi Thanh,city,93
+935,Huyện Vị Thuỷ,Vi Thuy,rural,93
+30,Huyện Vị Xuyên,Vi Xuyen,rural,2
+227,Thành Phố Việt Trì,Viet Tri,city,25
+222,Huyện Việt Yên,Viet Yen,rural,24
+412,Thành Phố Vinh,Vinh,city,40
+316,Huyện Vĩnh Bảo,Vinh Bao,rural,31
+950,Thị Xã Vĩnh Châu,Vinh Chau,town,94
+735,Huyện Vĩnh Cửu,Vinh Cuu,rural,75
+797,Huyện Vĩnh Hưng,Vinh Hung,rural,80
+464,Huyện Vĩnh Linh,Vinh Linh,rural,45
+393,Huyện Vĩnh Lộc,Vinh Loc,rural,38
+958,Huyện Vĩnh Lợi,Vinh Loi,rural,95
+855,Thành Phố Vĩnh Long,Vinh Long,city,86
+924,Huyện Vĩnh Thạnh,Vinh Thanh,rural,92
+546,Huyện Vĩnh Thạnh,Vinh Thanh,rural,52
+910,Huyện Vĩnh Thuận,Vinh Thuan,rural,91
+252,Huyện Vĩnh Tường,Vinh Tuong,rural,26
+243,Thành Phố Vĩnh Yên,Vinh Yen,city,26
+170,Huyện Võ Nhai,Vo Nhai,rural,19
+359,Huyện Vụ Bản,Vu Ban,rural,36
+441,Huyện Vũ Quang,Vu Quang,rural,42
+344,Huyện Vũ Thư,Vu Thu,rural,34
+859,Huyện Vũng Liêm,Vung Liem,rural,86
+747,Thành Phố Vũng Tàu,Vung Tau,city,77
+33,Huyện Xín Mần,Xin Man,rural,2
+741,Huyện Xuân Lộc,Xuan Loc,rural,75
+364,Huyện Xuân Trường,Xuan Truong,rural,36
+751,Huyện Xuyên Mộc,Xuyen Moc,rural,77
+360,Huyện Ý Yên,Y Yen,rural,36
+132,Thành Phố Yên Bái,Yen Bai,city,15
+141,Huyện Yên Bình,Yen Binh,rural,15
+124,Huyện Yên Châu,Yen Chau,rural,14
+221,Huyện Yên Dũng,Yen Dung,rural,24
+375,Huyện Yên Khánh,Yen Khanh,rural,37
+251,Huyện Yên Lạc,Yen Lac,rural,26
+234,Huyện Yên Lập,Yen Lap,rural,25
+28,Huyện Yên Minh,Yen Minh,rural,2
+377,Huyện Yên Mô,Yen Mo,rural,37
+327,Huyện Yên Mỹ,Yen My,rural,33
+258,Huyện Yên Phong,Yen Phong,rural,27
+75,Huyện Yên Sơn,Yen Son,rural,8
+426,Huyện Yên Thành,Yen Thanh,rural,40
+215,Huyện Yên Thế,Yen The,rural,24
+158,Huyện Yên Thủy,Yen Thuy,rural,17
+394,Huyện Yên Định,Yen Dinh,rural,38
+150,Huyện Đà Bắc,Da Bac,rural,17
+681,Huyện Đạ Huoai,Da Huoai,rural,68
+467,Huyện Đa Krông,Da Krong,rural,45
+672,Thành Phố Đà Lạt,Da Lat,city,68
+682,Huyện Đạ Tẻh,Da Teh,rural,68
+506,Huyện Đại Lộc,Dai Loc,rural,49
+171,Huyện Đại Từ,Dai Tu,rural,19
+610,Huyện Đắk Glei,Dak Glei,rural,62
+661,Huyện Đăk Glong,Dak Glong,rural,67
+615,Huyện Đắk Hà,Dak Ha,rural,62
+663,Huyện Đắk Mil,Dak Mil,rural,67
+634,Huyện Đăk Pơ,Dak Po,rural,64
+666,Huyện Đắk R'Lấp,Dak R'Lap,rural,67
+665,Huyện Đắk Song,Dak Song,rural,67
+612,Huyện Đắk Tô,Dak To,rural,62
+626,Huyện Đăk Đoa,Dak Doa,rural,64
+970,Huyện Đầm Dơi,Dam Doi,rural,96
+200,Huyện Đầm Hà,Dam Ha,rural,22
+674,Huyện Đam Rông,Dam Rong,rural,68
+273,Huyện Đan Phượng,Dan Phuong,rural,1
+753,Huyện Đất Đỏ,Dat Do,rural,77
+507,Thị Xã Điện Bàn,Dien Ban,town,49
+100,Huyện Điện Biên,Dien Bien,rural,11
+94,Thành Phố Điện Biên Phủ,Dien Bien Phu,city,11
+101,Huyện Điện Biên Đông,Dien Bien Dong,rural,11
+167,Huyện Định Hóa,Dinh Hoa,rural,19
+189,Huyện Đình Lập,Dinh Lap,rural,20
+736,Huyện Định Quán,Dinh Quan,rural,75
+427,Huyện Đô Lương,Do Luong,rural,40
+308,Quận Đồ Sơn,Do Son,urban,31
+230,Huyện Đoan Hùng,Doan Hung,rural,25
+677,Huyện Đơn Dương,Don Duong,rural,68
+17,Huyện Đông Anh,Dong Anh,rural,1
+505,Huyện Đông Giang,Dong Giang,rural,49
+461,Thành Phố Đông Hà,Dong Ha,city,45
+960,Huyện Đông Hải,Dong Hai,rural,95
+564,Thị Xã Đông Hòa,Dong Hoa,town,54
+450,Thành Phố Đồng Hới,Dong Hoi,city,44
+340,Huyện Đông Hưng,Dong Hung,rural,34
+169,Huyện Đồng Hỷ,Dong Hy,rural,19
+695,Huyện Đồng Phú,Dong Phu,rural,70
+405,Huyện Đông Sơn,Dong Son,rural,38
+205,Thị Xã Đông Triều,Dong Trieu,town,22
+26,Huyện Đồng Văn,Dong Van,rural,2
+689,Thành Phố Đồng Xoài,Dong Xoai,city,70
+558,Huyện Đồng Xuân,Dong Xuan,rural,54
+6,Quận Đống Đa,Dong Da,urban,1
+631,Huyện Đức Cơ,Duc Co,rural,64
+802,Huyện Đức Hòa,Duc Hoa,rural,80
+801,Huyện Đức Huệ,Duc Hue,rural,80
+600,Huyện Đức Linh,Duc Linh,rural,60
+534,Thị Xã Đức Phổ,Duc Pho,town,51
+440,Huyện Đức Thọ,Duc Tho,rural,42
+678,Huyện Đức Trọng,Duc Trong,rural,68
