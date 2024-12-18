@@ -8,6 +8,8 @@ services:
       - "5002:8000"
     env_file:
       - .env
+    environment:
+      - AUTHENTICATE_API=http://localhost:8000/user/api/token-validate/
     working_dir: /app
     networks:
       - iuhkart-network

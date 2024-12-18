@@ -8,6 +8,8 @@ from datetime import date
 
 User = get_user_model()
 
+class TokenValidationSerializer(serializers.Serializer):
+    token = serializers.CharField(required=True, help_text="JWT token to be validated")
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:

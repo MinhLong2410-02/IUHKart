@@ -1,4 +1,4 @@
-import os
+import os, requests
 import jwt
 from fastapi import HTTPException, Security
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
@@ -11,37 +11,37 @@ try:
 except ModuleNotFoundError:
     pass
 
-# Secret key to encode/decode the JWT tokens
-SECRET_KEY = os.getenv("SECRET_KEY")
-ALGORITHM = "HS256"
+AUTHENTICATE_API = os.getenv("AUTHENTICATE_API")
+
 METABASE_URL = os.getenv("METABASE_URL")
 METABASE_EMBEDDING_SECRET = os.getenv("METABASE_EMBEDDING_SECRET")
 METABASE_DASHBOARD_ID=1
 
-security = HTTPBearer()  
+security = HTTPBearer()
 
 
 def decode_jwt(token: str) -> Dict:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        return payload
-    # try:
-    #     payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-    #     return payload
-
-    # except ExpiredSignatureError:
-    #     raise HTTPException(
-    #         status_code=401, detail="JWT token has expired"
-    #     )
-    # except PyJWTError:
-    #     raise HTTPException(
-    #         status_code=401, detail="Invalid or expired JWT token"
-    #     )
+    try:
+        payload = requests.post(AUTHENTICATE_API, data={'token': token})
+        if payload.status_code != 200:
+            raise HTTPException(
+                status_code=401, detail="Invalid or expired JWT token"
+            )
+        return payload.json()
+    except ExpiredSignatureError:
+        raise HTTPException(
+            status_code=401, detail="JWT token has expired"
+        )
+    except PyJWTError:
+        raise HTTPException(
+            status_code=401, detail="Invalid or expired JWT token"
+        )
 
 
 def get_current_user(credentials: HTTPAuthorizationCredentials = Security(security)) -> Dict:
     token = credentials.credentials
     payload = decode_jwt(token)
-    return payload 
+    return payload['decoded_token']
 
 def generate_metabase_embed_url(shop_id: str) -> str:
     payload = {

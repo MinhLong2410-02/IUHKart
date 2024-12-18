@@ -7,6 +7,8 @@ from apps.account.serializers import *
 from drf_spectacular.utils import extend_schema
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.exceptions import NotFound, ValidationError
+import jwt
+from django.conf import settings
 
 class RegisterCustomerView(generics.CreateAPIView):
     queryset = User.objects.all()
@@ -215,8 +217,22 @@ class UpdateMoneyView(generics.RetrieveUpdateAPIView):
         )
 
 class ValidateTokenView(generics.GenericAPIView):
-    permission_classes = [permissions.IsAuthenticated]
-    def get(self, request, *args, **kwargs):
-        token = request.user.auth_token
-        return Response({"user_id": request.user.id, "token": str(token)}, status=status.HTTP_200_OK)
+    serializer_class = TokenValidationSerializer
+    permission_classes = []
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        token = serializer.validated_data["token"]
+
+        try:
+            # Decode the JWT token
+            decoded = jwt.decode(token, settings.SECRET_KEY, algorithms=["HS256"])
+            return Response({"decoded_token": decoded}, status=status.HTTP_200_OK)
+        except jwt.ExpiredSignatureError:
+            return Response({"error": "Token has expired"}, status=status.HTTP_401_UNAUTHORIZED)
+        except jwt.InvalidTokenError:
+            return Response({"error": "Invalid token"}, status=status.HTTP_401_UNAUTHORIZED)
+
 
