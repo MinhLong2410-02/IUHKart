@@ -1,114 +1,97 @@
-use default;
-
-CREATE TABLE category (
-    id Int32,
-    name String,
+-- Bảng Dimension: dim_province
+CREATE TABLE dim_province (
+    id UInt32,
+    province_name String,
+    is_city UInt8,
     PRIMARY KEY (id)
 ) ENGINE = MergeTree()
 ORDER BY id;
 
-CREATE TABLE user_address (
-    user_id Int32,
-    address_id Int32
-) ENGINE = MergeTree()
-ORDER BY user_id;
-
+-- Bảng Dimension: dim_date
 CREATE TABLE dim_date (
-    id Int32,
+    id UInt32,
     full_date Date,
-    day Int32,
-    month Int32,
-    year Int32,
-    quarter Int32,
-    day_of_week String,
-    week_of_month Int32,
-    holiday String,
+    day UInt8,
+    month UInt8,
+    year UInt16,
+    quarter UInt8,
+    day_of_week UInt8,
+    week_of_year UInt8,
+    is_weekend Boolean,
+    is_holiday String,
     PRIMARY KEY (id)
 ) ENGINE = MergeTree()
-ORDER BY id
 PARTITION BY toYYYYMM(full_date)
-SETTINGS index_granularity = 8192;
+ORDER BY id;
 
+-- Bảng Dimension: dim_customer
 CREATE TABLE dim_customer (
-    id Int32,
-    full_name String,
+    id UInt32,
+    fullname String,
     gender String,
-    date_of_birth Datetime64,
-    date_join Datetime64,
+    date_of_birth DateTime,
+    date_join DateTime,
     PRIMARY KEY (id)
 ) ENGINE = MergeTree()
-ORDER BY id
-SETTINGS index_granularity = 8192;
+ORDER BY id;
 
+-- Bảng Dimension: dim_store
 CREATE TABLE dim_store (
-    id Int32,
+    id UInt32,
     store_name String,
-    date_join Datetime64,
+    date_join DateTime,
     PRIMARY KEY (id)
 ) ENGINE = MergeTree()
-ORDER BY id
-SETTINGS index_granularity = 8192;
+ORDER BY id;
 
--- CREATE TABLE dim_promotion (
---     id Int32,
---     name String,
---     discount_rate Float32,
---     PRIMARY KEY (id)
--- ) ENGINE = MergeTree()
--- ORDER BY id
--- SETTINGS index_granularity = 8192;
+-- Bảng Dimension: dim_promotion
+CREATE TABLE dim_promotion (
+    id UInt32,
+    name String,
+    discount_rate Float32,
+    PRIMARY KEY (id)
+) ENGINE = MergeTree()
+ORDER BY id;
 
+-- Bảng Dimension: dim_product
 CREATE TABLE dim_product (
-    id Int32,
+    id UInt32,
     name String,
     brand String,
-    price Float32,
+    price Float64,
     stock Int32,
     category String,
     PRIMARY KEY (id)
 ) ENGINE = MergeTree()
-ORDER BY id
-SETTINGS index_granularity = 8192;
+ORDER BY id;
 
-CREATE TABLE dim_province (
-    id Int32,
-    province_name String,
-    is_city Boolean,
-    PRIMARY KEY (id)
-) ENGINE = MergeTree()
-ORDER BY id
-SETTINGS index_granularity = 8192;
-
+-- Bảng Fact: fact_sales
 CREATE TABLE fact_sales (
-    id Int32,
+    id UInt32,
     quantity Int32,
-    total_price Float32,
-    total_amount Float32,
-    status Boolean,
-    date_id Int32,
-    product_id Int32,
-    customer_id Int32,
-    store_id Int32,
-    location_id Int32,
+    total_amount Float64,
+    status String,
+    date_id UInt32,
+    promotion_id Nullable(UInt32),
+    location_id UInt32,
+    product_id UInt32,
+    customer_id UInt32,
+    shop_id UInt32,
     PRIMARY KEY (id)
 ) ENGINE = MergeTree()
-PARTITION BY store_id
-ORDER BY (date_id, id)
--- partition by store_id
+PARTITION BY (shop_id)
+ORDER BY id;
 
-
-SETTINGS index_granularity = 8192;
-
+-- Bảng Fact: fact_review
 CREATE TABLE fact_review (
-    id Int32,
+    id UInt32,
     content String,
     rating Int32,
-    date_id Int32,
-    product_id Int32,
-    customer_id Int32,
-    store_id Int32,
+    date_post DateTime,
+    product_id UInt32,
+    customer_id UInt32,
+    shop_id UInt32,
     PRIMARY KEY (id)
 ) ENGINE = MergeTree()
-ORDER BY (date_id, id)
-PARTITION BY store_id
-SETTINGS index_granularity = 8192;
+PARTITION BY (shop_id)
+ORDER BY id;
