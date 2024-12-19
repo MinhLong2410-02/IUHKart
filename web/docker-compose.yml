@@ -17,9 +17,9 @@ services:
       - ./dashboard-api:/app
     restart: unless-stopped
     depends_on:
-      - django_main
+      - django
 
-  tracking_api:
+  tracking:
     container_name: tracking-api
     build: 
       context: ./tracking-api
@@ -35,7 +35,7 @@ services:
       - ./tracking-api:/app
     restart: unless-stopped
 
-  search_api:
+  search:
     container_name: search-api
     build:
       context: ./search-api
@@ -45,7 +45,7 @@ services:
     env_file:
       - .env
     environment:
-      - TRACKING_API=http://tracking_api:8000/track
+      - tracking=http://tracking:8000/track
     working_dir: /app
     networks:
       - iuhkart-network
@@ -53,7 +53,7 @@ services:
       - ./search-api:/app
     restart: unless-stopped
 
-  django_main:
+  django:
     build: ./iuhkart
     container_name: django-main
     ports:
@@ -68,7 +68,7 @@ services:
     restart: unless-stopped
   
   
-  shop_fe:
+  shop:
     build: ./iuhkart-shop
     container_name: shop
     ports:
@@ -79,12 +79,12 @@ services:
     networks:
       - iuhkart-network
     depends_on:
-      - django_main
-      - search_api
-      - tracking_api
+      - django
+      - search
+      - tracking
       - dashboard_api
 
-  customer_fe:
+  customer:
     build: ./iuhkart-customer
     container_name: customer
     ports:
@@ -95,9 +95,12 @@ services:
     networks:
       - iuhkart-network
     depends_on:
-      - django_main
-      - search_api
-      - tracking_api
+      - django
+      - search
+      - tracking
+      - dashboard_api
+      - shop
+      - customer
   
   cloudflare:
     image: cloudflare/cloudflared:latest
@@ -107,9 +110,12 @@ services:
     networks:
       - iuhkart-network
     depends_on:
-      - django_main
-      - search_api
-      - tracking_api
+      - django
+      - search
+      - tracking
+      - dashboard_api
+      - shop
+      - customer
 
 networks:
   iuhkart-network:
