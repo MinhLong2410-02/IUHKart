@@ -14,8 +14,8 @@ import {
 import Cookies from 'js-cookie'; // Import Cookies if using it for authentication
 
 const LinkItems = [
-    { path: "dashboard", name: 'DashBoard' },
-    { path: "summary", name: 'Summary' },
+    { path: "dashboard", name: 'Home' },
+    // { path: "summary", name: 'Summary' },
     { path: "info", name: 'Info' },
     { path: "products", name: 'Products' },
 ];
