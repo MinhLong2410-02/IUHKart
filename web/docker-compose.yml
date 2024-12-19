@@ -53,7 +53,7 @@ services:
       - ./search-api:/app
     restart: unless-stopped
 
-  django:
+  django_main:
     build: ./iuhkart
     container_name: django-main
     ports:
