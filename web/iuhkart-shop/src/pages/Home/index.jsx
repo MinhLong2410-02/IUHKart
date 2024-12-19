@@ -26,7 +26,7 @@ function Home() {
             <div className="home w-[100vw] min-h-[100vh] pl-[300px] pr-[50px]">
                 <Routes>
                     <Route path="dashboard" element={<Dashboard />} />
-                    <Route path="summary" element={<Summary />} />
+                    {/* <Route path="summary" element={<Summary />} /> */}
                     <Route path="info" element={<Info />} />
                     <Route path="products" element={<Products />} />
                     <Route path="product/*" element={<Product />} />
