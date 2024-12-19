@@ -9,13 +9,15 @@ services:
     env_file:
       - .env
     environment:
-      - AUTHENTICATE_API=http://django_main:8000/user/api/token-validate/
+      - AUTHENTICATE_API=http://django:8000/user/api/token-validate/
     working_dir: /app
     networks:
       - iuhkart-network
     volumes:
       - ./dashboard-api:/app
     restart: unless-stopped
+    depends_on:
+      - django
 
   tracking_api:
     container_name: tracking-api
@@ -51,7 +53,7 @@ services:
       - ./search-api:/app
     restart: unless-stopped
 
-  django_main:
+  django:
     build: ./iuhkart
     container_name: django-main
     ports:
@@ -80,6 +82,7 @@ services:
       - django_main
       - search_api
       - tracking_api
+      - dashboard_api
 
   customer_fe:
     build: ./iuhkart-customer
