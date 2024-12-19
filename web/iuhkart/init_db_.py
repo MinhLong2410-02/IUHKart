@@ -557,5 +557,5 @@ def init_qdrant():
     df = pd.DataFrame(broken_products, columns=['product_id', 'product_name'])
     df.to_csv('../schema/Database/broken_products.csv', index=False)
     
-init_qdrant()
+# init_qdrant()
 print("🟢 Khởi tạo thành công qdrant")
