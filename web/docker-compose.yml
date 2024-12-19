@@ -17,7 +17,7 @@ services:
       - ./dashboard-api:/app
     restart: unless-stopped
     depends_on:
-      - django
+      - django_main
 
   tracking_api:
     container_name: tracking-api
