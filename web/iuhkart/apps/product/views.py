@@ -102,20 +102,6 @@ class CustomerProductListView(generics.ListAPIView):
         # Get the initial queryset for all products
         queryset = Product.objects.all().select_related('created_by', 'category').prefetch_related('images')
 
-        # Retrieve the customer instance from the user
-        customer = Customer.objects.filter(id=self.request.user.id).first()
-
-        # Check if page=0 is requested
-        page = self.request.query_params.get('page', None)
-        if page == '0':
-            preserved_order = Case(*[When(pk=pk, then=pos) for pos, pk in enumerate(customer.recommend_products)])
-            queryset = queryset.annotate(sort_order=preserved_order).order_by('sort_order')
-
-            category_id = self.request.query_params.get('category_id', None)
-            if category_id is not None:
-                queryset = queryset.filter(category=category_id)
-            return queryset 
-
         # Filter by category if category_id is provided
         category_id = self.request.query_params.get('category_id', None)
         if category_id is not None:
@@ -131,6 +117,15 @@ class CustomerOneProductView(generics.RetrieveAPIView):
     def get_queryset(self):
         return Product.objects.select_related('created_by', 'category').prefetch_related('images')
 
+class CustomerRecommendedProductListView(generics.ListAPIView):
+    serializer_class = CustomerProductSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    queryset = Product.objects.all().select_related('created_by', 'category').prefetch_related('images')
+    def get_queryset(self):
+        customer = self.request.user.customer
+        recommend_products = customer.recommend_products
+        print(recommend_products)
+        return Product.objects.filter(product_id__in=recommend_products).select_related('created_by', 'category').prefetch_related('images')
 
 class VendorProductCreateView(generics.CreateAPIView):
     serializer_class = ProductCreateSerializer

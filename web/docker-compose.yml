@@ -9,7 +9,7 @@ services:
     env_file:
       - .env
     environment:
-      - AUTHENTICATE_API=http://localhost:8000/user/api/token-validate/
+      - AUTHENTICATE_API=http://django_main:8000/user/api/token-validate/
     working_dir: /app
     networks:
       - iuhkart-network
