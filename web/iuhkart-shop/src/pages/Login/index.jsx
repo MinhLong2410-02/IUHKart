@@ -56,7 +56,7 @@ function Login() {
             // set response.access to Cookies
             Cookies.set('authorization', response.access)
             // redirect to home page
-            window.location.href = '/summary'
+            window.location.href = '/dashboard'
 
         } catch (error) {
             console.error(error);
