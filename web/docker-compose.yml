@@ -99,8 +99,6 @@ services:
       - search
       - tracking
       - dashboard_api
-      - shop
-      - customer
   
   cloudflare:
     image: cloudflare/cloudflared:latest
