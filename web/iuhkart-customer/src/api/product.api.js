@@ -65,6 +65,19 @@ const productApi = {
       throw error;
     }
   },
+
+  getProductRecommend: async () => {
+    try {
+      const url = `/product/api/customer/view-product/recommend/`;
+      return await axiosClient.get(url);
+    } catch (error) {
+      console.error(
+        "Error fetching product recommend:",
+        error.response || error.message
+      );
+      throw error;
+    }
+  },
 };
 
 export default productApi;
